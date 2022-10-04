@@ -1,24 +1,25 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:smc_mobile/obs/product_line_ob.dart';
-import 'package:smc_mobile/pages/material_requisition_page/material_product_line_page/material_product_line_bloc.dart';
-import 'package:smc_mobile/pages/material_requisition_page/material_requisition_create_bloc.dart';
-import 'package:smc_mobile/pages/material_requisition_page/material_requisition_create_page.dart';
-import 'package:smc_mobile/pages/material_requisition_page/purchase_requisition_bloc.dart';
-import 'package:smc_mobile/pages/quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
-
 import '../../dbs/database_helper.dart';
 import '../../dbs/sharef.dart';
+import '../../obs/product_line_ob.dart';
 import '../../obs/response_ob.dart';
 import '../../utils/app_const.dart';
+import '../quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
+import 'material_product_line_page/material_product_line_bloc.dart';
 import 'material_requisition_bloc.dart';
+import 'material_requisition_create_bloc.dart';
+import 'material_requisition_create_page.dart';
+import 'purchase_requisition_bloc.dart';
 
 class MaterialRequisitionDetailPage extends StatefulWidget {
   int id;
+  int userId;
   MaterialRequisitionDetailPage({
     Key? key,
     required this.id,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -145,6 +146,8 @@ class _MaterialRequisitionDetailPageState
   void getUpdateMaterialRequisitionStatusListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       setState(() {
+        isupdateStatus = false;
+        print('isupdateStatus $isupdateStatus');
         isCreatePR = true;
         print('isCreatePR $isCreatePR');
       });
@@ -176,6 +179,7 @@ class _MaterialRequisitionDetailPageState
       setState(() {
         purchaseproductId = responseOb.data;
         isCreatePR = false;
+        print('isCreatePR $isCreatePR');
         isCreatePPL = true;
         print('isCreatePPL $isCreatePPL');
       });
@@ -245,8 +249,8 @@ class _MaterialRequisitionDetailPageState
                     child: const Center(child: Text("Error")));
               } else if (responseOb?.msgState == MsgState.loading) {
                 return Container(
-                  child: const Center(child: CircularProgressIndicator()),
-                );
+                    color: Colors.white,
+                    child: const Center(child: CircularProgressIndicator()));
               } else {
                 return StreamBuilder<ResponseOb>(
                     initialData: ResponseOb(msgState: MsgState.loading),
@@ -260,6 +264,7 @@ class _MaterialRequisitionDetailPageState
                             child: const Center(child: Text("Error")));
                       } else if (responseOb?.msgState == MsgState.loading) {
                         return Container(
+                          color: Colors.white,
                           child:
                               const Center(child: CircularProgressIndicator()),
                         );
@@ -718,6 +723,67 @@ class _MaterialRequisitionDetailPageState
                                                               //   ],
                                                               // ),
                                                               const SizedBox(
+                                                                  height: 10),
+                                                              Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  const SizedBox(
+                                                                    width: 200,
+                                                                    child: Text(
+                                                                      'Priority: ',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                      child:
+                                                                          Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Icon(
+                                                                          Icons
+                                                                              .star,
+                                                                          color: materialRequisitionList[0]['priority'] == 'a'
+                                                                              ? Colors.grey
+                                                                              : Colors.yellow),
+                                                                      Icon(
+                                                                          Icons
+                                                                              .star,
+                                                                          color: materialRequisitionList[0]['priority'] == 'b' || materialRequisitionList[0]['priority'] == 'a'
+                                                                              ? Colors.grey
+                                                                              : Colors.yellow),
+                                                                      Icon(
+                                                                          Icons
+                                                                              .star,
+                                                                          color: materialRequisitionList[0]['priority'] == 'c' || materialRequisitionList[0]['priority'] == 'b' || materialRequisitionList[0]['priority'] == 'a'
+                                                                              ? Colors.grey
+                                                                              : Colors.yellow),
+                                                                      Icon(
+                                                                          Icons
+                                                                              .star,
+                                                                          color: materialRequisitionList[0]['priority'] == 'f' || materialRequisitionList[0]['priority'] == 'e'
+                                                                              ? Colors.yellow
+                                                                              : Colors.grey),
+                                                                      Icon(
+                                                                          Icons
+                                                                              .star,
+                                                                          color: materialRequisitionList[0]['priority'] == 'f'
+                                                                              ? Colors.yellow
+                                                                              : Colors.grey),
+                                                                    ],
+                                                                  ))
+                                                                ],
+                                                              ),
+                                                              const SizedBox(
                                                                 height: 10,
                                                               ),
                                                               Row(
@@ -1003,6 +1069,7 @@ class _MaterialRequisitionDetailPageState
                                               name: materialRequisitionList[0]
                                                   ['name'],
                                               neworedit: 0,
+                                              userId: widget.userId,
                                             );
                                           })).then((value) {
                                             setState(() {});
@@ -1019,6 +1086,7 @@ class _MaterialRequisitionDetailPageState
                                             return MaterialRequisitionCreatePage(
                                               name: '',
                                               neworedit: 0,
+                                              userId: widget.userId,
                                             );
                                           })).then((value) {
                                             setState(() {});
@@ -1124,10 +1192,8 @@ class _MaterialRequisitionDetailPageState
                                         label: 'Order Confirm',
                                       )
                                     ])),
-                            isupdateStatus == false
-                                ? Container()
-                                : Positioned(
-                                    child: StreamBuilder<ResponseOb>(
+                            isupdateStatus == true
+                                ? StreamBuilder<ResponseOb>(
                                     initialData:
                                         ResponseOb(msgState: MsgState.loading),
                                     stream: materialrequisitioncreateBloc
@@ -1138,25 +1204,25 @@ class _MaterialRequisitionDetailPageState
                                       if (responseOb?.msgState ==
                                           MsgState.loading) {
                                         return Container(
-                                            color: Colors.white,
-                                            child: const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ));
+                                          color: Colors.black.withOpacity(0.5),
+                                          child: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
                                       } else if (responseOb?.msgState ==
                                           MsgState.data) {
                                         isupdateStatus = false;
-                                        print('isupdateStatus $isupdateStatus');
                                       }
                                       return Container(
-                                        color: Colors.white,
+                                        color: Colors.black.withOpacity(0.5),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
                                       );
-                                    },
-                                  )),
-                            isCreatePR == false
-                                ? Container()
-                                : Positioned(
-                                    child: StreamBuilder<ResponseOb>(
+                                    })
+                                : Container(),
+                            isCreatePR == true
+                                ? StreamBuilder<ResponseOb>(
                                     initialData:
                                         ResponseOb(msgState: MsgState.loading),
                                     stream: purchaserequisitionBloc
@@ -1167,25 +1233,30 @@ class _MaterialRequisitionDetailPageState
                                       if (responseOb?.msgState ==
                                           MsgState.loading) {
                                         return Container(
-                                            color: Colors.white,
-                                            child: const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ));
+                                          color: Colors.black.withOpacity(0.5),
+                                          child: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
                                       } else if (responseOb?.msgState ==
                                           MsgState.data) {
                                         isCreatePR = false;
-                                        print('isCreatePR $isCreatePR');
+                                        // int pickingIds = responseOb!.data;
+                                        // print('PickingIds: $pickingIds');
+                                        // quotationEditBloc.updateQuotationPickingIdsData(
+                                        //     ids: quotationList[0]['id'],
+                                        //     pickingIds: pickingIds);
                                       }
                                       return Container(
-                                        color: Colors.white,
+                                        color: Colors.black.withOpacity(0.5),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
                                       );
-                                    },
-                                  )),
-                            isCreatePPL == false
-                                ? Container()
-                                : Positioned(
-                                    child: StreamBuilder<ResponseOb>(
+                                    })
+                                : Container(),
+                            isCreatePPL == true
+                                ? StreamBuilder<ResponseOb>(
                                     initialData:
                                         ResponseOb(msgState: MsgState.loading),
                                     stream: purchaserequisitionBloc
@@ -1196,21 +1267,28 @@ class _MaterialRequisitionDetailPageState
                                       if (responseOb?.msgState ==
                                           MsgState.loading) {
                                         return Container(
-                                            color: Colors.white,
-                                            child: const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ));
+                                          color: Colors.black.withOpacity(0.5),
+                                          child: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
                                       } else if (responseOb?.msgState ==
                                           MsgState.data) {
                                         isCreatePPL = false;
-                                        print('isCreatePPL $isCreatePPL');
+                                        // int pickingIds = responseOb!.data;
+                                        // print('PickingIds: $pickingIds');
+                                        // quotationEditBloc.updateQuotationPickingIdsData(
+                                        //     ids: quotationList[0]['id'],
+                                        //     pickingIds: pickingIds);
                                       }
                                       return Container(
-                                        color: Colors.white,
+                                        color: Colors.black.withOpacity(0.5),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
                                       );
-                                    },
-                                  )),
+                                    })
+                                : Container(),
                           ],
                         );
                       }

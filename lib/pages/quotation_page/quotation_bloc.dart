@@ -42,6 +42,12 @@ class QuotationBloc {
   Stream<ResponseOb> getZoneListStream() =>
       zoneListStreamController.stream; // ZoneList Stream Controller
 
+  StreamController<ResponseOb> zoneListWithUserIdStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getZoneListWithUserIdStream() =>
+      zoneListWithUserIdStreamController
+          .stream; // ZoneListWithUserId Stream Controller
+
   StreamController<ResponseOb> segmentListStreamController =
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getSegmentListStream() =>
@@ -473,6 +479,55 @@ class QuotationBloc {
     }
   } // get Zone List
 
+  getZoneListWithUserIdData(id) async {
+    print('EntergetZoneListWithUserIdData');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    zoneListWithUserIdStreamController.sink.add(responseOb);
+    List<dynamic>? data;
+
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res = await odoo.searchRead('zone.zone', [
+          ['id', '=', id]
+        ], [
+          'id',
+          'name'
+        ]);
+        if (res.getResult() != null) {
+          print('ZoneListWithUserIdresult: ${res.getResult()['records']}');
+          data = res.getResult()['records'];
+          responseOb.msgState = MsgState.data;
+          responseOb.data = data;
+          zoneListWithUserIdStreamController.sink.add(responseOb);
+        } else {
+          print('Zone error');
+          data = null;
+          print(
+              'GetZoneListWithUserIdError:' + res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          zoneListWithUserIdStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        zoneListWithUserIdStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        zoneListWithUserIdStreamController.sink.add(responseOb);
+      }
+    }
+  } // get ZoneListWithUserId
+
   getSegmenListData() async {
     print('EntergetSegmentListData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
@@ -568,6 +623,7 @@ class QuotationBloc {
     pricelistStreamController.close();
     paymentTermsStreamController.close();
     zoneListStreamController.close();
+    zoneListWithUserIdStreamController.close();
     segmentListStreamController.close();
     regionListStreamController.close();
     quotationWithIdStreamController.close();

@@ -110,6 +110,7 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
   List<dynamic> productcategoryList = [];
   List<dynamic> accountIdList = [];
   int deleteornot = 0;
+  int stockpickingId = 0;
   String statusString = '';
   String discountName = '';
   String taxName = '';
@@ -117,8 +118,11 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
   List<dynamic> quotationList = [];
   bool updateStatus = false;
   bool isCreateDelivery = false;
+  bool isUpdateDeliveryStatus = false;
+  bool isCreateStockMove = false;
   bool isCreateInvoice = false;
   bool isCreateInvoiceLine = false;
+  bool isUpdatePickingId = false;
   int invoiceId = 0;
 
   // List<dynamic> tripplandeliveryList = [];
@@ -240,9 +244,18 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
     invoicelineBloc
         .getInvoiceLineCreateStream()
         .listen(getInvoiceLineCreateListen);
-    // stockpickingcreateBloc
-    //     .getCreateStockPickingStream()
-    //     .listen(getStockPickingCreateListen);
+    stockpickingcreateBloc
+        .getCreateStockPickingStream()
+        .listen(getCreateDeliveryListen);
+    stockpickingcreateBloc
+        .getCreateStockMoveStream()
+        .listen(getCreateStockMoveListen);
+    stockpickingcreateBloc
+        .getUpdateStockPickingStatusStream()
+        .listen(getUpdateDeliveryStatus);
+    quotationeditBloc
+        .getUpdateQuotationPickingIdsStream()
+        .listen(getUpdateQuotationPickingIdsListen);
     // invoicelineBloc.getInvoiceLineData();
     // quotationdeleteBloc
     //     .deleteSaleOrderLineStream()
@@ -504,6 +517,74 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
         statusString = 'Cancelled';
       }
     });
+  }
+
+  void getCreateDeliveryListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      for (var customer in customerList) {
+        if (customer['id'] == quotationList[0]['partner_id'][0]) {
+          setState(() {
+            stockpickingId = responseOb.data;
+            isCreateDelivery = true;
+            print('isCreateDelivery: $isCreateDelivery');
+          });
+          setState(() {
+            isCreateDelivery = false;
+            isCreateStockMove = true;
+            for (var sol in productlineList) {
+              stockpickingcreateBloc.createStockMove(
+                pickingId: responseOb.data,
+                description: sol['product_id'][1],
+                productId: sol['product_id'][0],
+                qty: sol['product_uom_qty'],
+                productuom: sol['product_uom'][0],
+                locationId:
+                    stockpickingtypeList[0]['default_location_src_id'] == false
+                        ? customer['property_stock_supplier'][0]
+                        : stockpickingtypeList[0]['default_location_src_id'][0],
+                locationdestId:
+                    stockpickingtypeList[0]['default_location_dest_id'] == false
+                        ? customer['property_stock_customer'][0]
+                        : stockpickingtypeList[0]['default_location_dest_id']
+                            [0],
+                origin: quotationList[0]['name'],
+              );
+            }
+          });
+        }
+      }
+    }
+  }
+
+  void getCreateStockMoveListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() {
+        isCreateStockMove = false;
+        isUpdateDeliveryStatus = true;
+        stockpickingcreateBloc.stockpickingUpdateStatus(
+            ids: stockpickingId, state: 'confirmed');
+      });
+    }
+  }
+
+  void getUpdateDeliveryStatus(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() {
+        isUpdateDeliveryStatus = false;
+        isUpdatePickingId = true;
+        quotationeditBloc.updateQuotationPickingIdsData(
+            ids: quotationList[0]['id'], pickingIds: stockpickingId);
+      });
+    }
+  }
+
+  void getUpdateQuotationPickingIdsListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() {
+        isUpdatePickingId = false;
+      });
+      quotationBloc.getQuotationWithIdData(widget.quotationId);
+    }
   }
 
   createInvoice() async {
@@ -910,7 +991,7 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
-                                                            // createInvoice();
+                                                            //createInvoice();
                                                           }
                                                         },
                                                         child: const Text(
@@ -3512,15 +3593,99 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
+                                      MsgState.data) {}
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isCreateStockMove == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream: stockpickingcreateBloc
+                                    .getCreateStockMoveStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.data) {}
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isUpdateDeliveryStatus == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream: stockpickingcreateBloc
+                                    .getUpdateStockPickingStatusStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
                                       MsgState.data) {
-                                    quotationBloc.getQuotationWithIdData(
-                                        widget.quotationId);
-                                    isCreateDelivery = false;
+                                    // quotationBloc.getQuotationWithIdData(
+                                    //     widget.quotationId);
+                                    // // stockpickingcreateBloc
+                                    // //     .stockpickingUpdateStatus(
+                                    // //         state: 'confirmed');
+                                    // isUpdateDeliveryStatus = false;
                                     // int pickingIds = responseOb!.data;
                                     // print('PickingIds: $pickingIds');
                                     // quotationEditBloc.updateQuotationPickingIdsData(
                                     //     ids: quotationList[0]['id'],
                                     //     pickingIds: pickingIds);
+                                  }
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isUpdatePickingId == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream: quotationeditBloc.getUpdateQuotationPickingIdsStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.data) {
                                   }
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
@@ -3584,16 +3749,7 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
-                                      MsgState.data) {
-                                    quotationBloc.getQuotationWithIdData(
-                                        widget.quotationId);
-                                    isCreateInvoiceLine = false;
-                                    // int pickingIds = responseOb!.data;
-                                    // print('PickingIds: $pickingIds');
-                                    // quotationEditBloc.updateQuotationPickingIdsData(
-                                    //     ids: quotationList[0]['id'],
-                                    //     pickingIds: pickingIds);
-                                  }
+                                      MsgState.data) {}
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
                                     child: const Center(

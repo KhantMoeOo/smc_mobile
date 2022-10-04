@@ -150,7 +150,7 @@ class QuotationEditBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
-            await odoo.write('sale.order', [ids], {'picking_ids': pickingIds});
+            await odoo.write('sale.order', [ids], {'picking_ids': [pickingIds]});
         if (res.getResult() != null) {
           print('result');
           // data = res.getResult()['records'];

@@ -1,7 +1,9 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:smc_mobile/pages/material_requisition_page/material_product_line_page/multi_material_product_line_page.dart';
 import '../../dbs/database_helper.dart';
 import '../../dbs/sharef.dart';
 import '../../obs/product_line_ob.dart';
@@ -21,10 +23,12 @@ import 'material_requisition_page.dart';
 class MaterialRequisitionCreatePage extends StatefulWidget {
   String name;
   int neworedit;
+  int userId;
   MaterialRequisitionCreatePage({
     Key? key,
     required this.name,
     required this.neworedit,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -75,6 +79,7 @@ class _MaterialRequisitionCreatePageState
   String zoneName = '';
   bool hasZoneData = false;
   bool hasNotZone = true;
+  final zonenameController = TextEditingController();
 
   List<dynamic> invoiceId = [];
   List<dynamic> invoiceName = [];
@@ -93,6 +98,8 @@ class _MaterialRequisitionCreatePageState
   bool isCreateMaterialRequisition = false;
   bool isCreateMaterialProductLine = false;
 
+  String priorityrate = 'a';
+
   final slidableController = SlidableController();
 
   @override
@@ -103,8 +110,8 @@ class _MaterialRequisitionCreatePageState
     profileBloc.getHrEmployeeStream().listen(getHrEmployeeListen);
     saleteamBloc.getHrDeparmentListData();
     saleteamBloc.getHrDeparmentListStream().listen(getHrDepartmentListen);
-    quotationBloc.getZoneListData();
-    quotationBloc.getZoneListStream().listen(getZonelist);
+    quotationBloc.getZoneListWithUserIdData(widget.userId);
+    quotationBloc.getZoneListWithUserIdStream().listen(getZonelist);
     deliveryBloc.getAccountMoveListData();
     deliveryBloc.getAccountMoveListStream().listen(getAccountMoveListListen);
     materialrequisitionBloc.getStockLocationList();
@@ -143,6 +150,11 @@ class _MaterialRequisitionCreatePageState
     if (responseOb.msgState == MsgState.data) {
       zoneList = responseOb.data;
       hasZoneData = true;
+      setState(() {
+        if (zoneList.isNotEmpty) {
+          zonenameController.text = zoneList[0]['name'];
+        }
+      });
     } else if (responseOb.msgState == MsgState.error) {
       print("NoZoneList");
     }
@@ -283,12 +295,12 @@ class _MaterialRequisitionCreatePageState
       });
       materialrequisitioncreateBloc.createMaterialRequisition(
           refno: refnoController.text,
-          zoneId: zoneId,
+          zoneId: zoneList[0]['id'],
           requestPerson: hremployeeId,
           departmentId: hrdepartmentId,
           locationId: stocklocationId,
           invoiceId: invoiceId,
-          priority: 'b',
+          priority: priorityrate,
           orderdate: dateorderController.text,
           scheduledDate: scheduleddateController.text,
           description: descriptionController.text);
@@ -908,7 +920,7 @@ class _MaterialRequisitionCreatePageState
                                                               MsgState.loading)
                                                       : null,
                                                   stream: quotationBloc
-                                                      .getZoneListStream(),
+                                                      .getZoneListWithUserIdStream(),
                                                   builder: (context,
                                                       AsyncSnapshot<ResponseOb>
                                                           snapshot) {
@@ -928,40 +940,15 @@ class _MaterialRequisitionCreatePageState
                                                             "Something went Wrong!"),
                                                       );
                                                     } else {
-                                                      return DropdownSearch<
-                                                          String>(
-                                                        popupItemBuilder:
-                                                            (context, item,
-                                                                isSelected) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(item
-                                                                    .toString()
-                                                                    .split(
-                                                                        ',')[1]),
-                                                                const Divider(),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                        showSearchBox: true,
-                                                        showSelectedItems: true,
-                                                        showClearButton:
-                                                            !hasNotZone,
-                                                        items: zoneList
-                                                            .map((e) =>
-                                                                '${e['id']},${e['name']}')
-                                                            .toList(),
-                                                        onChanged:
-                                                            getZoneListId,
-                                                        selectedItem: zoneName,
+                                                      return TextField(
+                                                        readOnly: true,
+                                                        controller:
+                                                            zonenameController,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          border:
+                                                              OutlineInputBorder(),
+                                                        ),
                                                       );
                                                     }
                                                   }),
@@ -1044,6 +1031,42 @@ class _MaterialRequisitionCreatePageState
                                                     }
                                                   }),
                                             ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            const Text(
+                                              "Priority:",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black),
+                                            ),
+                                            RatingBar.builder(
+                                                initialRating: 0,
+                                                itemBuilder: (c, _) =>
+                                                    const Icon(Icons.star,
+                                                        color: Colors.amber),
+                                                onRatingUpdate: (priority) {
+                                                  setState(() {
+                                                    if (priority == 1.0) {
+                                                      priorityrate = 'b';
+                                                    } else if (priority ==
+                                                        2.0) {
+                                                      priorityrate = 'c';
+                                                    } else if (priority ==
+                                                        3.0) {
+                                                      priorityrate = 'd';
+                                                    } else if (priority ==
+                                                        4.0) {
+                                                      priorityrate = 'e';
+                                                    } else if (priority ==
+                                                        5.0) {
+                                                      priorityrate = 'f';
+                                                    }
+                                                  });
+                                                  print(
+                                                      'Priority: $priorityrate');
+                                                }),
                                             const SizedBox(
                                               height: 10,
                                             ),
@@ -1336,9 +1359,22 @@ class _MaterialRequisitionCreatePageState
                                                     Navigator.of(context).push(
                                                         MaterialPageRoute(
                                                             builder: (context) {
-                                                      return MaterialProductLineCreatePage();
-                                                    })).then((value) =>
-                                                        setState(() {}));
+                                                      return MultiMaterialProductLinePage(
+                                                        newOrEditSOL: 0,
+                                                        newOrEdit: 0,
+                                                        quotationId: 0,
+                                                        solId: 0,
+                                                        partnerId: 0,
+                                                        zoneId: 0,
+                                                        segmentId: 0,
+                                                        regionId: 0,
+                                                        currencyId: 119,
+                                                      );
+                                                    })).then(
+                                                        (value) => setState(() {
+                                                              databaseHelper
+                                                                  .deleteAllProductLineMultiSelect();
+                                                            }));
                                                   },
                                                   child: const Text(
                                                     "Add Product",

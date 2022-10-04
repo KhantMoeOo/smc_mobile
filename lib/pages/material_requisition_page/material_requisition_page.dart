@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:smc_mobile/dbs/database_helper.dart';
-import 'package:smc_mobile/pages/material_requisition_page/material_requisition_detail_page.dart';
-
+import '../../dbs/database_helper.dart';
 import '../../dbs/sharef.dart';
 import '../../obs/response_ob.dart';
 import '../../utils/app_const.dart';
@@ -13,6 +11,7 @@ import '../profile_page/profile_bloc.dart';
 import '../quotation_page/quotation_detail_page.dart';
 import 'material_requisition_bloc.dart';
 import 'material_requisition_create_page.dart';
+import 'material_requisition_detail_page.dart';
 
 class MaterialRequisitionPage extends StatefulWidget {
   const MaterialRequisitionPage({Key? key}) : super(key: key);
@@ -203,6 +202,7 @@ class _MaterialRequisitionPageState extends State<MaterialRequisitionPage> {
                                         return MaterialRequisitionCreatePage(
                                           name: '',
                                           neworedit: 0,
+                                          userId: userList[0]['zone_id'][0],
                                         );
                                       })).then((value) {
                                         setState(() {
@@ -241,53 +241,74 @@ class _MaterialRequisitionPageState extends State<MaterialRequisitionPage> {
                                         itemBuilder: (c, i) {
                                           return Column(
                                             children: [
-                                              Slidable(controller: slidableController,
-        actionPane: const SlidableBehindActionPane(),
-        secondaryActions: [
-          IconSlideAction(
-            color: AppColors.appBarColor,
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return MaterialRequisitionDetailPage(id: materialrequisitionList[i]
-                                                            ['id']);
-              })).then((value) {
-                setState(() {
-    profileBloc.getResUsersData();
-                });
-              });
-            },
-            iconWidget: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.read_more,
-                  size: 25,
-                  color: Colors.white,
-                ),
-                Text(
-                  "View Details",
-                  style: TextStyle(
-                      fontSize:
-                          MediaQuery.of(context).size.width > 400.0 ? 18 : 12,
-                      color: Colors.white),
-                ),
-              ],
-            ),
-          )
-        ],
+                                              Slidable(
+                                                controller: slidableController,
+                                                actionPane:
+                                                    const SlidableBehindActionPane(),
+                                                secondaryActions: [
+                                                  IconSlideAction(
+                                                    color:
+                                                        AppColors.appBarColor,
+                                                    onTap: () {
+                                                      Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                              builder:
+                                                                  (context) {
+                                                        return MaterialRequisitionDetailPage(
+                                                          id: materialrequisitionList[
+                                                              i]['id'],
+                                                          userId: userList[0]
+                                                              ['zone_id'][0],
+                                                        );
+                                                      })).then((value) {
+                                                        setState(() {
+                                                          profileBloc
+                                                              .getResUsersData();
+                                                        });
+                                                      });
+                                                    },
+                                                    iconWidget: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.read_more,
+                                                          size: 25,
+                                                          color: Colors.white,
+                                                        ),
+                                                        Text(
+                                                          "View Details",
+                                                          style: TextStyle(
+                                                              fontSize: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width >
+                                                                      400.0
+                                                                  ? 18
+                                                                  : 12,
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
                                                 child: Container(
                                                   padding:
                                                       const EdgeInsets.all(8),
-                                                  decoration: const BoxDecoration(
+                                                  decoration:
+                                                      const BoxDecoration(
                                                     color: Colors.white,
                                                   ),
                                                   child: Column(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
-                                                        materialrequisitionList[i]
-                                                            ['name'],
+                                                        materialrequisitionList[
+                                                            i]['name'],
                                                         style: const TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
@@ -317,7 +338,8 @@ class _MaterialRequisitionPageState extends State<MaterialRequisitionPage> {
                                                                   children: [
                                                                     Text(
                                                                       materialrequisitionList[
-                                                                              i][
+                                                                              i]
+                                                                          [
                                                                           'request_person'][1],
                                                                       style: const TextStyle(
                                                                           color: Colors
@@ -354,9 +376,9 @@ class _MaterialRequisitionPageState extends State<MaterialRequisitionPage> {
                                                                       materialrequisitionList[i]['department_id'] ==
                                                                               false
                                                                           ? ''
-                                                                          : materialrequisitionList[i]
+                                                                          : materialrequisitionList[i]['department_id']
                                                                               [
-                                                                              'department_id'][1],
+                                                                              1],
                                                                       style: const TextStyle(
                                                                           color: Colors
                                                                               .black,
@@ -390,7 +412,8 @@ class _MaterialRequisitionPageState extends State<MaterialRequisitionPage> {
                                                                   children: [
                                                                     Text(
                                                                       materialrequisitionList[
-                                                                              i][
+                                                                              i]
+                                                                          [
                                                                           'order_date'],
                                                                       style: const TextStyle(
                                                                           color: Colors
@@ -425,7 +448,8 @@ class _MaterialRequisitionPageState extends State<MaterialRequisitionPage> {
                                                                   children: [
                                                                     Text(
                                                                       materialrequisitionList[
-                                                                              i][
+                                                                              i]
+                                                                          [
                                                                           'scheduled_date'],
                                                                       style: const TextStyle(
                                                                           color: Colors
@@ -460,7 +484,8 @@ class _MaterialRequisitionPageState extends State<MaterialRequisitionPage> {
                                                                   children: [
                                                                     Text(
                                                                       materialrequisitionList[
-                                                                              i][
+                                                                              i]
+                                                                          [
                                                                           'desc'],
                                                                       style: const TextStyle(
                                                                           color: Colors

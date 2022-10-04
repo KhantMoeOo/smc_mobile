@@ -60,6 +60,9 @@ class _QuotationListPageState extends State<QuotationListPage> {
     await databaseHelper.deleteAllSaleOrderLineUpdate();
     await databaseHelper.deleteAllMaterialProductLine();
     await databaseHelper.deleteAllMaterialProductLineUpdate();
+    await databaseHelper.deleteAllProductLineMultiSelect();
+    await databaseHelper.deleteAllStockMove();
+    await databaseHelper.deleteAllStockMoveUpdate();
     await databaseHelper.deleteAllSaleOrderLineMultiSelect();
     await databaseHelper.deleteAllTripPlanDelivery();
     await databaseHelper.deleteAllTripPlanDeliveryUpdate();

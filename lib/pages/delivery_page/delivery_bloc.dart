@@ -19,6 +19,11 @@ class StockPickingBloc {
       stockpickingtypeStreamController
           .stream; // Stock Picking Type Stream Controller
 
+  StreamController<ResponseOb> stockmoveStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getStockMoveStream() =>
+      stockmoveStreamController.stream; // Stock Move Stream Controller
+
   late Odoo odoo;
 
   getStockPickingData(name) async {
@@ -117,7 +122,8 @@ class StockPickingBloc {
               : null;
         } else {
           data = null;
-          print('GetStockPicking Type Error:' + res.getErrorMessage().toString());
+          print(
+              'GetStockPicking Type Error:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           stockpickingtypeStreamController.sink.add(responseOb);
@@ -139,8 +145,70 @@ class StockPickingBloc {
     }
   } // get Stock Picking Type List
 
+  getStockMoveData(pickingId) async {
+    print('EntergetStockMoveData');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    stockmoveStreamController.sink.add(responseOb);
+    List<dynamic>? data;
+
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res = await odoo.searchRead(
+            'stock.move',
+            [
+              ['picking_id','=',pickingId],
+            ],
+            [
+              'id',
+              'name',
+              'picking_id',
+              'product_id',
+              'product_uom_qty',
+              'product_uom',
+              'location_id',
+              'location_dest_id',
+              'picking_id',
+              'origin',
+            ],
+            order: 'id desc');
+        if (res.getResult() != null) {
+          print('Stock Move Result: ${res.getResult()['records']}');
+          data = res.getResult()['records'];
+          responseOb.msgState = MsgState.data;
+          responseOb.data = data;
+          !stockmoveStreamController.isClosed
+              ? stockmoveStreamController.sink.add(responseOb)
+              : null;
+        } else {
+          data = null;
+          print('GetStockMoveError:' + res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          stockmoveStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('Stock Move catch: $e');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        stockmoveStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        stockmoveStreamController.sink.add(responseOb);
+      }
+    }
+  } // get Stock Move List
+
   dispose() {
     stockpickingStreamController.close();
     stockpickingtypeStreamController.close();
+    stockmoveStreamController.close();
   }
 }

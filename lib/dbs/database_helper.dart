@@ -1,4 +1,4 @@
-
+import 'package:smc_mobile/obs/stock_move_ob.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -24,6 +24,12 @@ class DatabaseHelper {
           'CREATE TABLE material_product_line(id INTEGER PRIMARY KEY, isSelect INTEGER, material_product_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, uom_id INTEGER, uom_name TEXT)');
       await db.execute(
           'CREATE TABLE material_product_line_update(id INTEGER PRIMARY KEY, isSelect INTEGER, material_product_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, uom_id INTEGER, uom_name TEXT)');
+      await db.execute(
+          'CREATE TABLE material_product_line_multi_select(id INTEGER PRIMARY KEY, isSelect INTEGER, material_product_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, uom_id INTEGER, uom_name TEXT)');
+      await db.execute(
+          'CREATE TABLE stock_move(id INTEGER PRIMARY KEY, isSelect INTEGER, picking_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, reserved TEXT, done TEXT, remaining_stock TEXT, damage_qty TEXT, uom_id INTEGER, uom_name TEXT)');
+      await db.execute(
+          'CREATE TABLE stock_move_update(id INTEGER PRIMARY KEY, isSelect INTEGER, picking_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, reserved TEXT, done TEXT, remaining_stock TEXT, damage_qty TEXT, uom_id INTEGER, uom_name TEXT)');
       await db.execute(
           'CREATE TABLE hr_employee_line(id INTEGER PRIMARY KEY,trip_line INTEGER, emp_id INTEGER, emp_name TEXT, department_id INTEGER, department_name TEXT, job_id INTEGER, job_name TEXT, responsible INTEGER)');
       await db.execute(
@@ -78,7 +84,8 @@ class DatabaseHelper {
     return id;
   } // insert datas to material_product_line table
 
-  Future<int> insertMaterialProductLineUpdate(ProductLineOb productLineOb) async {
+  Future<int> insertMaterialProductLineUpdate(
+      ProductLineOb productLineOb) async {
     int id = 0;
     Database db = await database();
     await db
@@ -87,6 +94,16 @@ class DatabaseHelper {
         .then((value) => id = value);
     return id;
   } // insert datas to material_product_line_update table
+
+  Future<int> insertProductLineMultiSelect(ProductLineOb productLineOb) async {
+    int id = 0;
+    Database db = await database();
+    await db
+        .insert('material_product_line_multi_select', productLineOb.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace)
+        .then((value) => id = value);
+    return id;
+  } // insert datas to material_product_line_multi_select table
 
   Future<int> insertOrderLineMultiSelect(
       SaleOrderLineOb saleOrderLineOb) async {
@@ -98,6 +115,28 @@ class DatabaseHelper {
         .then((value) => id = value);
     return id;
   } // insert datas to sale_order_line_multi_select table
+
+  Future<int> insertStockMove(
+      StockMoveOb stockMoveOb) async {
+    int id = 0;
+    Database db = await database();
+    await db
+        .insert('stock_move', stockMoveOb.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace)
+        .then((value) => id = value);
+    return id;
+  } // insert datas to stock_move table
+
+  Future<int> insertStockMoveUpdate(
+      StockMoveOb stockMoveOb) async {
+    int id = 0;
+    Database db = await database();
+    await db
+        .insert('stock_move_update', stockMoveOb.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace)
+        .then((value) => id = value);
+    return id;
+  } // insert datas to stock_move_update table
 
   Future<int> insertHrEmployeeLine(HrEmployeeLineOb hrEmployeeLineOb) async {
     int id = 0;
@@ -281,6 +320,30 @@ class DatabaseHelper {
     });
   } // insert datas list from sale_order_line_multi_select table to sale_order_line table
 
+  Future<List<ProductLineOb>> updateMPLSelect() async {
+    print('Worked');
+    Database db = await database();
+    await db.rawInsert(
+        'INSERT INTO material_product_line(isSelect, material_product_id, product_code_id, product_code_name, description, full_name, quantity, uom_id, uom_name) SELECT isSelect, material_product_id, product_code_id, product_code_name, description, full_name, quantity, uom_id, uom_name FROM material_product_line_multi_select WHERE isSelect = 1');
+
+    List<Map<String, dynamic>> productlineMap =
+        await db.query('material_product_line');
+    return List.generate(productlineMap.length, (i) {
+      return ProductLineOb(
+        id: productlineMap[i]['id'],
+        isSelect: productlineMap[i]['isSelect'],
+        materialproductId: productlineMap[i]['material_product_id'],
+        productCodeName: productlineMap[i]['product_code_name'],
+        productCodeId: productlineMap[i]['product_code_id'],
+        description: productlineMap[i]['description'],
+        fullName: productlineMap[i]['full_name'],
+        quantity: productlineMap[i]['quantity'],
+        uomName: productlineMap[i]['uom_name'],
+        uomId: productlineMap[i]['uom_id'],
+      );
+    });
+  } // insert datas list from material_product_line table to sale_order_line table
+
   Future<List<InvoiceLineOb>>
       insertAccountMoveLineTable2AccountMoveLineUpdateTable() async {
     print('Worked');
@@ -423,6 +486,28 @@ class DatabaseHelper {
     });
   } // search product name in sale_order_line_multi_select table
 
+  Future<List<ProductLineOb>>? searchProductLineName(String keyword) async {
+    Database db = await database();
+    List<Map<String, dynamic>> productlineMap = await db.query(
+        'material_product_line_multi_select',
+        where: 'full_name LIKE ?',
+        whereArgs: ['%$keyword%']);
+    return List.generate(productlineMap.length, (i) {
+      return ProductLineOb(
+        id: productlineMap[i]['id'],
+        isSelect: productlineMap[i]['isSelect'],
+        materialproductId: productlineMap[i]['material_product_id'],
+        productCodeName: productlineMap[i]['product_code_name'],
+        productCodeId: productlineMap[i]['product_code_id'],
+        description: productlineMap[i]['description'],
+        fullName: productlineMap[i]['full_name'],
+        quantity: productlineMap[i]['quantity'],
+        uomName: productlineMap[i]['uom_name'],
+        uomId: productlineMap[i]['uom_id'],
+      );
+    });
+  } // search product name in material_product_line_multi_select table
+
   Future<List<SaleOrderLineOb>>? getproductlineList() async {
     Database db = await database();
     List<Map<String, dynamic>> saleorderlineMap =
@@ -556,6 +641,72 @@ class DatabaseHelper {
           subTotal: saleorderlineMap[i]['price_subtotal']);
     });
   } // get datas list from sale_order_line_multi_select table
+
+  Future<List<ProductLineOb>> getMaterialProductLineMultiSelectList() async {
+    Database db = await database();
+    List<Map<String, dynamic>> saleorderlineMap =
+        await db.query('material_product_line_multi_select');
+    return List.generate(saleorderlineMap.length, (i) {
+      return ProductLineOb(
+        id: saleorderlineMap[i]['id'],
+        isSelect: saleorderlineMap[i]['isSelect'],
+        materialproductId: saleorderlineMap[i]['material_product_id'],
+        productCodeName: saleorderlineMap[i]['product_code_name'],
+        productCodeId: saleorderlineMap[i]['product_code_id'],
+        description: saleorderlineMap[i]['description'],
+        fullName: saleorderlineMap[i]['full_name'],
+        quantity: saleorderlineMap[i]['quantity'],
+        uomName: saleorderlineMap[i]['uom_name'],
+        uomId: saleorderlineMap[i]['uom_id'],
+      );
+    });
+  } // get datas list from material_product_line_multi_select table
+
+  Future<List<StockMoveOb>> getStockMoveList() async {
+    Database db = await database();
+    List<Map<String, dynamic>> stockmoveMap =
+        await db.query('stock_move');
+    return List.generate(stockmoveMap.length, (i) {
+      return StockMoveOb(
+          id: stockmoveMap[i]['id'],
+          isSelect: stockmoveMap[i]['isSelect'],
+          pickigId: stockmoveMap[i]['picking_id'],
+          productCodeName: stockmoveMap[i]['product_code_name'],
+          productCodeId: stockmoveMap[i]['product_code_id'],
+          description: stockmoveMap[i]['description'],
+          fullName: stockmoveMap[i]['full_name'],
+          demand: stockmoveMap[i]['quantity'],
+          uomName: stockmoveMap[i]['uom_name'],
+          uomId: stockmoveMap[i]['uom_id'],
+          reserved: stockmoveMap[i]['reserved'],
+          done: stockmoveMap[i]['done'],
+          remainingstock: stockmoveMap[i]['remaining_stock'],
+          damageQty: stockmoveMap[i]['damage_qty'],);
+    });
+  } // get datas list from stock_move table
+
+  Future<List<StockMoveOb>> getStockMoveUpdateList() async {
+    Database db = await database();
+    List<Map<String, dynamic>> stockmoveMap =
+        await db.query('stock_move_update');
+    return List.generate(stockmoveMap.length, (i) {
+      return StockMoveOb(
+          id: stockmoveMap[i]['id'],
+          isSelect: stockmoveMap[i]['isSelect'],
+          pickigId: stockmoveMap[i]['picking_id'],
+          productCodeName: stockmoveMap[i]['product_code_name'],
+          productCodeId: stockmoveMap[i]['product_code_id'],
+          description: stockmoveMap[i]['description'],
+          fullName: stockmoveMap[i]['full_name'],
+          demand: stockmoveMap[i]['quantity'],
+          uomName: stockmoveMap[i]['uom_name'],
+          uomId: stockmoveMap[i]['uom_id'],
+          reserved: stockmoveMap[i]['reserved'],
+          done: stockmoveMap[i]['done'],
+          remainingstock: stockmoveMap[i]['remaining_stock'],
+          damageQty: stockmoveMap[i]['damage_qty'],);
+    });
+  } // get datas list from stock_move_update table
 
   Future<List<HrEmployeeLineOb>> getHrEmployeeLineList() async {
     Database db = await database();
@@ -838,11 +989,33 @@ class DatabaseHelper {
         "UPDATE sale_order_line_multi_select SET quotation_id = $quotationId, isSelect = $isSelect, product_code_id = $productCodeId, product_code_name = '$productCodeName', description = '$description', quantity = '$quantity', uom_id = $uomId, uom_name = '$uomName', unit_price = '$unitPrice',tax_id = '$taxId',tax_name = '$taxName', price_subtotal = '$subTotal' WHERE id = $id");
   } // Update datas to sale_order_line_multi_select table
 
+  Future<void> updateProductLineMultiSelect({
+    int? id,
+    int? isSelect,
+    int? materialproductId,
+    int? productCodeId,
+    String? productCodeName,
+    String? description,
+    String? quantity,
+    int? uomId,
+    String? uomName,
+  }) async {
+    Database _db = await database();
+    await _db.rawUpdate(
+        "UPDATE material_product_line_multi_select SET isSelect = $isSelect, material_product_id = $materialproductId, product_code_id = $productCodeId, product_code_name = '$productCodeName', description = '$description',  quantity = $quantity, uom_id = $uomId, uom_name = '$uomName' WHERE id = $id");
+  } // Update datas to material_product_line_multi_select table
+
   Future<void> updateSaleOrderLineMultiSelectIsSelect({int? id}) async {
     Database _db = await database();
     await _db.rawUpdate(
         "UPDATE sale_order_line_multi_select SET isSelect = 0 WHERE id = $id");
   } // Update datas to sale_order_line_multi_select isSelect table
+
+  Future<void> updateMaterialProductLineMultiSelectIsSelect({int? id}) async {
+    Database _db = await database();
+    await _db.rawUpdate(
+        "UPDATE material_product_line_multi_select SET isSelect = 0 WHERE id = $id");
+  } // Update datas to material_product_line_multi_select isSelect table
 
   Future<void> updateHrEmployeeLine(
       int? id,
@@ -927,6 +1100,24 @@ class DatabaseHelper {
     Database _db = await database();
     await _db.rawDelete("DELETE FROM material_product_line_update");
     print('Delete Material Product line Successfully');
+  }
+
+  Future<void> deleteAllProductLineMultiSelect() async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM material_product_line_multi_select");
+    print('Delete Material Product line Multi Select Successfully');
+  }
+
+  Future<void> deleteAllStockMove() async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM stock_move");
+    print('Delete Stock Move Successfully');
+  }
+
+  Future<void> deleteAllStockMoveUpdate() async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM stock_move_update");
+    print('Delete Stock Move Update Successfully');
   }
 
   Future<void> deleteMaterialProductLineManul(int? id) async {
