@@ -26,6 +26,12 @@ class StockPickingCreateBloc {
       createStockMoveStreamController
           .stream; // Create Stocking Move Stream Controller
 
+  StreamController<ResponseOb> callActionConfirmStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getCallActionConfirmStream() =>
+      callActionConfirmStreamController
+          .stream; // Call Action Confirm Stream Controller
+
   late Odoo odoo;
 
   stockpickingCreate(
@@ -129,7 +135,15 @@ class StockPickingCreateBloc {
     }
   } // Update Stock Picking Status
 
-  createStockMove({description,productId, qty, productuom,locationId,locationdestId,pickingId,origin}) async {
+  createStockMove(
+      {description,
+      productId,
+      qty,
+      productuom,
+      locationId,
+      locationdestId,
+      pickingId,
+      origin}) async {
     print('Create Stocking Move');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     createStockMoveStreamController.sink.add(responseOb);
@@ -177,9 +191,50 @@ class StockPickingCreateBloc {
     }
   } // Create Stock Picking
 
+  callActionConfirm({id}) async {
+    print('Call Action Confirm');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    callActionConfirmStreamController.sink.add(responseOb);
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res =
+            await odoo.callKW('sale.order', 'action_confirm', [id]);
+        if (res.getResult() != null) {
+          print('Call Action Confirm Result: ${res.getResult()}');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          callActionConfirmStreamController.sink.add(responseOb);
+        } else {
+          print('GetCall Action Confirm Error:' +
+              res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          callActionConfirmStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        callActionConfirmStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        callActionConfirmStreamController.sink.add(responseOb);
+      }
+    }
+  } // Call Action Confirm
+
   dispose() {
     createStockPickingStreamController.close();
     updateStockPickingStatusStreamController.close();
     createStockMoveStreamController.close();
+    callActionConfirmStreamController.close();
   }
 }

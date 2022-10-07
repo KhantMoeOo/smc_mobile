@@ -18,6 +18,11 @@ class MaterialRequisitionCreateBloc {
   Stream<ResponseOb> getUpdateMaterialRequisitionStatusStream() =>
       updateMaterialRequisitionStatusStreamController.stream;
 
+  StreamController<ResponseOb> callActionConfirmStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getCallActionConfirmStream() =>
+      callActionConfirmStreamController.stream;
+
   late Odoo odoo;
 
   createMaterialRequisition(
@@ -91,8 +96,8 @@ class MaterialRequisitionCreateBloc {
       Sharef.getOdooClientInstance().then((value) async {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
-        OdooResponse res = await odoo.write('material.requisition', [ids],
-            {'state': state});
+        OdooResponse res =
+            await odoo.write('material.requisition', [ids], {'state': state});
         if (res.getResult() != null) {
           print('result');
           // data = res.getResult()['records'];
@@ -124,8 +129,91 @@ class MaterialRequisitionCreateBloc {
     }
   } // updateMaterial RequisitionStatus Data
 
+  // callActionConfirm(ids) {
+  //   print('EntercallActionConfirm');
+  //   ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+  //   callActionConfirmStreamController.sink.add(responseOb);
+
+  //   try {
+  //     print('Try');
+  //     Sharef.getOdooClientInstance().then((value) async {
+  //       odoo = Odoo(BASEURL);
+  //       odoo.setSessionId(value['session_id']);
+  //       OdooResponse res =
+  //           await odoo.callKW('material.requisition', 'action_confirm', [ids]);
+  //       if (res.getResult() != null) {
+  //         print('callActionConfirmresult');
+  //         // data = res.getResult()['records'];
+  //         responseOb.msgState = MsgState.data;
+  //         responseOb.data = res.getResult();
+  //         callActionConfirmStreamController.sink.add(responseOb);
+  //       } else {
+  //         print('error');
+  //         print('callActionConfirmError:' + res.getErrorMessage().toString());
+  //         responseOb.msgState = MsgState.error;
+  //         responseOb.errState = ErrState.unKnownErr;
+  //         callActionConfirmStreamController.sink.add(responseOb);
+  //       }
+  //     });
+  //   } catch (e) {
+  //     print('catch');
+  //     if (e.toString().contains("SocketException")) {
+  //       responseOb.data = "Internet Connection Error";
+  //       responseOb.msgState = MsgState.error;
+  //       responseOb.errState = ErrState.noConnection;
+  //       callActionConfirmStreamController.sink.add(responseOb);
+  //     } else {
+  //       responseOb.data = "Unknown Error";
+  //       responseOb.msgState = MsgState.error;
+  //       responseOb.errState = ErrState.unKnownErr;
+  //       callActionConfirmStreamController.sink.add(responseOb);
+  //     }
+  //   }
+  // } // callActionConfirm
+
+  callActionConfirm(id) async {
+    print('callActionConfirm');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    callActionConfirmStreamController.sink.add(responseOb);
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res =
+            await odoo.callKW('material.requisition', 'action_confirm', [id]);
+        if (!res.hasError()) {
+          print('callActionConfirm Result: ${res.getResult()}');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          callActionConfirmStreamController.sink.add(responseOb);
+        } else {
+          print('GetcallActionConfirmError:' +
+              res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          callActionConfirmStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        callActionConfirmStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        callActionConfirmStreamController.sink.add(responseOb);
+      }
+    }
+  } // callActionConfirm
+
   dispose() {
     createMaterialRequisitionStreamController.close();
     updateMaterialRequisitionStatusStreamController.close();
+    callActionConfirmStreamController.close();
   }
 }

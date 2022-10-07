@@ -59,14 +59,16 @@ class _MaterialRequisitionDetailPageState
         .getMaterialProductLineListStream()
         .listen(getMaterialProductLineListen);
     materialrequisitioncreateBloc
-        .getUpdateMaterialRequisitionStatusStream()
-        .listen(getUpdateMaterialRequisitionStatusListen);
-    purchaserequisitionBloc
-        .getCreatePurchaseRequisitionStream()
-        .listen(getCreatePurchaseRequisitionListen);
-    purchaserequisitionBloc
-        .getCreatePurchaseProductLineStream()
-        .listen(getCreatePurchaseProductLineListen);
+        .getCallActionConfirmStream().listen(getCallActionConfirmListen);
+    // materialrequisitioncreateBloc
+    //     .getUpdateMaterialRequisitionStatusStream()
+    //     .listen(getUpdateMaterialRequisitionStatusListen);
+    // purchaserequisitionBloc
+    //     .getCreatePurchaseRequisitionStream()
+    //     .listen(getCreatePurchaseRequisitionListen);
+    // purchaserequisitionBloc
+    //     .getCreatePurchaseProductLineStream()
+    //     .listen(getCreatePurchaseProductLineListen);
     saleorderlineBloc
         .getProductProductListStream()
         .listen(getProductProductListen);
@@ -214,6 +216,16 @@ class _MaterialRequisitionDetailPageState
       setState(() {
         isCreatePPL = false;
         print('isCreatePPL $isCreatePPL');
+      });
+      materialRequisitionBloc
+          .getMaterialRequisitionListWithIdData(['id', '=', widget.id]);
+    }
+  }
+
+  void getCallActionConfirmListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() {
+        isupdateStatus = false;
       });
       materialRequisitionBloc
           .getMaterialRequisitionListWithIdData(['id', '=', widget.id]);
@@ -1170,10 +1182,9 @@ class _MaterialRequisitionDetailPageState
                                                                 'isupdateStatus $isupdateStatus');
                                                           });
                                                           materialrequisitioncreateBloc
-                                                              .updateMaterialRequisitionStatusData(
+                                                              .callActionConfirm(
                                                                   materialRequisitionList[
-                                                                      0]['id'],
-                                                                  'confirm');
+                                                                      0]['id']);
                                                           Navigator.of(context)
                                                               .pop();
                                                         },
@@ -1197,7 +1208,7 @@ class _MaterialRequisitionDetailPageState
                                     initialData:
                                         ResponseOb(msgState: MsgState.loading),
                                     stream: materialrequisitioncreateBloc
-                                        .getUpdateMaterialRequisitionStatusStream(),
+                                        .getCallActionConfirmStream(),
                                     builder: (context,
                                         AsyncSnapshot<ResponseOb> snapshot) {
                                       ResponseOb? responseOb = snapshot.data;

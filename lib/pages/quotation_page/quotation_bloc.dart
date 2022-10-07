@@ -265,6 +265,7 @@ class QuotationBloc {
               'segment_id',
               'zone_id',
               'property_product_pricelist',
+              'property_account_receivable_id',
               'property_payment_term_id',
               'property_stock_supplier',
               'property_stock_customer'

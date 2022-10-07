@@ -66,6 +66,13 @@ class SaleOrderLineBloc {
       salepricelistproductlinewithfilterStreamController
           .stream; // SalePricelistProductLineWithFilter Stream Controller
 
+  StreamController<ResponseOb>
+      salepricelistproductlinebyregionStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getSalePricelistProductLineListByRegionStream() =>
+      salepricelistproductlinebyregionStreamController
+          .stream; // salepricelistproductlinebyregionStreamController
+
   StreamController<ResponseOb> salepricelistStreamController =
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getSalePricelistListStream() =>
@@ -354,9 +361,7 @@ class SaleOrderLineBloc {
         OdooResponse res = await odoo.searchRead(
             'product.product',
             [
-              // ['name', 'ilike', name],
-              // ['user_id', 'ilike', userId],
-              // ['partner_id', 'ilike', partnerId]
+              ['sale_ok', '=', true]
             ],
             [
               'id',
@@ -701,6 +706,70 @@ class SaleOrderLineBloc {
     }
   } // Get SalePricelistProductLine With Filter Data
 
+  getSalePricelistProductLineListByRegion({zoneId, type, filter}) async {
+    print('getSalePricelistProductLineListByRegion FilterData');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    salepricelistproductlinebyregionStreamController.sink.add(responseOb);
+    List<dynamic>? data;
+
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res = await odoo.searchRead(
+            'sale.pricelist.product.line',
+            [zoneId, type, filter],
+            [
+              'id',
+              'product_id',
+              'pricelist_id',
+              'code',
+              'currency_id',
+              'pricelist_type',
+              'customer_ids',
+              'zone_ids',
+              'segment_id',
+              'region_ids',
+              'state',
+              'priority',
+              'price',
+              'uom_id',
+              'formula',
+            ],
+            order: 'priority desc');
+        if (res.getResult() != null) {
+          print(
+              'getSalePricelistProductLineListByRegionresult: ${res.getResult()['records']}');
+          data = res.getResult()['records'];
+          responseOb.msgState = MsgState.data;
+          responseOb.data = data;
+          salepricelistproductlinebyregionStreamController.sink.add(responseOb);
+        } else {
+          data = null;
+          print('getSalePricelistProductLineListByRegionError:' +
+              res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          salepricelistproductlinebyregionStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        salepricelistproductlinebyregionStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        salepricelistproductlinebyregionStreamController.sink.add(responseOb);
+      }
+    }
+  } // getSalePricelistProductLineListByRegion
+
   getSalePricelistData(name) async {
     print('EntergetSalePricelistData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
@@ -867,5 +936,6 @@ class SaleOrderLineBloc {
     salepricelistStreamController.close();
     salediscountlistStreamController.close();
     accounttaxeslistStreamController.close();
+    salepricelistproductlinebyregionStreamController.close();
   }
 }

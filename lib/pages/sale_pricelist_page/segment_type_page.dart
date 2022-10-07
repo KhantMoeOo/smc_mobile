@@ -85,10 +85,10 @@ class _SegmentTypePageState extends State<SegmentTypePage> {
         } else {
           return Scaffold(
             backgroundColor: Colors.grey[200],
-            drawer: const DrawerWidget(),
             appBar: AppBar(
               backgroundColor: AppColors.appBarColor,
-              title: Text('Sale Pricelist (${userList[0]['zone_id'][1]})'),
+              title: Text(
+                  'Sale Pricelist (${userList[0]['zone_id'][1]}) By Segment'),
             ),
             body: Column(
               children: [

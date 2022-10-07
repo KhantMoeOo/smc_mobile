@@ -90,6 +90,8 @@ class InvoiceLineBloc {
   createInvoiceLine(
       {moveId,
       productId,
+      balance,
+      accountinternaltype,
       excludefrominvoicetab,
       salelineids,
       accountId,
@@ -99,6 +101,8 @@ class InvoiceLineBloc {
       priceunit,
       salediscount,
       taxIds,
+      debit,
+      credit,
       pricesubtotal}) async {
     print('Create Invoice Line');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
@@ -111,16 +115,21 @@ class InvoiceLineBloc {
         OdooResponse res = await odoo.create('account.move.line', {
           'move_id': moveId,
           'product_id': productId,
+          //'balance': balance,
+          'account_internal_type': accountinternaltype,
           'exclude_from_invoice_tab': excludefrominvoicetab,
           'sale_line_ids': salelineids,
           'account_id': accountId,
+          //'journal_id': 1,
           'name': name,
           'quantity': quantity,
           'product_uom_id': productUoMId,
           'price_unit': priceunit,
           'sale_discount': salediscount,
           'tax_ids': taxIds,
-          'price_subtotal': pricesubtotal,
+          //'debit': debit,
+          //'credit': credit,
+          //'price_subtotal': pricesubtotal,
         });
         if (res.getResult() != null) {
           print('Invoice Line Create Result: ${res.getResult()}');

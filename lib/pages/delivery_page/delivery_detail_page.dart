@@ -1,9 +1,9 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:smc_mobile/dbs/database_helper.dart';
-import 'package:smc_mobile/obs/stock_move_ob.dart';
+import '../../dbs/database_helper.dart';
 import '../../obs/response_ob.dart';
+import '../../obs/stock_move_ob.dart';
 import '../../utils/app_const.dart';
 import 'delivery_bloc.dart';
 

@@ -59,8 +59,19 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
     } else {
       invoiceBloc.getInvoiceData(['id', '=', widget.invoiceId]);
     }
+    invoiceeditBloc.getCallActionPostStream().listen(getCallActionPostListen);
     invoiceBloc.getInvoiceStream().listen(getInvoiceListListen);
     invoicelineBloc.getInvoiceLineStream().listen(getInvoiceLineListListen);
+  }
+
+  void getCallActionPostListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      invoiceBloc.getInvoiceData(
+          ['line_ids.sale_line_ids.order_id', '=', widget.quotationId]);
+      setState(() {
+        updateStatus = false;
+      });
+    }
   }
 
   void getInvoiceListListen(ResponseOb responseOb) {
@@ -935,8 +946,8 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                   setState(() {
                                     updateStatus = true;
                                   });
-                                  invoiceeditBloc.updateInvoiceStatusData(
-                                      invoiceList[0]['id'], 'posted');
+                                  invoiceeditBloc
+                                      .callactionpost(invoiceList[0]['id']);
                                   await databaseHelper
                                       .deleteAllAccountMoveLine();
                                   await databaseHelper
@@ -952,8 +963,7 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                         : Positioned(
                             child: StreamBuilder<ResponseOb>(
                             initialData: ResponseOb(msgState: MsgState.loading),
-                            stream: invoiceeditBloc
-                                .getUpdateQuotationStatusStream(),
+                            stream: invoiceeditBloc.getCallActionPostStream(),
                             builder:
                                 (context, AsyncSnapshot<ResponseOb> snapshot) {
                               ResponseOb? responseOb = snapshot.data;
@@ -964,14 +974,7 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                       child: CircularProgressIndicator(),
                                     ));
                               } else if (responseOb?.msgState ==
-                                  MsgState.data) {
-                                invoiceBloc.getInvoiceData([
-                                  'line_ids.sale_line_ids.order_id',
-                                  '=',
-                                  widget.quotationId
-                                ]);
-                                updateStatus = false;
-                              }
+                                  MsgState.data) {}
                               return Container(
                                 color: Colors.white,
                               );

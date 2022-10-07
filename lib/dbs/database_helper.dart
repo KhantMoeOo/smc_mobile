@@ -1,4 +1,3 @@
-import 'package:smc_mobile/obs/stock_move_ob.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -6,6 +5,7 @@ import '../obs/hr_employee_line_ob.dart';
 import '../obs/invoice_line_ob.dart';
 import '../obs/product_line_ob.dart';
 import '../obs/sale_order_line_ob.dart';
+import '../obs/stock_move_ob.dart';
 import '../obs/trip_plan_delivery_ob.dart';
 import '../obs/trip_plan_schedule_ob.dart';
 
@@ -116,8 +116,7 @@ class DatabaseHelper {
     return id;
   } // insert datas to sale_order_line_multi_select table
 
-  Future<int> insertStockMove(
-      StockMoveOb stockMoveOb) async {
+  Future<int> insertStockMove(StockMoveOb stockMoveOb) async {
     int id = 0;
     Database db = await database();
     await db
@@ -127,8 +126,7 @@ class DatabaseHelper {
     return id;
   } // insert datas to stock_move table
 
-  Future<int> insertStockMoveUpdate(
-      StockMoveOb stockMoveOb) async {
+  Future<int> insertStockMoveUpdate(StockMoveOb stockMoveOb) async {
     int id = 0;
     Database db = await database();
     await db
@@ -664,24 +662,24 @@ class DatabaseHelper {
 
   Future<List<StockMoveOb>> getStockMoveList() async {
     Database db = await database();
-    List<Map<String, dynamic>> stockmoveMap =
-        await db.query('stock_move');
+    List<Map<String, dynamic>> stockmoveMap = await db.query('stock_move');
     return List.generate(stockmoveMap.length, (i) {
       return StockMoveOb(
-          id: stockmoveMap[i]['id'],
-          isSelect: stockmoveMap[i]['isSelect'],
-          pickigId: stockmoveMap[i]['picking_id'],
-          productCodeName: stockmoveMap[i]['product_code_name'],
-          productCodeId: stockmoveMap[i]['product_code_id'],
-          description: stockmoveMap[i]['description'],
-          fullName: stockmoveMap[i]['full_name'],
-          demand: stockmoveMap[i]['quantity'],
-          uomName: stockmoveMap[i]['uom_name'],
-          uomId: stockmoveMap[i]['uom_id'],
-          reserved: stockmoveMap[i]['reserved'],
-          done: stockmoveMap[i]['done'],
-          remainingstock: stockmoveMap[i]['remaining_stock'],
-          damageQty: stockmoveMap[i]['damage_qty'],);
+        id: stockmoveMap[i]['id'],
+        isSelect: stockmoveMap[i]['isSelect'],
+        pickigId: stockmoveMap[i]['picking_id'],
+        productCodeName: stockmoveMap[i]['product_code_name'],
+        productCodeId: stockmoveMap[i]['product_code_id'],
+        description: stockmoveMap[i]['description'],
+        fullName: stockmoveMap[i]['full_name'],
+        demand: stockmoveMap[i]['quantity'],
+        uomName: stockmoveMap[i]['uom_name'],
+        uomId: stockmoveMap[i]['uom_id'],
+        reserved: stockmoveMap[i]['reserved'],
+        done: stockmoveMap[i]['done'],
+        remainingstock: stockmoveMap[i]['remaining_stock'],
+        damageQty: stockmoveMap[i]['damage_qty'],
+      );
     });
   } // get datas list from stock_move table
 
@@ -691,20 +689,21 @@ class DatabaseHelper {
         await db.query('stock_move_update');
     return List.generate(stockmoveMap.length, (i) {
       return StockMoveOb(
-          id: stockmoveMap[i]['id'],
-          isSelect: stockmoveMap[i]['isSelect'],
-          pickigId: stockmoveMap[i]['picking_id'],
-          productCodeName: stockmoveMap[i]['product_code_name'],
-          productCodeId: stockmoveMap[i]['product_code_id'],
-          description: stockmoveMap[i]['description'],
-          fullName: stockmoveMap[i]['full_name'],
-          demand: stockmoveMap[i]['quantity'],
-          uomName: stockmoveMap[i]['uom_name'],
-          uomId: stockmoveMap[i]['uom_id'],
-          reserved: stockmoveMap[i]['reserved'],
-          done: stockmoveMap[i]['done'],
-          remainingstock: stockmoveMap[i]['remaining_stock'],
-          damageQty: stockmoveMap[i]['damage_qty'],);
+        id: stockmoveMap[i]['id'],
+        isSelect: stockmoveMap[i]['isSelect'],
+        pickigId: stockmoveMap[i]['picking_id'],
+        productCodeName: stockmoveMap[i]['product_code_name'],
+        productCodeId: stockmoveMap[i]['product_code_id'],
+        description: stockmoveMap[i]['description'],
+        fullName: stockmoveMap[i]['full_name'],
+        demand: stockmoveMap[i]['quantity'],
+        uomName: stockmoveMap[i]['uom_name'],
+        uomId: stockmoveMap[i]['uom_id'],
+        reserved: stockmoveMap[i]['reserved'],
+        done: stockmoveMap[i]['done'],
+        remainingstock: stockmoveMap[i]['remaining_stock'],
+        damageQty: stockmoveMap[i]['damage_qty'],
+      );
     });
   } // get datas list from stock_move_update table
 

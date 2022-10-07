@@ -390,12 +390,12 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                     child: TextButton(
                                         onPressed: () {
-                                          loginBloc.quotationLogin('admin',
-                                              'Pr0fess!0n@l', 'smc_uat_db');
-                                          // loginBloc.quotationLogin(
-                                          //     _emailcontroller.text,
-                                          //     _passwordcontroller.text,
-                                          //     dbName);
+                                          // loginBloc.quotationLogin('admin',
+                                          //     'Pr0fess!0n@l', 'smc_uat');
+                                          loginBloc.quotationLogin(
+                                              _emailcontroller.text,
+                                              _passwordcontroller.text,
+                                              dbName);
                                         },
                                         child: const Text(
                                           'Log in',

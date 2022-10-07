@@ -14,6 +14,11 @@ class InvoiceEditBloc {
       updateInvoiceStatusStreamController
           .stream; //updateQuotationStatusStreamController
 
+  StreamController<ResponseOb> callactionpostStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getCallActionPostStream() =>
+      callactionpostStreamController.stream; //callactionpostStreamController
+
   late Odoo odoo;
 
   updateInvoiceStatusData(ids, state) {
@@ -56,7 +61,48 @@ class InvoiceEditBloc {
     }
   } // updatInvoiceStatus Data
 
+  callactionpost(ids) {
+    print('Entercallactionpost');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    callactionpostStreamController.sink.add(responseOb);
+
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res =
+            await odoo.callKW('account.move', 'action_post', [ids]);
+        if (res.getResult() != null) {
+          print('callactionpostresult');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          callactionpostStreamController.sink.add(responseOb);
+        } else {
+          print('callactionpostError:' + res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          callactionpostStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        callactionpostStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        callactionpostStreamController.sink.add(responseOb);
+      }
+    }
+  } // callactionpost
+
   dispose() {
     updateInvoiceStatusStreamController.close();
+    callactionpostStreamController.close();
   }
 }

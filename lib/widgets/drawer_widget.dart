@@ -8,6 +8,7 @@ import '../pages/product_page/product_page.dart';
 import '../pages/profile_page/profile_bloc.dart';
 import '../pages/profile_page/profile_page.dart';
 import '../pages/quotation_page/quotation_page.dart';
+import '../pages/sale_pricelist_page/sale_pricelist_type_page.dart';
 import '../pages/sale_pricelist_page/segment_type_page.dart';
 import '../pages/way_planning_page/way_planning_page.dart';
 import '../utils/app_const.dart';
@@ -81,7 +82,9 @@ class DrawerWidgetState extends State<DrawerWidget> {
                                   ResponseOb? responseOb = snapshot.data;
                                   if (responseOb?.msgState == MsgState.data) {
                                     return Text(
-                                      profileList[0]['name'],
+                                      profileList.isEmpty
+                                          ? '-'
+                                          : profileList[0]['name'],
                                       style: const TextStyle(
                                           fontSize: 20,
                                           color: Colors.black,
@@ -227,7 +230,7 @@ class DrawerWidgetState extends State<DrawerWidget> {
                                   child: Row(
                                     children: [
                                       Image.asset(
-                                        "assets/imgs/way_plan_icon.png",
+                                        "assets/imgs/material_requisition_icon.png",
                                         color: Colors.white,
                                         width: 25,
                                         height: 25,
@@ -313,7 +316,7 @@ class DrawerWidgetState extends State<DrawerWidget> {
                                   onTap: () {
                                     Navigator.of(context).pushAndRemoveUntil(
                                         MaterialPageRoute(builder: (context) {
-                                      return SegmentTypePage();
+                                      return SalePricelistTypePage();
                                     }), (route) => false);
                                   },
                                   child: Row(
