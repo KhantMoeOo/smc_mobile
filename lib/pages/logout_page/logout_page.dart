@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/pages/login/login.dart';
 import '../../obs/response_ob.dart';
 import '../login_page/login_page.dart';
 import 'logout_bloc.dart';
@@ -33,7 +34,7 @@ class _LogoutPageState extends State<LogoutPage> {
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return const LoginPage();
+          return const Login();
         }), (route) => false);
       } else if (responseOb.msgState == MsgState.error) {
         final snackbar = SnackBar(
@@ -58,8 +59,12 @@ class _LogoutPageState extends State<LogoutPage> {
         stream: logoutBloc.getLogoutStream(),
         builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
           ResponseOb? responseOb = snapshot.data;
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Center(
+            child: Image.asset(
+              'assets/gifs/three_circle_loading.gif',
+              width: 150,
+              height: 150,
+            ),
           );
         },
       ),

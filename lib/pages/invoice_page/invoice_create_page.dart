@@ -62,7 +62,7 @@ class _InvoiceCreatePageState extends State<InvoiceCreatePage> {
     super.initState();
     debugPrint('New or Edit:' + widget.createInvoiceWithId.toString());
     print('QuoId:' + widget.quotationId.toString());
-    quotationBloc.getCustomerList(['name', 'ilike', '']);
+    //quotationBloc.getCustomerList(['name', 'ilike', '']);
     quotationBloc.getCustomerStream().listen(getCustomerList);
     quotationBloc.getPaymentTermsData();
     quotationBloc.getPaymentTermsStream().listen(getPaymentTermslist);
@@ -291,8 +291,12 @@ class _InvoiceCreatePageState extends State<InvoiceCreatePage> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return const Center(
@@ -406,8 +410,12 @@ class _InvoiceCreatePageState extends State<InvoiceCreatePage> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return const Center(
@@ -460,8 +468,12 @@ class _InvoiceCreatePageState extends State<InvoiceCreatePage> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return const Center(
@@ -515,8 +527,12 @@ class _InvoiceCreatePageState extends State<InvoiceCreatePage> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return const Center(

@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 import '../../dbs/database_helper.dart';
 import '../../dbs/sharef.dart';
+import '../../features/pages/menu/menu_list.dart';
 import '../../obs/response_ob.dart';
 import '../../widgets/drawer_widget.dart';
 import '../../widgets/way_planning_widgets/way_planning_card_widget.dart';
@@ -32,6 +34,10 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     wayplanningListBloc.getWayPlanningListData(name: ['name', 'ilike', '']);
     deleteAllDatabase();
     // scrollController.addListener(scrollListener);
@@ -105,8 +111,16 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
               wayplanList = responseOb!.data;
               return Scaffold(
                   backgroundColor: Colors.grey[200],
-                  drawer: const DrawerWidget(),
                   appBar: AppBar(
+                    leading: IconButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return MenuList();
+                        }));
+                      },
+                      icon: const Icon(Icons.menu),
+                    ),
                     backgroundColor: Color.fromARGB(255, 12, 41, 92),
                     title: const Text("Way Planning"),
                   ),
@@ -142,7 +156,8 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
                                             onPressed: () {
                                               if (searchDone == true) {
                                                 setState(() {
-                                                  wayPlanSearchController.clear();
+                                                  wayPlanSearchController
+                                                      .clear();
                                                   searchDone = false;
                                                   wayplanningListBloc
                                                       .getWayPlanningListData(
@@ -251,7 +266,11 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
                                           fromDate: wayplanList[i]['from_date'],
                                           toDate: wayplanList[i]['to_date'],
                                           state: wayplanList[i]['state'],
-                                          leaderName: wayplanList[i]['leader_id'],
+                                          leaderName: wayplanList[i]
+                                                      ['leader_id'] ==
+                                                  false
+                                              ? []
+                                              : wayplanList[i]['leader_id'],
                                           hremployeelineList: [],
                                         );
                                       }),
@@ -262,7 +281,7 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
                                   //       right: 30,
                                   //       child: FloatingActionButton(
                                   //           onPressed: () {
-    
+
                                   //           },
                                   //           child: const Icon(Icons.add))
                                   //           ),
@@ -274,7 +293,8 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
                                       margin: const EdgeInsets.only(
                                           left: 15, right: 15),
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           color: Colors.grey[200],
                                           boxShadow: const [
                                             BoxShadow(
@@ -326,12 +346,10 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
                                                                         color: Colors
                                                                             .black,
                                                                         fontWeight:
-                                                                            FontWeight
-                                                                                .bold)),
+                                                                            FontWeight.bold)),
                                                                 TextSpan(
-                                                                    text:
-                                                                        wayPlanSearchController
-                                                                            .text,
+                                                                    text: wayPlanSearchController
+                                                                        .text,
                                                                     style: const TextStyle(
                                                                         color: Colors
                                                                             .black))
@@ -382,12 +400,10 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
                                                                         color: Colors
                                                                             .black,
                                                                         fontWeight:
-                                                                            FontWeight
-                                                                                .bold)),
+                                                                            FontWeight.bold)),
                                                                 TextSpan(
-                                                                    text:
-                                                                        wayPlanSearchController
-                                                                            .text,
+                                                                    text: wayPlanSearchController
+                                                                        .text,
                                                                     style: const TextStyle(
                                                                         color: Colors
                                                                             .black))
@@ -436,12 +452,10 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
                                                                         color: Colors
                                                                             .black,
                                                                         fontWeight:
-                                                                            FontWeight
-                                                                                .bold)),
+                                                                            FontWeight.bold)),
                                                                 TextSpan(
-                                                                    text:
-                                                                        wayPlanSearchController
-                                                                            .text,
+                                                                    text: wayPlanSearchController
+                                                                        .text,
                                                                     style: const TextStyle(
                                                                         color: Colors
                                                                             .black))
@@ -466,8 +480,12 @@ class _WayPlanningListPageState extends State<WayPlanningListPage> {
             } else {
               return Container(
                 color: Colors.white,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                child: Center(
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ),
               );
             }

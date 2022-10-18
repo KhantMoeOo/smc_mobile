@@ -11,7 +11,7 @@ class ProductCardWidget extends StatefulWidget {
   bool saleOk;
   bool purchaseOk;
   double listPrice;
-  double qtyAvailable;
+  String qtyAvailable;
   List<dynamic> uomId;
   ProductCardWidget({
     Key? key,
@@ -36,7 +36,7 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Container(
-        padding: const EdgeInsets.all(5),
+        //padding: const EdgeInsets.all(5),
         decoration: const BoxDecoration(
           color: Colors.white,
           // borderRadius: BorderRadius.circular(10),
@@ -114,11 +114,11 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                               children: [
                             const TextSpan(text: "On hand: "),
                             TextSpan(
-                              text: "${widget.qtyAvailable}",
+                              text: widget.qtyAvailable,
                             ),
-                            TextSpan(
-                                text:
-                                    "${widget.uomId.isEmpty ? '' : widget.uomId[1]}")
+                            // TextSpan(
+                            //     text:
+                            //         "${widget.uomId.isEmpty ? '' : widget.uomId[1]}")
                           ]))
                     ],
                   ),

@@ -15,6 +15,7 @@ import 'invoice_bloc.dart';
 import 'invoice_create_page.dart';
 import 'invoice_edit_bloc.dart';
 import 'invoice_line_page/invoice_line_bloc.dart';
+import 'register_payment_page/register_payment_page.dart';
 
 class InvoiceDetailPage extends StatefulWidget {
   int invoiceId;
@@ -45,6 +46,16 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
   List<dynamic> invoiceLineList = [];
   List<InvoiceLineOb>? invoiceLineListDB = [];
   bool updateStatus = false;
+
+  bool visible = false;
+  List<String> typeList = [
+    'out_invoice',
+    'out_refund',
+    'in_invoice',
+    'in_refund',
+    'out_receipt',
+    'in_receipt'
+  ];
 
   @override
   void initState() {
@@ -143,6 +154,17 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
     setState(() {});
   }
 
+  void checkVisibility() {
+    if (invoiceList[0]['state'] != 'posted' ||
+        invoiceList[0]['invoice_payment_state'] != 'not_paid' ||
+        typeList.contains(invoiceList[0]['type']) ||
+        invoiceList[0]['authorized_transaction_ids'].isNotEmpty) {
+      setState(() {
+        visible = false;
+      });
+    }
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -176,20 +198,25 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
               if (responseOb?.msgState == MsgState.loading) {
                 return Container(
                     color: Colors.white,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/gifs/three_circle_loading.gif',
+                        width: 150,
+                        height: 150,
+                      ),
                     ));
               } else if (responseOb?.msgState == MsgState.error) {
                 return const Center(child: Text('Error'));
               } else {
                 return Stack(
                   children: [
+                    //Image.asset("assets/imgs/paid_banner.png"),
                     Scaffold(
                         backgroundColor: Colors.grey[200],
                         appBar: AppBar(
                           backgroundColor: AppColors.appBarColor,
                           title: Text(
-                              '${invoiceList[0]['name'] == '/' ? 'Draft Invoice (* ${invoiceList[0]['id']})' : invoiceList[0]['name']}'),
+                              '${invoiceList[0]['name'] == '/' ? 'Draft Invoice (* ${invoiceList[0]['id']})' : invoiceList[0]['name']} ${invoiceList[0]['invoice_payment_state'] == 'paid' ? '(Paid)' : ''}'),
                           actions: [
                             Visibility(
                               visible: true,
@@ -350,6 +377,44 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                     'Invoice Print',
                                     style: TextStyle(color: Colors.white),
                                   )),
+                            ),
+                            Visibility(
+                              visible: invoiceList[0]['state'] == 'posted' &&
+                                      invoiceList[0]['invoice_payment_state'] ==
+                                          'not_paid' &&
+                                      typeList
+                                          .contains(invoiceList[0]['type']) &&
+                                      invoiceList[0]
+                                              ['authorized_transaction_ids']
+                                          .isEmpty
+                                  ? true
+                                  : false,
+                              child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                      return RegisterPaymentPage(
+                                        invoiceId: invoiceList[0]['id'],
+                                        partnerId: invoiceList[0]['partner_id']
+                                            [0],
+                                        amountresidual: invoiceList[0]
+                                                ['amount_residual']
+                                            .toString(),
+                                        currencyId: invoiceList[0]
+                                            ['currency_id'][0],
+                                        invoiceName: invoiceList[0]['name'],
+                                      );
+                                    })).then((value) => invoiceBloc
+                                            .getInvoiceData([
+                                          'line_ids.sale_line_ids.order_id',
+                                          '=',
+                                          widget.quotationId
+                                        ]));
+                                  },
+                                  child: const Text('Register Payment',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ))),
                             )
                           ],
                         ),
@@ -895,69 +960,103 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                 ),
                               ),
                             ),
+                            Visibility(
+                              visible: invoiceList[0]
+                                              ['invoice_payment_state'] ==
+                                          'paid' ||
+                                      typeList.contains(invoiceList[0]['type'])
+                                  ? true
+                                  : false,
+                              // invoiceList[0]
+                              //         ['authorized_transaction_ids']
+                              //     .isEmpty,
+                              child: Positioned(
+                                left: -60,
+                                top: 40,
+                                child: RotationTransition(
+                                  turns:
+                                      const AlwaysStoppedAnimation(-40 / 360),
+                                  child: Container(
+                                      width: 300,
+                                      padding: const EdgeInsets.all(10),
+                                      color: Colors.green,
+                                      child: const Text(
+                                        'PAID',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 30),
+                                      )),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                        floatingActionButton: SpeedDial(
-                            backgroundColor: AppColors.appBarColor,
-                            buttonSize: 80,
-                            childrenButtonSize: 75,
-                            animationSpeed: 80,
-                            openCloseDial: isDialOpen,
-                            animatedIcon: AnimatedIcons.menu_close,
-                            overlayColor: Colors.black,
-                            overlayOpacity: 0.5,
-                            children: [
-                              SpeedDialChild(
-                                visible: invoiceList[0]['state'] == 'posted'
-                                    ? false
-                                    : true,
-                                onTap: () {},
-                                child: const Icon(Icons.edit),
-                                label: 'Edit',
-                              ),
-                              SpeedDialChild(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) {
-                                    return InvoiceCreatePage(
-                                        createInvoiceWithId: 0,
-                                        quotationId: 0,
-                                        customerId: 0,
-                                        paymentTermsId: 0,
-                                        currencyId: 0);
-                                  }));
-                                },
-                                child: const Icon(Icons.add),
-                                label: 'Create',
-                              ),
-                              SpeedDialChild(
-                                visible: invoiceList[0]['state'] == 'posted'
-                                    ? false
-                                    : true,
-                                onTap: () {},
-                                child: const Icon(Icons.delete_forever),
-                                label: 'Delete',
-                              ),
-                              SpeedDialChild(
-                                visible: invoiceList[0]['state'] == 'posted'
-                                    ? false
-                                    : true,
-                                onTap: () async {
-                                  setState(() {
-                                    updateStatus = true;
-                                  });
-                                  invoiceeditBloc
-                                      .callactionpost(invoiceList[0]['id']);
-                                  await databaseHelper
-                                      .deleteAllAccountMoveLine();
-                                  await databaseHelper
-                                      .deleteAllAccountMoveLineUpdate();
-                                  await databaseHelper.deleteAllTaxIds();
-                                },
-                                child: const Icon(Icons.upload_outlined),
-                                label: 'Post',
-                              )
-                            ])),
+                        floatingActionButton: Visibility(
+                          visible: invoiceList[0]['state'] == 'posted'
+                              ? false
+                              : true,
+                          child: SpeedDial(
+                              backgroundColor: AppColors.appBarColor,
+                              buttonSize: 80,
+                              childrenButtonSize: 75,
+                              animationSpeed: 80,
+                              openCloseDial: isDialOpen,
+                              animatedIcon: AnimatedIcons.menu_close,
+                              overlayColor: Colors.black,
+                              overlayOpacity: 0.5,
+                              children: [
+                                // SpeedDialChild(
+                                //   visible: invoiceList[0]['state'] == 'posted'
+                                //       ? false
+                                //       : true,
+                                //   onTap: () {},
+                                //   child: const Icon(Icons.edit),
+                                //   label: 'Edit',
+                                // ),
+                                // SpeedDialChild(
+                                //   onTap: () {
+                                //     Navigator.of(context).push(
+                                //         MaterialPageRoute(builder: (context) {
+                                //       return InvoiceCreatePage(
+                                //           createInvoiceWithId: 0,
+                                //           quotationId: 0,
+                                //           customerId: 0,
+                                //           paymentTermsId: 0,
+                                //           currencyId: 0);
+                                //     }));
+                                //   },
+                                //   child: const Icon(Icons.add),
+                                //   label: 'Create',
+                                // ),
+                                // SpeedDialChild(
+                                //   visible: invoiceList[0]['state'] == 'posted'
+                                //       ? false
+                                //       : true,
+                                //   onTap: () {},
+                                //   child: const Icon(Icons.delete_forever),
+                                //   label: 'Delete',
+                                // ),
+                                SpeedDialChild(
+                                  visible: invoiceList[0]['state'] == 'posted'
+                                      ? false
+                                      : true,
+                                  onTap: () async {
+                                    setState(() {
+                                      updateStatus = true;
+                                    });
+                                    invoiceeditBloc
+                                        .callactionpost(invoiceList[0]['id']);
+                                    await databaseHelper
+                                        .deleteAllAccountMoveLine();
+                                    await databaseHelper
+                                        .deleteAllAccountMoveLineUpdate();
+                                    await databaseHelper.deleteAllTaxIds();
+                                  },
+                                  child: const Icon(Icons.upload_outlined),
+                                  label: 'Post',
+                                )
+                              ]),
+                        )),
                     updateStatus == false
                         ? Container()
                         : Positioned(
@@ -970,8 +1069,12 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                               if (responseOb?.msgState == MsgState.loading) {
                                 return Container(
                                     color: Colors.white,
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
                                     ));
                               } else if (responseOb?.msgState ==
                                   MsgState.data) {}
@@ -979,7 +1082,7 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                 color: Colors.white,
                               );
                             },
-                          ))
+                          )),
                   ],
                 );
               }

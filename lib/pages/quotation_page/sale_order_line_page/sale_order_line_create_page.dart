@@ -26,7 +26,7 @@ class OrderLineCreatePage extends StatefulWidget {
   int regionId;
   int currencyId;
   String? subtotal;
-  int? taxesId;
+  String? taxesId;
   String? taxesName;
   int? isFOC;
   OrderLineCreatePage({
@@ -83,6 +83,8 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
   bool hasUnitPrice = false;
   String accounttaxesName = '';
   int accounttaxesId = 0;
+  List<dynamic> accounttaxesIdList = [];
+  List<dynamic> accounttaxesNameList = [];
   bool isCheck = false;
   int prioritySortUOMCategoryId = 0;
   String prioritySortUOMCategoryName = '';
@@ -597,19 +599,29 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
     }
   } // listen to get Account Taxes List
 
-  void getAccountTaxesListId(String? v) {
+  void getAccountTaxesListId(List? v) {
     if (v != null) {
       setState(() {
-        accounttaxesId = int.parse(v.toString().split(',')[0]);
-        hasNotAccountTaxes = false;
-        for (var element in accounttaxsList) {
-          if (element['id'] == accounttaxesId) {
-            accounttaxesName = element['name'];
-            accounttaxesId = element['id'];
-            print('accounttaxesName: $accounttaxesName');
-            print('accounttaxesId: $accounttaxesId');
-          }
+        //accounttaxesId = int.parse(v.toString().split(',')[0]);
+        for (var ele in v) {
+          accounttaxesName = ele.toString().split(',')[1];
+          accounttaxesId = int.parse(ele.toString().split(',')[0]);
+          accounttaxesIdList.add(int.parse(ele.toString().split(',')[0]));
+          accounttaxesNameList.add(ele.toString().split(',')[1]);
         }
+        print('accounttaxesName: $accounttaxesName');
+        print('accounttaxesId: $accounttaxesId');
+        print('accounttaxesIdList $accounttaxesIdList');
+        print('accounttaxesNameList $accounttaxesNameList');
+        hasNotAccountTaxes = false;
+        // for (var element in accounttaxsList) {
+        //   if (element['id'] == accounttaxesId) {
+        //     accounttaxesName = element['name'];
+        //     accounttaxesId = element['id'];
+        //     print('accounttaxesName: $accounttaxesName');
+        //     print('accounttaxesId: $accounttaxesId');
+        //   }
+        // }
       });
     } else {
       hasNotAccountTaxes = true;
@@ -665,8 +677,8 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                             uomId: uomId,
                             uomName: uomName,
                             unitPrice: unitPriceController.text,
-                            taxId: accounttaxesId,
-                            taxName: accounttaxesName,
+                            taxId: accounttaxesIdList.toString(),
+                            taxName: accounttaxesNameList.toString(),
                             subTotal: subTotalController.text);
                       } else {
                         final saleOrderLineOb = SaleOrderLineOb(
@@ -681,8 +693,8 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                             uomName: uomName,
                             uomId: uomId,
                             unitPrice: unitPriceController.text,
-                            taxId: accounttaxesId,
-                            taxName: accounttaxesName,
+                            taxId: accounttaxesIdList.toString(),
+                            taxName: accounttaxesNameList.toString(),
                             subTotal: subTotalController.text);
                         saleorderlineId = await databaseHelper
                             .insertOrderLine(saleOrderLineOb);
@@ -706,8 +718,8 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                             uomId: uomId,
                             uomName: uomName,
                             unitPrice: unitPriceController.text,
-                            taxId: accounttaxesId,
-                            taxName: accounttaxesName,
+                            taxId: accounttaxesIdList.toString(),
+                            taxName: accounttaxesNameList.toString(),
                             subTotal: subTotalController.text);
                       } else {
                         final saleOrderLineOb = SaleOrderLineOb(
@@ -722,8 +734,8 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                             uomName: uomName,
                             uomId: uomId,
                             unitPrice: unitPriceController.text,
-                            taxId: accounttaxesId,
-                            taxName: accounttaxesName,
+                            taxId: accounttaxesIdList.toString(),
+                            taxName: accounttaxesNameList.toString(),
                             subTotal: subTotalController.text);
                         saleorderlineId = await databaseHelper
                             .insertOrderLine(saleOrderLineOb);
@@ -758,8 +770,12 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return const Center(
@@ -884,8 +900,12 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return const Center(
@@ -1056,15 +1076,19 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return const Center(
                           child: Text("Something went Wrong!"),
                         );
                       } else {
-                        return DropdownSearch<String>(
+                        return DropdownSearch<String>.multiSelection(
                           popupItemBuilder: (context, item, isSelected) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -1084,7 +1108,7 @@ class _OrderLineCreatePageState extends State<OrderLineCreatePage> {
                               .map((e) => '${e['id']},${e['name']}')
                               .toList(),
                           onChanged: getAccountTaxesListId,
-                          selectedItem: accounttaxesName,
+                          //selectedItem: accounttaxesName,
                         );
                       }
                     }),

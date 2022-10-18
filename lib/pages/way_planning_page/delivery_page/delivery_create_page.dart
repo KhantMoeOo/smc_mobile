@@ -21,20 +21,21 @@ class DeliveryCreatePage extends StatefulWidget {
   String state;
   String invoiceStatus;
   String remark;
-  DeliveryCreatePage({Key? key,
-  required this.newOrEdit,
-  required this.neworeditTPD,
-  required this.tripLine,
-  required this.tripplandeliveryId,
-  required this.teamId,
-  required this.assignPersonId,
-  required this.zoneId,
-  required this.zoneName,
-  required this.invoiceId,
-  required this.orderId,
-  required this.state,
-  required this.invoiceStatus,
-  required this.remark,
+  DeliveryCreatePage({
+    Key? key,
+    required this.newOrEdit,
+    required this.neworeditTPD,
+    required this.tripLine,
+    required this.tripplandeliveryId,
+    required this.teamId,
+    required this.assignPersonId,
+    required this.zoneId,
+    required this.zoneName,
+    required this.invoiceId,
+    required this.orderId,
+    required this.state,
+    required this.invoiceStatus,
+    required this.remark,
   }) : super(key: key);
 
   @override
@@ -83,7 +84,7 @@ class _DeliveryCreatePageState extends State<DeliveryCreatePage> {
     super.initState();
     deliveryBloc.getCRMTeamListData();
     deliveryBloc.getCRMTeamListStream().listen(getCRMTeamListListen);
-    profileBloc.getHrEmployeeData();
+    //profileBloc.getHrEmployeeData();
     profileBloc.getHrEmployeeStream().listen(getHrEmployeeListListen);
     deliveryBloc.getAccountMoveListData();
     deliveryBloc.getAccountMoveListStream().listen(getAccountMoveListListen);
@@ -276,8 +277,12 @@ class _DeliveryCreatePageState extends State<DeliveryCreatePage> {
                   builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                     ResponseOb? responseOb = snapshot.data;
                     if (responseOb?.msgState == MsgState.loading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return const Center(
@@ -317,14 +322,17 @@ class _DeliveryCreatePageState extends State<DeliveryCreatePage> {
             SizedBox(
               height: 40,
               child: StreamBuilder<ResponseOb>(
-                  initialData: ResponseOb(
-                      msgState: MsgState.loading),
+                  initialData: ResponseOb(msgState: MsgState.loading),
                   stream: profileBloc.getHrEmployeeStream(),
                   builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                     ResponseOb? responseOb = snapshot.data;
                     if (responseOb?.msgState == MsgState.loading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return const Center(
@@ -381,14 +389,17 @@ class _DeliveryCreatePageState extends State<DeliveryCreatePage> {
             SizedBox(
               height: 40,
               child: StreamBuilder<ResponseOb>(
-                  initialData: ResponseOb(
-                      msgState: MsgState.loading),
+                  initialData: ResponseOb(msgState: MsgState.loading),
                   stream: deliveryBloc.getAccountMoveListStream(),
                   builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                     ResponseOb? responseOb = snapshot.data;
                     if (responseOb?.msgState == MsgState.loading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return const Center(
@@ -428,14 +439,17 @@ class _DeliveryCreatePageState extends State<DeliveryCreatePage> {
             SizedBox(
               height: 40,
               child: StreamBuilder<ResponseOb>(
-                  initialData: ResponseOb(
-                      msgState: MsgState.loading),
+                  initialData: ResponseOb(msgState: MsgState.loading),
                   stream: deliveryBloc.getOrderListStream(),
                   builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                     ResponseOb? responseOb = snapshot.data;
                     if (responseOb?.msgState == MsgState.loading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return const Center(

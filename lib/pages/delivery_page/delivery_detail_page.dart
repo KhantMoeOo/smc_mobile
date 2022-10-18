@@ -47,7 +47,7 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
           fullName: '${element['product_id'][0]} ${element['name']}',
           demand: element['product_uom_qty'].toString(),
           reserved: '0.0',
-          done: '0.0',
+          done: element['quantity_done'].toString(),
           remainingstock: '0.0',
           damageQty: '0.0',
           uomName: element['product_uom'][1],
@@ -434,9 +434,13 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
                               childCount: stockmoveDBList!.length,
                             ));
                           } else {
-                            stockmoveWidget = const SliverToBoxAdapter(
+                            stockmoveWidget = SliverToBoxAdapter(
                               child: Center(
-                                child: CircularProgressIndicator(),
+                                child: Image.asset(
+                                  'assets/gifs/three_circle_loading.gif',
+                                  width: 150,
+                                  height: 150,
+                                ),
                               ),
                             );
                           }
@@ -502,7 +506,7 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
                                                                   .start,
                                                           children: [
                                                         Text(
-                                                            '${stockpickingList[0]['partner_id'][1]}',
+                                                            '${stockpickingList[0]['partner_id'] == false ? '' : stockpickingList[0]['partner_id'][1]}',
                                                             style: const TextStyle(
                                                                 color: Colors
                                                                     .black,
@@ -754,7 +758,7 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
                                                                   .start,
                                                           children: [
                                                         Text(
-                                                            '${stockpickingList[0]['origin']}',
+                                                            '${stockpickingList[0]['origin'] == false ? '' : stockpickingList[0]['origin']}',
                                                             style: const TextStyle(
                                                                 color: Colors
                                                                     .black,
@@ -1251,8 +1255,12 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
                 } else {
                   return Container(
                     color: Colors.white,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/gifs/three_circle_loading.gif',
+                        width: 150,
+                        height: 150,
+                      ),
                     ),
                   );
                 }

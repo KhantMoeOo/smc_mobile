@@ -15,6 +15,10 @@ class StockMoveOb {
   String? remainingstock;
   String uomName;
   int uomId;
+  int? locationId;
+  String? locationName;
+  int? locationDestId;
+  String? locationDestName;
 
   StockMoveOb({
     this.id,
@@ -33,6 +37,10 @@ class StockMoveOb {
     this.damageQty,
     required this.uomName,
     required this.uomId,
+    this.locationId,
+    this.locationDestId,
+    this.locationDestName,
+    this.locationName,
   });
 
   Map<String, dynamic> toMap() {
@@ -53,6 +61,10 @@ class StockMoveOb {
       'done': done,
       'uom_name': uomName,
       'uom_id': uomId,
+      'location_id': locationId,
+      'location_name': locationName,
+      'location_dest_id': locationDestId,
+      'location_dest_name': locationDestName
     };
   }
 }

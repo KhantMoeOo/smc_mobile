@@ -70,12 +70,25 @@ class DeliveryCreateWidgetState extends State<DeliveryCreateWidget> {
                 //   )
                 // ],
                 // borderRadius: BorderRadius.circular(10)
-                        ),
+              ),
               child: TextButton(
                   onPressed: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
-                      return DeliveryCreatePage(newOrEdit: widget.neworedit, neworeditTPD: 0, tripLine: 0, tripplandeliveryId: 0, teamId: 0, assignPersonId: 0, zoneId: 0, zoneName: '', invoiceId: 0, orderId: 0, state: '', invoiceStatus: '', remark: '');
+                      return DeliveryCreatePage(
+                          newOrEdit: widget.neworedit,
+                          neworeditTPD: 0,
+                          tripLine: 0,
+                          tripplandeliveryId: 0,
+                          teamId: 0,
+                          assignPersonId: 0,
+                          zoneId: 0,
+                          zoneName: '',
+                          invoiceId: 0,
+                          orderId: 0,
+                          state: '',
+                          invoiceStatus: '',
+                          remark: '');
                     })).then((value) {
                       setState(() {});
                     });
@@ -104,78 +117,109 @@ class DeliveryCreateWidgetState extends State<DeliveryCreateWidget> {
                             children: [
                               Slidable(
                                 controller: slidableController,
-                              actionPane: const SlidableBehindActionPane(),
-                              actions: [
-                                IconSlideAction(
-                                  onTap: (){
-                                    Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                                      return DeliveryCreatePage(newOrEdit: widget.neworedit, neworeditTPD: 1, tripLine: tripplandeliveryList![i].tripline, tripplandeliveryId: tripplandeliveryList![i].id, teamId: tripplandeliveryList![i].teamId, assignPersonId: tripplandeliveryList![i].assignPersonId, zoneId: tripplandeliveryList![i].zoneId, zoneName: tripplandeliveryList![i].zoneName, invoiceId: tripplandeliveryList![i].invoiceId, orderId: tripplandeliveryList![i].orderId, state: tripplandeliveryList![i].state, invoiceStatus: tripplandeliveryList![i].invoiceStatus, remark: tripplandeliveryList![i].remark);
-                                    })).then((value){
-                                      setState(() {
-                                        
+                                actionPane: const SlidableBehindActionPane(),
+                                actions: [
+                                  IconSlideAction(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) {
+                                        return DeliveryCreatePage(
+                                            newOrEdit: widget.neworedit,
+                                            neworeditTPD: 1,
+                                            tripLine: tripplandeliveryList![i]
+                                                .tripline,
+                                            tripplandeliveryId:
+                                                tripplandeliveryList![i].id,
+                                            teamId:
+                                                tripplandeliveryList![i].teamId,
+                                            assignPersonId:
+                                                tripplandeliveryList![i]
+                                                    .assignPersonId,
+                                            zoneId:
+                                                tripplandeliveryList![i].zoneId,
+                                            zoneName: tripplandeliveryList![i]
+                                                .zoneName,
+                                            invoiceId: tripplandeliveryList![i]
+                                                .invoiceId,
+                                            orderId: tripplandeliveryList![i]
+                                                .orderId,
+                                            state:
+                                                tripplandeliveryList![i].state,
+                                            invoiceStatus:
+                                                tripplandeliveryList![i]
+                                                    .invoiceStatus,
+                                            remark: tripplandeliveryList![i]
+                                                .remark);
+                                      })).then((value) {
+                                        setState(() {});
                                       });
-                                    });
-                                  },
-                                  color: Colors.yellow,
-                                  iconWidget: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(
-                                  Icons.edit,
-                                  size: 25,
-                                ),
-                                Text(
-                                  "Edit",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                ),
-                              ],
-                            ),
-                                ),
-                              ],
-                              secondaryActions: [
-                                IconSlideAction(
-                                  onTap: () async{
-                                    await databaseHelper.deleteTripPlanDeliveryManual(tripplandeliveryList![i].id);
-                                    tripplandeliveryDeleteList.add(tripplandeliveryList![i].id);
-                                    setState(() {
-                                      
-                                    });
-                                  },
-                                  color: Colors.red,
-                                  iconWidget: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(
-                                  Icons.delete,
-                                  size: 25,
-                                ),
-                                Text(
-                                  "Delete",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                ),
-                              ],
-                            ),
-                                )
-                              ],
+                                    },
+                                    color: Colors.yellow,
+                                    iconWidget: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(
+                                          Icons.edit,
+                                          size: 25,
+                                        ),
+                                        Text(
+                                          "Edit",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                                secondaryActions: [
+                                  IconSlideAction(
+                                    onTap: () async {
+                                      await databaseHelper
+                                          .deleteTripPlanDeliveryManual(
+                                              tripplandeliveryList![i].id);
+                                      tripplandeliveryDeleteList
+                                          .add(tripplandeliveryList![i].id);
+                                      setState(() {});
+                                    },
+                                    color: Colors.red,
+                                    iconWidget: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(
+                                          Icons.delete,
+                                          size: 25,
+                                        ),
+                                        Text(
+                                          "Delete",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
                                 child: Container(
                                   width: double.infinity,
                                   padding: const EdgeInsets.all(10),
                                   decoration: const BoxDecoration(
-                                                    color: Colors.white,
-                                                    // borderRadius:
-                                                    //     BorderRadius.circular(10),
-                                                    // boxShadow: const [
-                                                    //   BoxShadow(
-                                                    //     color: Colors.black,
-                                                    //     offset: Offset(0, 0),
-                                                    //     blurRadius: 2,
-                                                    //   )
-                                                    // ]
-                                                    ),
+                                    color: Colors.white,
+                                    // borderRadius:
+                                    //     BorderRadius.circular(10),
+                                    // boxShadow: const [
+                                    //   BoxShadow(
+                                    //     color: Colors.black,
+                                    //     offset: Offset(0, 0),
+                                    //     blurRadius: 2,
+                                    //   )
+                                    // ]
+                                  ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       RichText(
                                           text: TextSpan(children: [
@@ -187,8 +231,8 @@ class DeliveryCreateWidgetState extends State<DeliveryCreateWidget> {
                                               color: Colors.black),
                                         ),
                                         TextSpan(
-                                            text:
-                                                tripplandeliveryList![i].teamName,
+                                            text: tripplandeliveryList![i]
+                                                .teamName,
                                             style: const TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 18))
@@ -219,8 +263,8 @@ class DeliveryCreateWidgetState extends State<DeliveryCreateWidget> {
                                               color: Colors.black),
                                         ),
                                         TextSpan(
-                                            text:
-                                                tripplandeliveryList![i].zoneName,
+                                            text: tripplandeliveryList![i]
+                                                .zoneName,
                                             style: const TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 18))
@@ -322,8 +366,12 @@ class DeliveryCreateWidgetState extends State<DeliveryCreateWidget> {
                         });
                   } else {
                     print(snapshot.hasError.toString());
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    return Center(
+                      child: Image.asset(
+                        'assets/gifs/three_circle_loading.gif',
+                        width: 150,
+                        height: 150,
+                      ),
                     );
                   }
                 }),

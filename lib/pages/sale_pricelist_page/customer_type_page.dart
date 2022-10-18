@@ -24,6 +24,8 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
   List<dynamic> salepricelistproductlineList = [];
   List<dynamic> salepricelistList = [];
   List<dynamic> segmentList = [];
+  List<dynamic> currencyList = [];
+  String currencysymbol = '';
 
   bool isSearch = false;
   bool searchDone = false;
@@ -43,6 +45,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
         .getSalePricelistListStream()
         .listen(getSalePricelistListen);
     quotationBloc.getSegmentListStream().listen(getSegmentListListen);
+    quotationBloc.getCurrencyStream().listen(getCurrencyListen);
   }
 
   void getSalePricelistProductLineListen(ResponseOb responseOb) {
@@ -61,6 +64,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
     if (responseOb.msgState == MsgState.data) {
       userList = responseOb.data;
       if (userList.isNotEmpty) {
+        quotationBloc.getCurrencyList();
         saleorderlineBloc.getSalePricelistProductLineListByRegion(
             zoneId: ['pricelist_id.zone_id', '=', userList[0]['zone_id'][0]],
             type: ['pricelist_id.pricelist_type', '=', 'customer'],
@@ -79,6 +83,23 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
         }
       }
       quotationBloc.getSegmenListData();
+    }
+  }
+
+  void getCurrencyListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      currencyList = responseOb.data;
+    }
+  }
+
+  void getCurrencySymbol(int i) {
+    print('work');
+    for (var currency in currencyList) {
+      print('loop');
+      if (salepricelistproductlineList[i]['currency_id'][0] == currency['id']) {
+        print('same');
+        currencysymbol = currency['symbol'];
+      }
     }
   }
 
@@ -104,12 +125,18 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
               if (responseOb?.msgState == MsgState.loading) {
                 return Container(
                   color: Colors.white,
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/gifs/three_circle_loading.gif',
+                      width: 150,
+                      height: 150,
+                    ),
+                  ),
                 );
               } else if (responseOb?.msgState == MsgState.error) {
                 return Container(
                   color: Colors.white,
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: const Center(child: Text('Error')),
                 );
               } else {
                 return StreamBuilder<ResponseOb>(
@@ -123,12 +150,18 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                     if (responseOb?.msgState == MsgState.loading) {
                       return Container(
                         color: Colors.white,
-                        child: const Center(child: CircularProgressIndicator()),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return Container(
                         color: Colors.white,
-                        child: const Center(child: CircularProgressIndicator()),
+                        child: const Center(child: Text('Error')),
                       );
                     } else {
                       return Scaffold(
@@ -247,47 +280,50 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                             Container(
                                                 padding:
                                                     const EdgeInsets.all(8),
-                                                width: 250,
+                                                width: 150,
                                                 child: const Text(
-                                                  'Product Code',
+                                                  'Product',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
+                                                    fontSize: 13,
                                                   ),
                                                 )),
                                             Container(
                                                 padding:
                                                     const EdgeInsets.all(8),
-                                                width: 100,
+                                                width: 80,
                                                 child: const Text(
-                                                  'UOM',
+                                                  'Unit Price (ctn)',
+                                                  textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
+                                                    fontSize: 13,
                                                   ),
                                                 )),
                                             Container(
                                                 padding:
                                                     const EdgeInsets.all(8),
-                                                width: 100,
+                                                width: 80,
                                                 child: const Text(
                                                   'Unit Price',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
+                                                    fontSize: 13,
                                                   ),
                                                 )),
-                                            Container(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                width: 100,
-                                                child: const Text(
-                                                  'Formula',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
-                                                  ),
-                                                ))
+                                            Expanded(
+                                              child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: const Text(
+                                                    'Formula',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 13,
+                                                    ),
+                                                  )),
+                                            )
                                           ],
                                         ),
                                       ),
@@ -302,6 +338,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                                       salepricelistproductlineList
                                                           .length,
                                                   itemBuilder: (c, i) {
+                                                    getCurrencySymbol(i);
                                                     return Column(
                                                       children: [
                                                         Container(
@@ -315,7 +352,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                                                   padding:
                                                                       const EdgeInsets
                                                                           .all(8),
-                                                                  width: 250,
+                                                                  width: 150,
                                                                   child: Text(
                                                                     '${salepricelistproductlineList[i]['product_id'][1]} ${salepricelistproductlineList[i]['code']}',
                                                                     style:
@@ -324,57 +361,65 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          15,
+                                                                          13,
                                                                     ),
                                                                   )),
                                                               Container(
                                                                   padding:
                                                                       const EdgeInsets
                                                                           .all(8),
-                                                                  width: 100,
+                                                                  width: 80,
                                                                   child: Text(
-                                                                    '${salepricelistproductlineList[i]['uom_id'][1]}',
+                                                                    '${salepricelistproductlineList[i]['custom_price']} $currencysymbol',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .end,
                                                                     style:
                                                                         const TextStyle(
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          15,
+                                                                          13,
                                                                     ),
                                                                   )),
                                                               Container(
                                                                   padding:
                                                                       const EdgeInsets
                                                                           .all(8),
-                                                                  width: 100,
+                                                                  width: 80,
                                                                   child: Text(
-                                                                    '${salepricelistproductlineList[i]['price']}',
+                                                                    '${salepricelistproductlineList[i]['ctn_price']} $currencysymbol',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .end,
                                                                     style:
                                                                         const TextStyle(
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          15,
+                                                                          13,
                                                                     ),
                                                                   )),
-                                                              Container(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(8),
-                                                                  width: 100,
-                                                                  child: Text(
-                                                                    '${salepricelistproductlineList[i]['formula'] == false ? '' : salepricelistproductlineList[i]['formula']}',
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          15,
-                                                                    ),
-                                                                  ))
+                                                              Expanded(
+                                                                child:
+                                                                    Container(
+                                                                        padding:
+                                                                            const EdgeInsets.all(
+                                                                                8),
+                                                                        child:
+                                                                            Text(
+                                                                          '${salepricelistproductlineList[i]['formula'] == false ? '' : salepricelistproductlineList[i]['formula']}',
+                                                                          style:
+                                                                              const TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize:
+                                                                                13,
+                                                                          ),
+                                                                        )),
+                                                              )
                                                             ],
                                                           ),
                                                         ),

@@ -59,7 +59,8 @@ class _MaterialRequisitionDetailPageState
         .getMaterialProductLineListStream()
         .listen(getMaterialProductLineListen);
     materialrequisitioncreateBloc
-        .getCallActionConfirmStream().listen(getCallActionConfirmListen);
+        .getCallActionConfirmStream()
+        .listen(getCallActionConfirmListen);
     // materialrequisitioncreateBloc
     //     .getUpdateMaterialRequisitionStatusStream()
     //     .listen(getUpdateMaterialRequisitionStatusListen);
@@ -262,7 +263,13 @@ class _MaterialRequisitionDetailPageState
               } else if (responseOb?.msgState == MsgState.loading) {
                 return Container(
                     color: Colors.white,
-                    child: const Center(child: CircularProgressIndicator()));
+                    child: Center(
+                      child: Image.asset(
+                        'assets/gifs/three_circle_loading.gif',
+                        width: 150,
+                        height: 150,
+                      ),
+                    ));
               } else {
                 return StreamBuilder<ResponseOb>(
                     initialData: ResponseOb(msgState: MsgState.loading),
@@ -277,8 +284,13 @@ class _MaterialRequisitionDetailPageState
                       } else if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.white,
-                          child:
-                              const Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
+                          ),
                         );
                       } else {
                         return Stack(
@@ -518,9 +530,13 @@ class _MaterialRequisitionDetailPageState
                                         ));
                                       } else {
                                         materialproductlineWidget =
-                                            const SliverToBoxAdapter(
+                                            SliverToBoxAdapter(
                                           child: Center(
-                                            child: CircularProgressIndicator(),
+                                            child: Image.asset(
+                                              'assets/gifs/three_circle_loading.gif',
+                                              width: 150,
+                                              height: 150,
+                                            ),
                                           ),
                                         );
                                       }
@@ -1216,8 +1232,12 @@ class _MaterialRequisitionDetailPageState
                                           MsgState.loading) {
                                         return Container(
                                           color: Colors.black.withOpacity(0.5),
-                                          child: const Center(
-                                            child: CircularProgressIndicator(),
+                                          child: Center(
+                                            child: Image.asset(
+                                              'assets/gifs/three_circle_loading.gif',
+                                              width: 150,
+                                              height: 150,
+                                            ),
                                           ),
                                         );
                                       } else if (responseOb?.msgState ==
@@ -1226,8 +1246,12 @@ class _MaterialRequisitionDetailPageState
                                       }
                                       return Container(
                                         color: Colors.black.withOpacity(0.5),
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
+                                        child: Center(
+                                          child: Image.asset(
+                                            'assets/gifs/three_circle_loading.gif',
+                                            width: 150,
+                                            height: 150,
+                                          ),
                                         ),
                                       );
                                     })
@@ -1245,8 +1269,12 @@ class _MaterialRequisitionDetailPageState
                                           MsgState.loading) {
                                         return Container(
                                           color: Colors.black.withOpacity(0.5),
-                                          child: const Center(
-                                            child: CircularProgressIndicator(),
+                                          child: Center(
+                                            child: Image.asset(
+                                              'assets/gifs/three_circle_loading.gif',
+                                              width: 150,
+                                              height: 150,
+                                            ),
                                           ),
                                         );
                                       } else if (responseOb?.msgState ==
@@ -1260,8 +1288,12 @@ class _MaterialRequisitionDetailPageState
                                       }
                                       return Container(
                                         color: Colors.black.withOpacity(0.5),
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
+                                        child: Center(
+                                          child: Image.asset(
+                                            'assets/gifs/three_circle_loading.gif',
+                                            width: 150,
+                                            height: 150,
+                                          ),
                                         ),
                                       );
                                     })
@@ -1279,8 +1311,12 @@ class _MaterialRequisitionDetailPageState
                                           MsgState.loading) {
                                         return Container(
                                           color: Colors.black.withOpacity(0.5),
-                                          child: const Center(
-                                            child: CircularProgressIndicator(),
+                                          child: Center(
+                                            child: Image.asset(
+                                              'assets/gifs/three_circle_loading.gif',
+                                              width: 150,
+                                              height: 150,
+                                            ),
                                           ),
                                         );
                                       } else if (responseOb?.msgState ==
@@ -1294,8 +1330,12 @@ class _MaterialRequisitionDetailPageState
                                       }
                                       return Container(
                                         color: Colors.black.withOpacity(0.5),
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
+                                        child: Center(
+                                          child: Image.asset(
+                                            'assets/gifs/three_circle_loading.gif',
+                                            width: 150,
+                                            height: 150,
+                                          ),
                                         ),
                                       );
                                     })

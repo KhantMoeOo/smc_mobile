@@ -30,6 +30,12 @@ class _RegionTypePageState extends State<RegionTypePage> {
 
   int salepricelistId = 0;
 
+  List<dynamic> currencyList = [];
+  String currencysymbol = '';
+
+  bool issalepricelistproductlineListData = false;
+  bool hassalepricelistListData = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -43,11 +49,15 @@ class _RegionTypePageState extends State<RegionTypePage> {
         .getSalePricelistListStream()
         .listen(getSalePricelistListen);
     quotationBloc.getSegmentListStream().listen(getSegmentListListen);
+    quotationBloc.getCurrencyStream().listen(getCurrencyListen);
   }
 
   void getSalePricelistProductLineListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       salepricelistproductlineList = responseOb.data;
+      setState(() {
+        issalepricelistproductlineListData = true;
+      });
     }
   }
 
@@ -63,6 +73,7 @@ class _RegionTypePageState extends State<RegionTypePage> {
       if (userList.isNotEmpty) {
         saleorderlineBloc.getSalePricelistData(
             ['zone_id.id', '=', userList[0]['zone_id'][0]]);
+        quotationBloc.getCurrencyList();
         saleorderlineBloc.getSalePricelistProductLineListByRegion(
             zoneId: ['pricelist_id.zone_id', '=', userList[0]['zone_id'][0]],
             type: ['pricelist_id.pricelist_type', '=', 'region'],
@@ -74,6 +85,9 @@ class _RegionTypePageState extends State<RegionTypePage> {
   void getSalePricelistListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       salepricelistList = responseOb.data;
+      setState(() {
+        hassalepricelistListData = true;
+      });
       // for (var salepricelist in salepricelistList) {
       //   if (userList[0]['zone_id'][0] == salepricelist['zone_id'][0]) {
       //     salepricelistId = salepricelist['id'];
@@ -81,6 +95,23 @@ class _RegionTypePageState extends State<RegionTypePage> {
       //   }
       // }
       //quotationBloc.getSegmenListData();
+    }
+  }
+
+  void getCurrencyListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      currencyList = responseOb.data;
+    }
+  }
+
+  void getCurrencySymbol(int i) {
+    print('work');
+    for (var currency in currencyList) {
+      print('loop');
+      if (salepricelistproductlineList[i]['currency_id'][0] == currency['id']) {
+        print('same');
+        currencysymbol = currency['symbol'];
+      }
     }
   }
 
@@ -106,12 +137,18 @@ class _RegionTypePageState extends State<RegionTypePage> {
               if (responseOb?.msgState == MsgState.loading) {
                 return Container(
                   color: Colors.white,
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/gifs/three_circle_loading.gif',
+                      width: 150,
+                      height: 150,
+                    ),
+                  ),
                 );
               } else if (responseOb?.msgState == MsgState.error) {
                 return Container(
                   color: Colors.white,
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: const Center(child: Text('Error')),
                 );
               } else {
                 return StreamBuilder<ResponseOb>(
@@ -124,20 +161,25 @@ class _RegionTypePageState extends State<RegionTypePage> {
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.white,
-                          child:
-                              const Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
+                          ),
                         );
                       } else if (responseOb?.msgState == MsgState.error) {
                         return Container(
                           color: Colors.white,
-                          child:
-                              const Center(child: CircularProgressIndicator()),
+                          child: const Center(child: Text('Error')),
                         );
                       } else {
                         return StreamBuilder<ResponseOb>(
-                          initialData: salepricelistproductlineList.isNotEmpty
-                              ? null
-                              : ResponseOb(msgState: MsgState.loading),
+                          initialData:
+                              issalepricelistproductlineListData == true
+                                  ? null
+                                  : ResponseOb(msgState: MsgState.loading),
                           stream: saleorderlineBloc
                               .getSalePricelistProductLineListByRegionStream(),
                           builder:
@@ -146,14 +188,18 @@ class _RegionTypePageState extends State<RegionTypePage> {
                             if (responseOb?.msgState == MsgState.loading) {
                               return Container(
                                 color: Colors.white,
-                                child: const Center(
-                                    child: CircularProgressIndicator()),
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/gifs/three_circle_loading.gif',
+                                    width: 150,
+                                    height: 150,
+                                  ),
+                                ),
                               );
                             } else if (responseOb?.msgState == MsgState.error) {
                               return Container(
                                 color: Colors.white,
-                                child: const Center(
-                                    child: CircularProgressIndicator()),
+                                child: const Center(child: Text('Error')),
                               );
                             } else {
                               return Scaffold(
@@ -283,54 +329,58 @@ class _RegionTypePageState extends State<RegionTypePage> {
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(8),
-                                                        width: 250,
+                                                        width: 150,
                                                         child: const Text(
-                                                          'Product Code',
+                                                          'Product',
                                                           style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            fontSize: 15,
+                                                            fontSize: 13,
                                                           ),
                                                         )),
                                                     Container(
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(8),
-                                                        width: 100,
-                                                        child: const Text(
-                                                          'UOM',
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 15,
-                                                          ),
-                                                        )),
-                                                    Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8),
-                                                        width: 100,
+                                                        width: 80,
                                                         child: const Text(
                                                           'Unit Price',
                                                           style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            fontSize: 15,
+                                                            fontSize: 13,
                                                           ),
                                                         )),
                                                     Container(
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(8),
-                                                        width: 100,
+                                                        width: 80,
                                                         child: const Text(
-                                                          'Formula',
+                                                          'Unit Price (ctn)',
+                                                          textAlign:
+                                                              TextAlign.center,
                                                           style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            fontSize: 15,
+                                                            fontSize: 13,
                                                           ),
-                                                        ))
+                                                        )),
+                                                    Expanded(
+                                                      child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8),
+                                                          child: const Text(
+                                                            'Formula',
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 13,
+                                                            ),
+                                                          )),
+                                                    )
                                                   ],
                                                 ),
                                               ),
@@ -346,6 +396,8 @@ class _RegionTypePageState extends State<RegionTypePage> {
                                                               salepricelistproductlineList
                                                                   .length,
                                                           itemBuilder: (c, i) {
+                                                            getCurrencySymbol(
+                                                                i);
                                                             return Column(
                                                               children: [
                                                                 Container(
@@ -360,58 +412,59 @@ class _RegionTypePageState extends State<RegionTypePage> {
                                                                           padding: const EdgeInsets.all(
                                                                               8),
                                                                           width:
-                                                                              250,
+                                                                              150,
                                                                           child:
                                                                               Text(
                                                                             '${salepricelistproductlineList[i]['product_id'][1]} ${salepricelistproductlineList[i]['code']}',
                                                                             style:
                                                                                 const TextStyle(
                                                                               fontWeight: FontWeight.bold,
-                                                                              fontSize: 15,
+                                                                              fontSize: 13,
                                                                             ),
                                                                           )),
                                                                       Container(
                                                                           padding: const EdgeInsets.all(
                                                                               8),
                                                                           width:
-                                                                              100,
+                                                                              80,
                                                                           child:
                                                                               Text(
-                                                                            '${salepricelistproductlineList[i]['uom_id'][1]}',
+                                                                            '${salepricelistproductlineList[i]['custom_price']} $currencysymbol',
+                                                                            textAlign:
+                                                                                TextAlign.end,
                                                                             style:
                                                                                 const TextStyle(
                                                                               fontWeight: FontWeight.bold,
-                                                                              fontSize: 15,
+                                                                              fontSize: 13,
                                                                             ),
                                                                           )),
                                                                       Container(
                                                                           padding: const EdgeInsets.all(
                                                                               8),
                                                                           width:
-                                                                              100,
+                                                                              80,
                                                                           child:
                                                                               Text(
-                                                                            '${salepricelistproductlineList[i]['price']}',
+                                                                            '${salepricelistproductlineList[i]['ctn_price']} $currencysymbol',
+                                                                            textAlign:
+                                                                                TextAlign.end,
                                                                             style:
                                                                                 const TextStyle(
                                                                               fontWeight: FontWeight.bold,
-                                                                              fontSize: 15,
+                                                                              fontSize: 13,
                                                                             ),
                                                                           )),
-                                                                      Container(
-                                                                          padding: const EdgeInsets.all(
-                                                                              8),
-                                                                          width:
-                                                                              100,
-                                                                          child:
-                                                                              Text(
-                                                                            '${salepricelistproductlineList[i]['formula'] == false ? '' : salepricelistproductlineList[i]['formula']}',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 15,
-                                                                            ),
-                                                                          ))
+                                                                      Expanded(
+                                                                        child: Container(
+                                                                            padding: const EdgeInsets.all(8),
+                                                                            child: Text(
+                                                                              '${salepricelistproductlineList[i]['formula'] == false ? '' : salepricelistproductlineList[i]['formula']}',
+                                                                              style: const TextStyle(
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 13,
+                                                                              ),
+                                                                            )),
+                                                                      )
                                                                     ],
                                                                   ),
                                                                 ),

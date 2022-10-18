@@ -17,16 +17,17 @@ class ScheduleCreatePage extends StatefulWidget {
   int locationId;
   String? locationName;
   String remark;
-  ScheduleCreatePage({Key? key,
-  required this.newOrEdit,
-  required this.neworeditTPS,
-  required this.tripId,
-  required this.tripplanscheduleId,
-  required this.fromDate,
-  required this.toDate,
-  required this.locationId,
-  required this.locationName,
-  required this.remark,
+  ScheduleCreatePage({
+    Key? key,
+    required this.newOrEdit,
+    required this.neworeditTPS,
+    required this.tripId,
+    required this.tripplanscheduleId,
+    required this.fromDate,
+    required this.toDate,
+    required this.locationId,
+    required this.locationName,
+    required this.remark,
   }) : super(key: key);
 
   @override
@@ -57,7 +58,7 @@ class _ScheduleCreatePageState extends State<ScheduleCreatePage> {
     super.initState();
     scheduleBloc.getTownshipListData('');
     scheduleBloc.getTownshipListStream().listen(getTownshipListListen);
-    if(widget.newOrEdit == 1){
+    if (widget.newOrEdit == 1) {
       fromDateController.text = widget.fromDate;
       toDateController.text = widget.toDate;
       remarkController.text = widget.remark;
@@ -98,17 +99,17 @@ class _ScheduleCreatePageState extends State<ScheduleCreatePage> {
       if (widget.locationId != 0) {
         for (var element in townshipList) {
           if (element['id'] == widget.locationId) {
-            hasNotTownship= false;
+            hasNotTownship = false;
             townshipId = element['id'];
             townshipName = element['name'];
-            
+
             print('townshipId: $townshipId');
             print('townshipName: $townshipName');
           }
         }
       }
     }
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,47 +122,54 @@ class _ScheduleCreatePageState extends State<ScheduleCreatePage> {
           actions: [
             TextButton(
                 onPressed: () async {
-                  if(widget.newOrEdit == 1){
-                    if(widget.neworeditTPS == 1){
-                      await databaseHelper.updateTripPlanSchedule(widget.tripplanscheduleId, widget.tripId, fromDateController.text, toDateController.text, townshipId, townshipName, remarkController.text);
+                  if (widget.newOrEdit == 1) {
+                    if (widget.neworeditTPS == 1) {
+                      await databaseHelper.updateTripPlanSchedule(
+                          widget.tripplanscheduleId,
+                          widget.tripId,
+                          fromDateController.text,
+                          toDateController.text,
+                          townshipId,
+                          townshipName,
+                          remarkController.text);
                       Navigator.of(context).pop();
-                    }else{
+                    } else {
                       final tripplanscheduleOb = TripPlanScheduleOb(
-                      tripId: widget.tripId,
-                      fromDate: fromDate,
-                      toDate: toDate,
-                      locationId: townshipId,
-                      locationName: townshipName,
-                      remark: remarkController.text);
-                  int isCreated = await databaseHelper
-                      .insertTripPlanSchedule(tripplanscheduleOb);
-                  if (isCreated > 0) {
-                    print('Success Created a Schedule');
-                    Navigator.of(context).pop();
-                  } else {
-                    print('Error');
-                  }
+                          tripId: widget.tripId,
+                          fromDate: fromDate,
+                          toDate: toDate,
+                          locationId: townshipId,
+                          locationName: townshipName,
+                          remark: remarkController.text);
+                      int isCreated = await databaseHelper
+                          .insertTripPlanSchedule(tripplanscheduleOb);
+                      if (isCreated > 0) {
+                        print('Success Created a Schedule');
+                        Navigator.of(context).pop();
+                      } else {
+                        print('Error');
+                      }
                     }
-                  }else{
-                    final tripplanscheduleOb = TripPlanScheduleOb(
-                      tripId: 0,
-                      fromDate: fromDate,
-                      toDate: toDate,
-                      locationId: townshipId,
-                      locationName: townshipName,
-                      remark: remarkController.text);
-                  int isCreated = await databaseHelper
-                      .insertTripPlanSchedule(tripplanscheduleOb);
-                  if (isCreated > 0) {
-                    print('Success Created a Schedule');
-                    Navigator.of(context).pop();
                   } else {
-                    print('Error');
-                  }
+                    final tripplanscheduleOb = TripPlanScheduleOb(
+                        tripId: 0,
+                        fromDate: fromDate,
+                        toDate: toDate,
+                        locationId: townshipId,
+                        locationName: townshipName,
+                        remark: remarkController.text);
+                    int isCreated = await databaseHelper
+                        .insertTripPlanSchedule(tripplanscheduleOb);
+                    if (isCreated > 0) {
+                      print('Success Created a Schedule');
+                      Navigator.of(context).pop();
+                    } else {
+                      print('Error');
+                    }
                   }
                 },
-                child: Text(widget.neworeditTPS == 1? 'Update':
-                  "Create",
+                child: Text(
+                  widget.neworeditTPS == 1 ? 'Update' : "Create",
                   style: const TextStyle(color: Colors.white),
                 ))
           ],
@@ -188,7 +196,7 @@ class _ScheduleCreatePageState extends State<ScheduleCreatePage> {
                               initialDate: DateTime.now(),
                               firstDate: DateTime.now(),
                               lastDate: DateTime(2023));
-    
+
                           if (selected != null) {
                             fromDate = selected.toString().split(' ')[0];
                             fromDateController.text =
@@ -220,7 +228,7 @@ class _ScheduleCreatePageState extends State<ScheduleCreatePage> {
                               initialDate: DateTime.now(),
                               firstDate: DateTime.now(),
                               lastDate: DateTime(2023));
-    
+
                           if (selected != null) {
                             toDate = selected.toString().split(' ')[0];
                             toDateController.text =
@@ -241,14 +249,17 @@ class _ScheduleCreatePageState extends State<ScheduleCreatePage> {
               color: Colors.white,
               height: 40,
               child: StreamBuilder<ResponseOb>(
-                  initialData: ResponseOb(
-                      msgState: MsgState.loading),
+                  initialData: ResponseOb(msgState: MsgState.loading),
                   stream: scheduleBloc.getTownshipListStream(),
                   builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                     ResponseOb? responseOb = snapshot.data;
                     if (responseOb?.msgState == MsgState.loading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return const Center(

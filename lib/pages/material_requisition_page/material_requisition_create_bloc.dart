@@ -26,12 +26,13 @@ class MaterialRequisitionCreateBloc {
   late Odoo odoo;
 
   createMaterialRequisition(
-      {refno,
+      {
+      //refno,
       zoneId,
       requestPerson,
       departmentId,
       locationId,
-      invoiceId,
+      //invoiceId,
       priority,
       orderdate,
       scheduledDate,
@@ -46,12 +47,12 @@ class MaterialRequisitionCreateBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.create('material.requisition', {
           'multi_config': 'sale',
-          'ref_no': refno,
+          //'ref_no': refno,
           'zone_id': zoneId,
           'request_person': requestPerson,
           'department_id': departmentId,
           'location_id': locationId,
-          'invoice_id': invoiceId,
+          //'invoice_id': invoiceId,
           'priority': priority,
           'order_date': orderdate,
           'scheduled_date': scheduledDate,
@@ -188,8 +189,8 @@ class MaterialRequisitionCreateBloc {
           responseOb.data = res.getResult();
           callActionConfirmStreamController.sink.add(responseOb);
         } else {
-          print('GetcallActionConfirmError:' +
-              res.getErrorMessage().toString());
+          print(
+              'GetcallActionConfirmError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           callActionConfirmStreamController.sink.add(responseOb);

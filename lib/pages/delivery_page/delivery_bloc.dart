@@ -51,13 +51,15 @@ class StockPickingBloc {
               'picking_type_id',
               'location_id',
               'location_dest_id',
+              'department_id',
               'scheduled_date',
-              'origin',
+              'material_id',
+                  'origin',
               'is_ncr_complaint',
               'sale_id',
             ],
             order: 'id desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Stock Picking Result: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -112,7 +114,7 @@ class StockPickingBloc {
               'default_location_dest_id'
             ],
             order: 'id desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Stock Picking Type Result: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -159,7 +161,7 @@ class StockPickingBloc {
         OdooResponse res = await odoo.searchRead(
             'stock.move',
             [
-              ['picking_id','=',pickingId],
+              ['picking_id', '=', pickingId],
             ],
             [
               'id',
@@ -167,14 +169,17 @@ class StockPickingBloc {
               'picking_id',
               'product_id',
               'product_uom_qty',
+              'quantity_done',
               'product_uom',
               'location_id',
               'location_dest_id',
-              'picking_id',
+              'remaining_qty',
+              'damage_qty',
+              //'picking_id',
               'origin',
             ],
             order: 'id desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Stock Move Result: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

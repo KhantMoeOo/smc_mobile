@@ -69,27 +69,29 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    
+
     quotationBloc.getRegionListStream().listen(getResCitiesListen);
     quotationBloc.getZoneListData();
     quotationBloc.getZoneListStream().listen(getZonelist);
     quotationBloc.getSegmenListData();
     quotationBloc.getSegmentListStream().listen(getSegmentlist);
     scheduleBloc.getTownshipListStream().listen(getTownshipListListen);
-    customerBloc.getResCountryStateListStream().listen(getResCountryStateListListen);
+    customerBloc
+        .getResCountryStateListStream()
+        .listen(getResCountryStateListListen);
     customerBloc.getResCountryList();
     customerBloc.getResCountryListStream().listen(getResCountryListListen);
     customercreateBloc.getCustomemrCreateStream().listen(createCustomerListen);
   }
 
   void getResCitiesListen(ResponseOb responseOb) {
-    if(responseOb.msgState == MsgState.data){
+    if (responseOb.msgState == MsgState.data) {
       rescitiesList = responseOb.data;
       hasCityData = false;
-    }else if(responseOb.msgState == MsgState.error){
+    } else if (responseOb.msgState == MsgState.error) {
       print('No Res Cities List');
     }
-  }// Get Res Cities Listen
+  } // Get Res Cities Listen
 
   void getTownshipListListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
@@ -125,7 +127,7 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
     if (responseOb.msgState == MsgState.data) {
       rescountrystateList = responseOb.data;
       hasResCountryStateData = false;
-      for(var element in rescountrystateList){
+      for (var element in rescountrystateList) {
         element['country_code'] = rescountryCode;
       }
       print('Final ResCountryState: ${rescountrystateList}');
@@ -147,7 +149,7 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
             rescountrystateName = '${element['name']} ($rescountryCode)';
             rescountrystateId = element['id'];
             quotationBloc.getRegionListData(rescountrystateId);
-            
+
             print('rescountrystateName: $rescountrystateName');
             print('rescountrystateId: $rescountrystateId');
           }
@@ -259,7 +261,7 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
         for (var element in rescitiesList) {
           if (element['id'] == rescitiesId) {
             rescitiesName = element['name'];
-            rescitiesId= element['id'];
+            rescitiesId = element['id'];
             scheduleBloc.getTownshipListData(rescitiesId);
             print('rescitiesName: $rescitiesName');
             print('rescitiesId: $rescitiesId');
@@ -272,25 +274,25 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
   } // get RegionListId from RegionListSelection
 
   void createCustomerListen(ResponseOb responseOb) {
-    if(responseOb.msgState == MsgState.data){
+    if (responseOb.msgState == MsgState.data) {
       final snackbar = SnackBar(
-              elevation: 0.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 1),
-              backgroundColor: Colors.green,
-              content: const Text('Create Quo Successfully!',
-                  textAlign: TextAlign.center));
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) {
-            return CustomerListPage();
-          }), (route) => false);
-          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+          elevation: 0.0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.green,
+          content: const Text('Create Quo Successfully!',
+              textAlign: TextAlign.center));
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) {
+        return CustomerListPage();
+      }), (route) => false);
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
   }
 
-  createCustomer() async{
+  createCustomer() async {
     bool isValid = _formKey.currentState!.validate();
     if (isValid) {
       setState(() {
@@ -298,21 +300,21 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
         print('isCreateCustomer: $isCreateCustomer');
       });
       await customercreateBloc.customerCreate(
-                  name: customerNameController.text, 
-                  code: customerCodeController.text, 
-                  partnerCity: rescitiesId,
-                  partnerTownship: townshipId, 
-                  stateId: rescountrystateId, 
-                  countryId: rescountryId, 
-                  street: streetController.text, 
-                  street2: street2Controller.text, 
-                  segmentId: segmentId, 
-                  zoneId: zoneId, 
-                  email: emailController.text, 
-                  phone: phoneController.text, 
-                  mobile: mobileController.text, 
-                  categoryId: 0, 
-                  website: websiteLinkController.text);
+          name: customerNameController.text,
+          code: customerCodeController.text,
+          partnerCity: rescitiesId,
+          partnerTownship: townshipId,
+          stateId: rescountrystateId,
+          countryId: rescountryId,
+          street: streetController.text,
+          street2: street2Controller.text,
+          segmentId: segmentId,
+          zoneId: zoneId,
+          email: emailController.text,
+          phone: phoneController.text,
+          mobile: mobileController.text,
+          categoryId: 0,
+          website: websiteLinkController.text);
     } else {
       final snackbar = SnackBar(
           elevation: 0.0,
@@ -341,597 +343,613 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
     quotationBloc.dipose();
     scheduleBloc.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Stack(
         children: [
           Scaffold(
-            backgroundColor: Colors.grey[200],
-            appBar: AppBar(
-              backgroundColor: AppColors.appBarColor,
-              title: const Text("New"),
-              actions: [
-                TextButton(
-                  onPressed: createCustomer, 
-                  child: const Text('Save',style: TextStyle(color: Colors.white, fontSize: 20),)
-                )
-              ],
-            ),
-            body: Form(
-              key: _formKey,
-              child: CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    sliver: SliverList(delegate: SliverChildListDelegate([
-                      const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(
-                                            "Customer Name*:",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: hasNotCustomer == true
-                                                    ? Colors.red
-                                                    : Colors.black),
-                                          ),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                  autovalidateMode: AutovalidateMode
-                                                      .onUserInteraction,
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Please Enter Customer Name';
-                                                    }
-                                                    return null;
-                                                  },
-                                                  onChanged: (customer){
-                                                    setState(() {
-                                                      if(customer.isEmpty){
-                                                        hasNotCustomer = true;
-                                                      }else{
-                                                        hasNotCustomer = false;
-                                                      }
-                                                    });
-                                                  },
-                                                  controller: customerNameController,
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                      const SizedBox(
-                                            height: 20,
-                                          ),
-                                          const Text(
-                                            "Customer Code:",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                  controller: customerCodeController,
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                      const SizedBox(
-                                            height: 20,
-                                          ),
-                                          const Text(
-                                            "Address:",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                  controller: streetController,
-                                                  decoration: const InputDecoration(
-                                                    hintText: 'Street...',
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                  controller: street2Controller,
-                                                  decoration: const InputDecoration(
-                                                    hintText: 'Street 2...',
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                                                      const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          color: Colors.white,
-                                          height: 40,
-                                          child: StreamBuilder<ResponseOb>(
-                                              initialData:
-                                                  hasCityData == true
-                                                      ? ResponseOb(
-                                                          msgState: MsgState.loading)
-                                                      : null,
-                                              stream: quotationBloc
-                                                  .getRegionListStream(),
-                                              builder: (context,
-                                                  AsyncSnapshot<ResponseOb>
-                                                      snapshot) {
-                                                ResponseOb? responseOb =
-                                                    snapshot.data;
-                                                if (responseOb?.msgState ==
-                                                    MsgState.loading) {
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                } else if (responseOb?.msgState ==
-                                                    MsgState.error) {
-                                                  return const Center(
-                                                    child:
-                                                        Text("Something went Wrong!"),
-                                                  );
-                                                } else {
-                                                  return DropdownSearch<String>(
-                                                    label: 'Cities',
-                                                    // dropdownSearchDecoration: const InputDecoration(
-                                                    //   border: OutlineInputBorder(),
-                                                    //   helperText: 'Cities',
-                                                    // ),
-                                                    popupItemBuilder:
-                                                        (context, item, isSelected) {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets.all(8.0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(item
-                                                                .toString()
-                                                                .split(',')[1]),
-                                                            const Divider(),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                    showSearchBox: true,
-                                                    showSelectedItems: true,
-                                                    showClearButton:
-                                                        !hasNotCity,
-                                                    items: rescitiesList
-                                                        .map((e) =>
-                                                            '${e['id']},${e['name']}')
-                                                        .toList(),
-                                                    onChanged: getResCitiesListId,
-                                                    selectedItem: rescitiesName
-                                                  );
-                                                }
-                                              }),
-                                        ),
-                      const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    color: Colors.white,
-                    height: 40,
-                    child: StreamBuilder<ResponseOb>(
-                        initialData: hasTownshipData == false? null : ResponseOb(
-                            msgState: MsgState.loading),
-                        stream: scheduleBloc.getTownshipListStream(),
-                        builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                          ResponseOb? responseOb = snapshot.data;
-                          if (responseOb?.msgState == MsgState.loading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (responseOb?.msgState == MsgState.error) {
-                            return const Center(
-                              child: Text("Something went Wrong!"),
-                            );
-                          } else {
-                            return DropdownSearch<String>(
-                              label: 'Township',
-                              popupItemBuilder: (context, item, isSelected) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(item.toString().split(',')[1]),
-                                      const Divider(),
-                                    ],
-                                  ),
-                                );
-                              },
-                              showSearchBox: true,
-                              showSelectedItems: true,
-                              showClearButton: !hasNotTownship,
-                              items: townshipList
-                                  .map((e) => '${e['id']},${e['name']}')
-                                  .toList(),
-                              onChanged: getTownshipListId,
-                              selectedItem: townshipName,
-                            );
-                          }
-                        }),
-                  ),
-                      
-                                        const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    color: Colors.white,
-                    height: 40,
-                    child: StreamBuilder<ResponseOb>(
-                        initialData: hasResCountryData == false ? null: ResponseOb(
-                            msgState: MsgState.loading),
-                        stream: customerBloc.getResCountryStateListStream(),
-                        builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                          ResponseOb? responseOb = snapshot.data;
-                          if (responseOb?.msgState == MsgState.loading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (responseOb?.msgState == MsgState.error) {
-                            return const Center(
-                              child: Text("Something went Wrong!"),
-                            );
-                          } else {
-                            return DropdownSearch<String>(
-                              label: 'State',
-                              popupItemBuilder: (context, item, isSelected) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(item.toString().split(',')[1]),
-                                      const Divider(),
-                                    ],
-                                  ),
-                                );
-                              },
-                              showSearchBox: true,
-                              showSelectedItems: true,
-                              showClearButton: !hasNotResCountryState,
-                              items: rescountrystateList
-                                  .map((e) => '${e['id']},${e['name']} (${e['country_code']})')
-                                  .toList(),
-                              onChanged: getResCountryStateListId,
-                              selectedItem: rescountrystateName,
-                            );
-                          }
-                        }),
-                  ),
-                                      const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    color: Colors.white,
-                    height: 40,
-                    child: StreamBuilder<ResponseOb>(
-                        initialData: hasResCountryData == true? null : ResponseOb(
-                            msgState: MsgState.loading),
-                        stream: customerBloc.getResCountryListStream(),
-                        builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                          ResponseOb? responseOb = snapshot.data;
-                          if (responseOb?.msgState == MsgState.loading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (responseOb?.msgState == MsgState.error) {
-                            return const Center(
-                              child: Text("Something went Wrong!"),
-                            );
-                          } else {
-                            return DropdownSearch<String>(
-                              label: 'Country',
-                              popupItemBuilder: (context, item, isSelected) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(item.toString().split(',')[1]),
-                                      const Divider(),
-                                    ],
-                                  ),
-                                );
-                              },
-                              showSearchBox: true,
-                              showSelectedItems: true,
-                              showClearButton: !hasNotResCountry,
-                              items: rescountryList
-                                  .map((e) => '${e['id']},${e['name']}')
-                                  .toList(),
-                              onChanged: getResCountryListId,
-                              selectedItem: rescountryName,
-                            );
-                          }
-                        }),
-                  ),
-                      const SizedBox(
-                                          height: 10,
-                                        ),
-                                        const Text(
-                                          "Zone:",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
-                                        ),
-                                          const SizedBox(height: 10,),
-                                        Container(
-                                          color: Colors.white,
-                                          height: 40,
-                                          child: StreamBuilder<ResponseOb>(
-                                              initialData: hasZoneData == false
-                                                  ? ResponseOb(
-                                                      msgState: MsgState.loading)
-                                                  : null,
-                                              stream:
-                                                  quotationBloc.getZoneListStream(),
-                                              builder: (context,
-                                                  AsyncSnapshot<ResponseOb>
-                                                      snapshot) {
-                                                ResponseOb? responseOb =
-                                                    snapshot.data;
-                                                if (responseOb?.msgState ==
-                                                    MsgState.loading) {
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                } else if (responseOb?.msgState ==
-                                                    MsgState.error) {
-                                                  return const Center(
-                                                    child:
-                                                        Text("Something went Wrong!"),
-                                                  );
-                                                } else {
-                                                  return DropdownSearch<String>(
-                                                    popupItemBuilder:
-                                                        (context, item, isSelected) {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets.all(8.0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(item
-                                                                .toString()
-                                                                .split(',')[1]),
-                                                            const Divider(),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                    showSearchBox: true,
-                                                    showSelectedItems: true,
-                                                    showClearButton: !hasNotZone,
-                                                    items: zoneList
-                                                        .map((e) =>
-                                                            '${e['id']},${e['name']}')
-                                                        .toList(),
-                                                    onChanged: getZoneListId,
-                                                    selectedItem: zoneName,
-                                                  );
-                                                }
-                                              }),
-                                        ),
-                      const SizedBox(
-                                          height: 10,
-                                        ),
-                                        const Text(
-                                          "Segment:",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
-                                        ),
-                                          const SizedBox(height: 10,),
-                                        Container(
-                                          color: Colors.white,
-                                          height: 40,
-                                          child: StreamBuilder<ResponseOb>(
-                                              initialData: hasSegmentData == false
-                                                  ? ResponseOb(
-                                                      msgState: MsgState.loading)
-                                                  : null,
-                                              stream: quotationBloc
-                                                  .getSegmentListStream(),
-                                              builder: (context,
-                                                  AsyncSnapshot<ResponseOb>
-                                                      snapshot) {
-                                                ResponseOb? responseOb =
-                                                    snapshot.data;
-                                                if (responseOb?.msgState ==
-                                                    MsgState.loading) {
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                } else if (responseOb?.msgState ==
-                                                    MsgState.error) {
-                                                  return const Center(
-                                                    child:
-                                                        Text("Something went Wrong!"),
-                                                  );
-                                                } else {
-                                                  return DropdownSearch<String>(
-                                                    popupItemBuilder:
-                                                        (context, item, isSelected) {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets.all(8.0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(item
-                                                                .toString()
-                                                                .split(',')[1]),
-                                                            const Divider(),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                    showSearchBox: true,
-                                                    showSelectedItems: true,
-                                                    showClearButton: !hasNotSegment,
-                                                    items: segmentList
-                                                        .map((e) =>
-                                                            '${e['id']},${e['name']}')
-                                                        .toList(),
-                                                    onChanged: getSegmentListId,
-                                                    selectedItem: segmentName,
-                                                  );
-                                                }
-                                              }),
-                                        ),
-                      const SizedBox(
-                                            height: 20,
-                                          ),
-                                          const Text(
-                                            "Phone:",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                keyboardType: TextInputType.number,
-                                                inputFormatters: <TextInputFormatter>[
-                                                  FilteringTextInputFormatter.digitsOnly
-                                                ],
-                                                  controller: phoneController,
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                      const SizedBox(
-                                            height: 20,
-                                          ),
-                                          const Text(
-                                            "Mobile:",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                keyboardType: TextInputType.number,
-                                                inputFormatters: <TextInputFormatter>[
-                                                  FilteringTextInputFormatter.digitsOnly
-                                                ],
-                                                  controller: mobileController,
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                      const SizedBox(
-                                            height: 20,
-                                          ),
-                                          const Text(
-                                            "Email:",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                  controller: emailController,
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                      const SizedBox(
-                                            height: 20,
-                                          ),
-                                          const Text(
-                                            "Website Link:",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                          const SizedBox(height: 10,),
-                                          Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: TextFormField(
-                                                  controller: websiteLinkController,
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      
-                                                      ))),
-                    ])),
-                  )
+              backgroundColor: Colors.grey[200],
+              appBar: AppBar(
+                backgroundColor: AppColors.appBarColor,
+                title: const Text("New"),
+                actions: [
+                  TextButton(
+                      onPressed: createCustomer,
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ))
                 ],
               ),
-            )
-          ),
-          isCreateCustomer == false? Container():
-          StreamBuilder<ResponseOb>(
-            initialData: ResponseOb(msgState: MsgState.loading),
-            stream: customercreateBloc.getCustomemrCreateStream(),
-            builder: (context, AsyncSnapshot<ResponseOb> snapshot){
-              ResponseOb responseOb = snapshot.data!;
-              if(responseOb.msgState == MsgState.loading){
-                return Container(
-                          color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+              body: Form(
+                key: _formKey,
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      sliver: SliverList(
+                          delegate: SliverChildListDelegate([
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "Customer Name*:",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: hasNotCustomer == true
+                                  ? Colors.red
+                                  : Colors.black),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please Enter Customer Name';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (customer) {
+                                  setState(() {
+                                    if (customer.isEmpty) {
+                                      hasNotCustomer = true;
+                                    } else {
+                                      hasNotCustomer = false;
+                                    }
+                                  });
+                                },
+                                controller: customerNameController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ))),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          "Customer Code:",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                controller: customerCodeController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ))),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          "Address:",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                controller: streetController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Street...',
+                                  border: OutlineInputBorder(),
+                                ))),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                controller: street2Controller,
+                                decoration: const InputDecoration(
+                                  hintText: 'Street 2...',
+                                  border: OutlineInputBorder(),
+                                ))),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          color: Colors.white,
+                          height: 40,
+                          child: StreamBuilder<ResponseOb>(
+                              initialData: hasCityData == true
+                                  ? ResponseOb(msgState: MsgState.loading)
+                                  : null,
+                              stream: quotationBloc.getRegionListStream(),
+                              builder: (context,
+                                  AsyncSnapshot<ResponseOb> snapshot) {
+                                ResponseOb? responseOb = snapshot.data;
+                                if (responseOb?.msgState == MsgState.loading) {
+                                  return Center(
+                                    child: Image.asset(
+                                      'assets/gifs/three_circle_loading.gif',
+                                      width: 150,
+                                      height: 150,
+                                    ),
+                                  );
+                                } else if (responseOb?.msgState ==
+                                    MsgState.error) {
+                                  return const Center(
+                                    child: Text("Something went Wrong!"),
+                                  );
+                                } else {
+                                  return DropdownSearch<String>(
+                                      label: 'Cities',
+                                      // dropdownSearchDecoration: const InputDecoration(
+                                      //   border: OutlineInputBorder(),
+                                      //   helperText: 'Cities',
+                                      // ),
+                                      popupItemBuilder:
+                                          (context, item, isSelected) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(item
+                                                  .toString()
+                                                  .split(',')[1]),
+                                              const Divider(),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      showSearchBox: true,
+                                      showSelectedItems: true,
+                                      showClearButton: !hasNotCity,
+                                      items: rescitiesList
+                                          .map((e) => '${e['id']},${e['name']}')
+                                          .toList(),
+                                      onChanged: getResCitiesListId,
+                                      selectedItem: rescitiesName);
+                                }
+                              }),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          color: Colors.white,
+                          height: 40,
+                          child: StreamBuilder<ResponseOb>(
+                              initialData: hasTownshipData == false
+                                  ? null
+                                  : ResponseOb(msgState: MsgState.loading),
+                              stream: scheduleBloc.getTownshipListStream(),
+                              builder: (context,
+                                  AsyncSnapshot<ResponseOb> snapshot) {
+                                ResponseOb? responseOb = snapshot.data;
+                                if (responseOb?.msgState == MsgState.loading) {
+                                  return Center(
+                                    child: Image.asset(
+                                      'assets/gifs/three_circle_loading.gif',
+                                      width: 150,
+                                      height: 150,
+                                    ),
+                                  );
+                                } else if (responseOb?.msgState ==
+                                    MsgState.error) {
+                                  return const Center(
+                                    child: Text("Something went Wrong!"),
+                                  );
+                                } else {
+                                  return DropdownSearch<String>(
+                                    label: 'Township',
+                                    popupItemBuilder:
+                                        (context, item, isSelected) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.toString().split(',')[1]),
+                                            const Divider(),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    showSearchBox: true,
+                                    showSelectedItems: true,
+                                    showClearButton: !hasNotTownship,
+                                    items: townshipList
+                                        .map((e) => '${e['id']},${e['name']}')
+                                        .toList(),
+                                    onChanged: getTownshipListId,
+                                    selectedItem: townshipName,
+                                  );
+                                }
+                              }),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          color: Colors.white,
+                          height: 40,
+                          child: StreamBuilder<ResponseOb>(
+                              initialData: hasResCountryData == false
+                                  ? null
+                                  : ResponseOb(msgState: MsgState.loading),
+                              stream:
+                                  customerBloc.getResCountryStateListStream(),
+                              builder: (context,
+                                  AsyncSnapshot<ResponseOb> snapshot) {
+                                ResponseOb? responseOb = snapshot.data;
+                                if (responseOb?.msgState == MsgState.loading) {
+                                  return Center(
+                                    child: Image.asset(
+                                      'assets/gifs/three_circle_loading.gif',
+                                      width: 150,
+                                      height: 150,
+                                    ),
+                                  );
+                                } else if (responseOb?.msgState ==
+                                    MsgState.error) {
+                                  return const Center(
+                                    child: Text("Something went Wrong!"),
+                                  );
+                                } else {
+                                  return DropdownSearch<String>(
+                                    label: 'State',
+                                    popupItemBuilder:
+                                        (context, item, isSelected) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.toString().split(',')[1]),
+                                            const Divider(),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    showSearchBox: true,
+                                    showSelectedItems: true,
+                                    showClearButton: !hasNotResCountryState,
+                                    items: rescountrystateList
+                                        .map((e) =>
+                                            '${e['id']},${e['name']} (${e['country_code']})')
+                                        .toList(),
+                                    onChanged: getResCountryStateListId,
+                                    selectedItem: rescountrystateName,
+                                  );
+                                }
+                              }),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          color: Colors.white,
+                          height: 40,
+                          child: StreamBuilder<ResponseOb>(
+                              initialData: hasResCountryData == true
+                                  ? null
+                                  : ResponseOb(msgState: MsgState.loading),
+                              stream: customerBloc.getResCountryListStream(),
+                              builder: (context,
+                                  AsyncSnapshot<ResponseOb> snapshot) {
+                                ResponseOb? responseOb = snapshot.data;
+                                if (responseOb?.msgState == MsgState.loading) {
+                                  return Center(
+                                    child: Image.asset(
+                                      'assets/gifs/three_circle_loading.gif',
+                                      width: 150,
+                                      height: 150,
+                                    ),
+                                  );
+                                } else if (responseOb?.msgState ==
+                                    MsgState.error) {
+                                  return const Center(
+                                    child: Text("Something went Wrong!"),
+                                  );
+                                } else {
+                                  return DropdownSearch<String>(
+                                    label: 'Country',
+                                    popupItemBuilder:
+                                        (context, item, isSelected) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.toString().split(',')[1]),
+                                            const Divider(),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    showSearchBox: true,
+                                    showSelectedItems: true,
+                                    showClearButton: !hasNotResCountry,
+                                    items: rescountryList
+                                        .map((e) => '${e['id']},${e['name']}')
+                                        .toList(),
+                                    onChanged: getResCountryListId,
+                                    selectedItem: rescountryName,
+                                  );
+                                }
+                              }),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text(
+                          "Zone:",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          color: Colors.white,
+                          height: 40,
+                          child: StreamBuilder<ResponseOb>(
+                              initialData: hasZoneData == false
+                                  ? ResponseOb(msgState: MsgState.loading)
+                                  : null,
+                              stream: quotationBloc.getZoneListStream(),
+                              builder: (context,
+                                  AsyncSnapshot<ResponseOb> snapshot) {
+                                ResponseOb? responseOb = snapshot.data;
+                                if (responseOb?.msgState == MsgState.loading) {
+                                  return Center(
+                                    child: Image.asset(
+                                      'assets/gifs/three_circle_loading.gif',
+                                      width: 150,
+                                      height: 150,
+                                    ),
+                                  );
+                                } else if (responseOb?.msgState ==
+                                    MsgState.error) {
+                                  return const Center(
+                                    child: Text("Something went Wrong!"),
+                                  );
+                                } else {
+                                  return DropdownSearch<String>(
+                                    popupItemBuilder:
+                                        (context, item, isSelected) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.toString().split(',')[1]),
+                                            const Divider(),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    showSearchBox: true,
+                                    showSelectedItems: true,
+                                    showClearButton: !hasNotZone,
+                                    items: zoneList
+                                        .map((e) => '${e['id']},${e['name']}')
+                                        .toList(),
+                                    onChanged: getZoneListId,
+                                    selectedItem: zoneName,
+                                  );
+                                }
+                              }),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text(
+                          "Segment:",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          color: Colors.white,
+                          height: 40,
+                          child: StreamBuilder<ResponseOb>(
+                              initialData: hasSegmentData == false
+                                  ? ResponseOb(msgState: MsgState.loading)
+                                  : null,
+                              stream: quotationBloc.getSegmentListStream(),
+                              builder: (context,
+                                  AsyncSnapshot<ResponseOb> snapshot) {
+                                ResponseOb? responseOb = snapshot.data;
+                                if (responseOb?.msgState == MsgState.loading) {
+                                  return Center(
+                                    child: Image.asset(
+                                      'assets/gifs/three_circle_loading.gif',
+                                      width: 150,
+                                      height: 150,
+                                    ),
+                                  );
+                                } else if (responseOb?.msgState ==
+                                    MsgState.error) {
+                                  return const Center(
+                                    child: Text("Something went Wrong!"),
+                                  );
+                                } else {
+                                  return DropdownSearch<String>(
+                                    popupItemBuilder:
+                                        (context, item, isSelected) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.toString().split(',')[1]),
+                                            const Divider(),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    showSearchBox: true,
+                                    showSelectedItems: true,
+                                    showClearButton: !hasNotSegment,
+                                    items: segmentList
+                                        .map((e) => '${e['id']},${e['name']}')
+                                        .toList(),
+                                    onChanged: getSegmentListId,
+                                    selectedItem: segmentName,
+                                  );
+                                }
+                              }),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          "Phone:",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                controller: phoneController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ))),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          "Mobile:",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                controller: mobileController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ))),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          "Email:",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                controller: emailController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ))),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          "Website Link:",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            color: Colors.white,
+                            height: 40,
+                            child: TextFormField(
+                                controller: websiteLinkController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ))),
+                      ])),
+                    )
+                  ],
+                ),
+              )),
+          isCreateCustomer == false
+              ? Container()
+              : StreamBuilder<ResponseOb>(
+                  initialData: ResponseOb(msgState: MsgState.loading),
+                  stream: customercreateBloc.getCustomemrCreateStream(),
+                  builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                    ResponseOb responseOb = snapshot.data!;
+                    if (responseOb.msgState == MsgState.loading) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
                           ),
-                        );
-              }
-              return Container(
-                          color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-            })
+                        ),
+                      );
+                    }
+                    return Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
+                      ),
+                    );
+                  })
         ],
       ),
     );

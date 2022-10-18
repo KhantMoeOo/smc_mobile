@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:smc_mobile/pages/sale_pricelist_page/customer_type_page.dart';
-
+import '../../features/pages/menu/menu_list.dart';
 import '../../utils/app_const.dart';
 import '../../widgets/drawer_widget.dart';
+import 'customer_type_page.dart';
 import 'region_type_page.dart';
 import 'segment_type_page.dart';
 
@@ -44,8 +44,17 @@ class _SalePricelistTypePageState extends State<SalePricelistTypePage> {
       child: SafeArea(
         child: Scaffold(
             backgroundColor: Colors.grey[200],
-            drawer: const DrawerWidget(),
+            // drawer: const DrawerWidget(),
             appBar: AppBar(
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return MenuList();
+                  }));
+                },
+                icon: const Icon(Icons.menu),
+              ),
               backgroundColor: AppColors.appBarColor,
               title: const Text('Select Pricelist Type'),
             ),

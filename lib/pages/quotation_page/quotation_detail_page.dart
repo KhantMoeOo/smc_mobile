@@ -25,6 +25,7 @@ import '../invoice_page/invoice_detail_page.dart';
 import '../invoice_page/invoice_line_page/invoice_line_bloc.dart';
 import '../invoice_page/invoice_page.dart';
 import '../print_page/print_page.dart';
+import '../profile_page/profile_bloc.dart';
 import '../way_planning_page/delivery_page/delivery_bloc.dart';
 import 'quotation_bloc.dart';
 import 'quotation_create_page.dart';
@@ -97,8 +98,9 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
   final deliveryBloc = DeliveryBloc();
   final stockpickingBloc = StockPickingBloc();
   final stockpickingcreateBloc = StockPickingCreateBloc();
+  final profileBloc = ProfileBloc();
   final isDialOpen = ValueNotifier(false);
-  Map<String, dynamic> saleorderidList = {};
+  //Map<String, dynamic> saleorderidList = {};
   final databaseHelper = DatabaseHelper();
   List<SaleOrderLineOb>? materialproductlineDBList = [];
   List<dynamic> productlineList = [];
@@ -109,6 +111,8 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
   List<dynamic> productproductList = [];
   List<dynamic> productcategoryList = [];
   List<dynamic> accountIdList = [];
+  List<dynamic> userList = [];
+  List<dynamic> stockmoveList = [];
   int deleteornot = 0;
   int stockpickingId = 0;
   double totalSOLsubtotal = 0.0;
@@ -126,6 +130,10 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
   bool isUpdatePickingId = false;
   int invoiceId = 0;
   int createInvoice = 0;
+  bool isCallStockPicking = false;
+  bool isCallStockMove = false;
+  bool isUpdateQtyDone = false;
+  bool isWaitingState = false;
 
   // List<dynamic> tripplandeliveryList = [];
   // List<TripPlanDeliveryOb>? tripplandeliveryDBList = [];
@@ -193,14 +201,13 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
             promotionName: '',
             saleDiscount: element['sale_discount'].toString(),
             promotionDiscount: element['promotion_discount'].toString(),
-            taxId: element['tax_id'].isEmpty ? 0 : element['tax_id'][0],
+            taxId: element['tax_id'].toString(),
             taxName: taxName,
             isFOC: element['is_foc'] == false ? 0 : 1,
             subTotal: element['price_subtotal'].toString());
         await databaseHelper.insertOrderLineUpdate(saleOrderLineOb);
       }
     }
-
     setState(() {});
   }
 
@@ -213,6 +220,7 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
     print('CUstoemrId:' + widget.customerId[0].toString());
     quotationBloc.getQuotationWithIdData(widget.quotationId);
     quotationBloc.getQuotationWithIdStream().listen(getQuotationListListen);
+    profileBloc.getResUsersStream().listen(getResUsersData);
     // getproductlineList();
 
     saleorderlineBloc.getproductlineListStream().listen(getproductlineList);
@@ -267,6 +275,14 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
     stockpickingcreateBloc
         .getCallActionConfirmStream()
         .listen(getCallActionConfirmListen);
+    stockpickingBloc.getStockPickingStream().listen(getStockPickingListen);
+    stockpickingBloc.getStockMoveStream().listen(getStockMoveListen);
+    stockpickingcreateBloc
+        .getUpdateQtyDoneStream()
+        .listen(getUpdateQtyDoneListen);
+    saleorderlineBloc
+        .waitingproductlineListStream()
+        .listen(getproductlineListListen);
     // invoicelineBloc.getInvoiceLineData();
     // quotationdeleteBloc
     //     .deleteSaleOrderLineStream()
@@ -282,6 +298,24 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
     super.dispose();
     quotationdeleteBloc.dispose();
     saleorderlineBloc.dispose();
+  }
+
+  void getproductlineListListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() => isWaitingState = false);
+      quotationBloc.getQuotationWithIdData(widget.quotationId);
+    }
+  }
+
+  void getResUsersData(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      userList = responseOb.data;
+      if (userList.isNotEmpty) {
+        quotationBloc.getCustomerList(
+            ['id', '=', quotationList[0]['partner_id'][0]],
+            userList[0]['zone_id'][0]);
+      }
+    }
   }
 
   void getStockPickingTypeListen(ResponseOb responseOb) {
@@ -353,8 +387,8 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
       await saleorderlineBloc.getAccountTaxeslistData();
       await saleorderlineBloc.getProductProductData();
       await saleorderlineBloc.getProductCategoryData();
-      await quotationBloc
-          .getCustomerList(['id', '=', quotationList[0]['partner_id'][0]]);
+      await profileBloc.getResUsersData();
+
       // getproductlineListFromDB();
     } else if (responseOb.msgState == MsgState.error) {
       print("NoQuotationList");
@@ -418,7 +452,8 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
             neworeditInvoice: 1,
             address: customerAddress,
           );
-        }));
+        })).then((value) => setState(
+            () => quotationBloc.getQuotationWithIdData(widget.quotationId)));
       }
     }
   }
@@ -472,9 +507,9 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
     }
   }
 
-  void saleorderlineDeleteListen(ResponseOb responseOb) async {
+  void saleorderlineDeleteListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
-      await saleorderlineBloc.waitingSaleOrderLineData();
+      saleorderlineBloc.waitingSaleOrderLineData();
       print('Delete SOL Success');
     } else if (responseOb.msgState == MsgState.error) {
       print('Fail delete SOL');
@@ -558,8 +593,45 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
     if (responseOb.msgState == MsgState.data) {
       setState(() {
         updateStatus = false;
+        isCallStockPicking = true;
       });
-      quotationBloc.getQuotationWithIdData(widget.quotationId);
+      stockpickingBloc
+          .getStockPickingData(['sale_id', '=', widget.quotationId]);
+    }
+  }
+
+  void getStockPickingListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() {
+        isCallStockPicking = false;
+        isCallStockMove = true;
+      });
+      stockpickingBloc.getStockMoveData(responseOb.data[0]['id']);
+    }
+  }
+
+  void getStockMoveListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      stockmoveList = responseOb.data;
+      setState(() {
+        isCallStockMove = false;
+        isUpdateQtyDone = true;
+      });
+      for (var stockmove in stockmoveList) {
+        stockpickingcreateBloc.updateQtyDoneData(
+            stockmove['id'], stockmove['product_uom_qty']);
+      }
+    }
+  }
+
+  void getUpdateQtyDoneListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() {
+        isUpdateQtyDone = false;
+        isWaitingState = true;
+      });
+      SharefCount.setTotal(stockmoveList.length);
+      saleorderlineBloc.waitingSaleOrderLineData();
     }
   }
 
@@ -761,8 +833,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
           if (responseOb!.msgState == MsgState.loading) {
             return Container(
               color: Colors.white,
-              child: const Center(
-                child: CircularProgressIndicator(),
+              child: Center(
+                child: Image.asset(
+                  'assets/gifs/three_circle_loading.gif',
+                  width: 150,
+                  height: 150,
+                ),
               ),
             );
           } else if (responseOb.msgState == MsgState.error) {
@@ -778,8 +854,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                   if (responseOb?.msgState == MsgState.loading) {
                     return Container(
                       color: Colors.white,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       ),
                     );
                   } else if (responseOb?.msgState == MsgState.error) {
@@ -795,7 +875,8 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                               backgroundColor:
                                   const Color.fromARGB(255, 12, 41, 92),
                               elevation: 0.0,
-                              title: Text(widget.name),
+                              title: Text(
+                                  '${widget.name} (${widget.customerId[1]})'),
                               actions: [
                                 // TextButton(
                                 //     onPressed: () async {
@@ -1212,7 +1293,9 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                             neworeditInvoice: 1,
                                             address: customerAddress,
                                           );
-                                        }));
+                                        })).then((value) => quotationBloc
+                                            .getQuotationWithIdData(
+                                                widget.quotationId));
                                       },
                                       child: Text(
                                           'Invoice (${quotationList[0]['invoice_count']})',
@@ -2128,10 +2211,13 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                           materialproductlineDBList!.length,
                                     ));
                                   } else {
-                                    saleOrderLineWidget =
-                                        const SliverToBoxAdapter(
+                                    saleOrderLineWidget = SliverToBoxAdapter(
                                       child: Center(
-                                        child: CircularProgressIndicator(),
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       ),
                                     );
                                   }
@@ -2962,7 +3048,9 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                                             400.0
                                                         ? const EdgeInsets.only(
                                                             left: 220,
-                                                            right: 20)
+                                                            right: 20,
+                                                            top: 20,
+                                                            bottom: 20)
                                                         : const EdgeInsets.only(
                                                             left: 10,
                                                             right: 10),
@@ -2979,101 +3067,186 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .end,
-                                                              children: const [
-                                                                Text(
-                                                                  "Untaxed Amount:    ",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          20),
-                                                                ),
-                                                                Text(
-                                                                  "Taxes:    ",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          20),
-                                                                ),
-                                                                Text(
-                                                                  "Total Discount:    ",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          20),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 1,
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .end,
                                                               children: [
-                                                                Text(
-                                                                  "${quotationList[0]['amount_untaxed']} K",
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          20),
+                                                                Row(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          200,
+                                                                      child:
+                                                                          Text(
+                                                                        'Untaxed Amount',
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color: Colors.black),
+                                                                      ),
+                                                                    ),
+                                                                    const Text(
+                                                                      ':',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ),
+                                                                    Expanded(
+                                                                        child: Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.end,
+                                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                                            children: [
+                                                                          Text(
+                                                                              '${quotationList[0]['amount_untaxed']} K',
+                                                                              style: const TextStyle(color: Colors.black, fontSize: 18))
+                                                                        ])),
+                                                                  ],
                                                                 ),
-                                                                Text(
-                                                                  "${quotationList[0]['amount_tax']} K",
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          20),
+                                                                Row(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          200,
+                                                                      child:
+                                                                          Text(
+                                                                        'Taxes',
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color: Colors.black),
+                                                                      ),
+                                                                    ),
+                                                                    const Text(
+                                                                      ':',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ),
+                                                                    Expanded(
+                                                                        child: Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.end,
+                                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                                            children: [
+                                                                          Text(
+                                                                              '${quotationList[0]['amount_tax']} K',
+                                                                              style: const TextStyle(color: Colors.black, fontSize: 18))
+                                                                        ])),
+                                                                  ],
                                                                 ),
-                                                                Text(
-                                                                  "${quotationList[0]['amount_discount']} K",
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          20),
+                                                                Row(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          200,
+                                                                      child:
+                                                                          Text(
+                                                                        'Total Discount',
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color: Colors.black),
+                                                                      ),
+                                                                    ),
+                                                                    const Text(
+                                                                      ':',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ),
+                                                                    Expanded(
+                                                                        child: Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.end,
+                                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                                            children: [
+                                                                          Text(
+                                                                              '${quotationList[0]['amount_discount']} K',
+                                                                              style: const TextStyle(color: Colors.black, fontSize: 18))
+                                                                        ])),
+                                                                  ],
                                                                 ),
                                                               ],
                                                             ),
                                                           ),
                                                         ]),
-                                                        const Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                            left: 50,
-                                                          ),
-                                                          child: Divider(
-                                                            thickness: 1.5,
-                                                            color: Colors.black,
-                                                          ),
+                                                        const Divider(
+                                                          thickness: 1.5,
+                                                          color: Colors.black,
                                                         ),
-                                                        Row(children: [
-                                                          Expanded(
-                                                            flex: 2,
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .end,
-                                                              children: const [
-                                                                Text(
-                                                                  "Total:    ",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          20),
-                                                                ),
-                                                              ],
+                                                        Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            const SizedBox(
+                                                              width: 200,
+                                                              child: Text(
+                                                                'Total',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
                                                             ),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 1,
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .end,
-                                                              children: [
-                                                                Text(
-                                                                  "${quotationList[0]['amount_total']} K",
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          20),
-                                                                ),
-                                                              ],
+                                                            const Text(
+                                                              ':',
+                                                              style: TextStyle(
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .black),
                                                             ),
-                                                          ),
-                                                        ]),
+                                                            Expanded(
+                                                                child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .end,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                  Text(
+                                                                      '${quotationList[0]['amount_total']} K',
+                                                                      style: const TextStyle(
+                                                                          color: Colors
+                                                                              .black,
+                                                                          fontSize:
+                                                                              18))
+                                                                ])),
+                                                          ],
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
@@ -3704,8 +3877,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                         color: Colors.white,
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
+                                        child: Center(
+                                          child: Image.asset(
+                                            'assets/gifs/three_circle_loading.gif',
+                                            width: 150,
+                                            height: 150,
+                                          ),
                                         ));
                                   }
                                   return Container(
@@ -3728,8 +3905,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                         color: Colors.white,
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
+                                        child: Center(
+                                          child: Image.asset(
+                                            'assets/gifs/three_circle_loading.gif',
+                                            width: 150,
+                                            height: 150,
+                                          ),
                                         ));
                                   } else if (responseOb?.msgState ==
                                       MsgState.data) {
@@ -3753,16 +3934,24 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                       color: Colors.black.withOpacity(0.5),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
                                       MsgState.data) {}
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
                                     ),
                                   );
                                 })
@@ -3780,16 +3969,24 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                       color: Colors.black.withOpacity(0.5),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
                                       MsgState.data) {}
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
                                     ),
                                   );
                                 })
@@ -3807,8 +4004,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                       color: Colors.black.withOpacity(0.5),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
@@ -3827,8 +4028,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                   }
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
                                     ),
                                   );
                                 })
@@ -3846,16 +4051,163 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                       color: Colors.black.withOpacity(0.5),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
                                       MsgState.data) {}
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isCallStockPicking == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream:
+                                    stockpickingBloc.getStockPickingStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.data) {}
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isCallStockMove == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream: stockpickingBloc.getStockMoveStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.data) {}
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isUpdateQtyDone == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream: stockpickingcreateBloc
+                                    .getUpdateQtyDoneStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.data) {}
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isWaitingState == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream: saleorderlineBloc
+                                    .waitingproductlineListStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.data) {}
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
                                     ),
                                   );
                                 })
@@ -3873,8 +4225,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                       color: Colors.black.withOpacity(0.5),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
@@ -3890,8 +4246,12 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                   }
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
                                     ),
                                   );
                                 })
@@ -3909,16 +4269,24 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
                                       MsgState.loading) {
                                     return Container(
                                       color: Colors.black.withOpacity(0.5),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
                                       MsgState.data) {}
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/three_circle_loading.gif',
+                                        width: 150,
+                                        height: 150,
+                                      ),
                                     ),
                                   );
                                 })
@@ -3933,13 +4301,13 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
     );
   }
 
-  void deleteRecord() async {
+  void deleteRecord() {
     if (widget.state == 'draft' || widget.state == 'cancel') {
       setState(() {
         deleteornot = 1;
       });
       Navigator.of(context).pop();
-      await quotationdeleteBloc.deleteQuotationData(widget.quotationId);
+      quotationdeleteBloc.deleteQuotationData(widget.quotationId);
     } else {
       Navigator.of(context).pop();
       showDialog(

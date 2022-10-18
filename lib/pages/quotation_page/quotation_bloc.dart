@@ -60,7 +60,7 @@ class QuotationBloc {
 
   late Odoo odoo;
 
-  getQuotationData({List? name, List? state}) async {
+  getQuotationData({name, state}) async {
     print('EntergetQuotationData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     quotationStreamController.sink.add(responseOb);
@@ -97,6 +97,7 @@ class QuotationBloc {
               'invoice_status',
               'discount_id',
               'create_date',
+              'commitment_date',
               'expected_date',
               'date_order',
               'validity_date',
@@ -112,14 +113,12 @@ class QuotationBloc {
               'seg_filter_id',
               'invoice_count',
               'delivery_count',
-              'order_line',
               'amount_untaxed',
               'amount_discount',
               'amount_tax',
-              'amount_total'
             ],
             order: 'name desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('QuotationResult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -237,7 +236,8 @@ class QuotationBloc {
     }
   } // getQuotationWithIdData List
 
-  getCustomerList(name) async {
+  getCustomerList(name, zoneId) async {
+    String userId = '';
     print('EntergetCustomerData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     customerStreamController.sink.add(responseOb);
@@ -248,12 +248,13 @@ class QuotationBloc {
       Sharef.getOdooClientInstance().then((value) async {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
+        userId = value['uid'];
         OdooResponse res = await odoo.searchRead(
             'res.partner',
             [
               ['customer_rank', '>=', '1'],
               name,
-              // ['zone_id', 'ilike', zoneId],
+              zoneId,
               // ['segment_id', 'ilike', segmentId]
             ],
             [
@@ -313,10 +314,8 @@ class QuotationBloc {
       Sharef.getOdooClientInstance().then((value) async {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
-        OdooResponse res = await odoo.searchRead('res.currency', [], [
-          'id',
-          'name',
-        ]);
+        OdooResponse res =
+            await odoo.searchRead('res.currency', [], ['id', 'name', 'symbol']);
         if (res.getResult() != null) {
           print('Currencyresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];

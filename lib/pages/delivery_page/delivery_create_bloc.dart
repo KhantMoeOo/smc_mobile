@@ -32,6 +32,11 @@ class StockPickingCreateBloc {
       callActionConfirmStreamController
           .stream; // Call Action Confirm Stream Controller
 
+  StreamController<ResponseOb> updateQtyDoneStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getUpdateQtyDoneStream() => updateQtyDoneStreamController
+      .stream; // Call Update Done Stream Controller
+
   late Odoo odoo;
 
   stockpickingCreate(
@@ -231,10 +236,51 @@ class StockPickingCreateBloc {
     }
   } // Call Action Confirm
 
+  updateQtyDoneData(ids, qtyDone) {
+    print('EnterupdateQtyDoneData');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    updateQtyDoneStreamController.sink.add(responseOb);
+
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res =
+            await odoo.write('stock.move', [ids], {'quantity_done': qtyDone});
+        if (res.getResult() != null) {
+          print('updateQtyDoneDataresult');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          updateQtyDoneStreamController.sink.add(responseOb);
+        } else {
+          print('updateQtyDoneDataError:' + res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          updateQtyDoneStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        updateQtyDoneStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        updateQtyDoneStreamController.sink.add(responseOb);
+      }
+    }
+  }
+
   dispose() {
     createStockPickingStreamController.close();
     updateStockPickingStatusStreamController.close();
     createStockMoveStreamController.close();
     callActionConfirmStreamController.close();
+    updateQtyDoneStreamController.close();
   }
 }

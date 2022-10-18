@@ -117,7 +117,7 @@ class ProfileBloc {
         OdooResponse res = await odoo.searchRead(
             'hr.employee',
             [
-              // ['user_id', '=', int.parse(userId)]
+              ['user_id', '=', int.parse(userId)]
             ],
             [
               'id',
@@ -127,7 +127,7 @@ class ProfileBloc {
               // 'mobile_phone',
               // 'image_128',
               // 'emp_id',
-              // 'user_id',
+              'user_id',
               // 'mobile_phone',
               // 'work_phone',
               // 'work_email',
@@ -144,7 +144,7 @@ class ProfileBloc {
               // 'age',
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Get hr employee result: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

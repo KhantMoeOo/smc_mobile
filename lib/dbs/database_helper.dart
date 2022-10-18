@@ -17,9 +17,9 @@ class DatabaseHelper {
       await db.execute(
           'CREATE TABLE sale_order_line(id INTEGER PRIMARY KEY, isSelect INTEGER, quotation_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, qty_delivered TEXT, qty_invoiced TEXT, uom_id INTEGER, uom_name TEXT, unit_price TEXT,discount_id INTEGER, discount_name TEXT,promotion_id INTEGER, promotion_name TEXT,sale_discount TEXT,promotion_discount TEXT,tax_id INTEGER,tax_name TEXT,is_foc INTEGER, price_subtotal TEXT)');
       await db.execute(
-          'CREATE TABLE sale_order_line_update(id INTEGER PRIMARY KEY, isSelect INTEGER,quotation_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, qty_delivered TEXT, qty_invoiced TEXT, uom_id INTEGER, uom_name TEXT, unit_price TEXT,discount_id INTEGER, discount_name TEXT,promotion_id INTEGER, promotion_name TEXT,sale_discount TEXT,promotion_discount TEXT,tax_id INTEGER,tax_name TEXT,is_foc INTEGER, price_subtotal TEXT)');
+          'CREATE TABLE sale_order_line_update(id INTEGER PRIMARY KEY, isSelect INTEGER,quotation_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, qty_delivered TEXT, qty_invoiced TEXT, uom_id INTEGER, uom_name TEXT, unit_price TEXT,discount_id INTEGER, discount_name TEXT,promotion_id INTEGER, promotion_name TEXT,sale_discount TEXT,promotion_discount TEXT,tax_id TEXT,tax_name TEXT,is_foc INTEGER, price_subtotal TEXT)');
       await db.execute(
-          'CREATE TABLE sale_order_line_multi_select(id INTEGER PRIMARY KEY, isSelect INTEGER,quotation_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, qty_delivered TEXT, qty_invoiced TEXT, uom_id INTEGER, uom_name TEXT, unit_price TEXT,discount_id INTEGER, discount_name TEXT,promotion_id INTEGER, promotion_name TEXT,sale_discount TEXT,promotion_discount TEXT,tax_id INTEGER,tax_name TEXT,is_foc INTEGER, price_subtotal TEXT)');
+          'CREATE TABLE sale_order_line_multi_select(id INTEGER PRIMARY KEY, isSelect INTEGER,quotation_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, qty_delivered TEXT, qty_invoiced TEXT, uom_id INTEGER, uom_name TEXT, unit_price TEXT,discount_id INTEGER, discount_name TEXT,promotion_id INTEGER, promotion_name TEXT,sale_discount TEXT,promotion_discount TEXT,tax_id TEXT,tax_name TEXT,is_foc INTEGER, price_subtotal TEXT)');
       await db.execute(
           'CREATE TABLE material_product_line(id INTEGER PRIMARY KEY, isSelect INTEGER, material_product_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, uom_id INTEGER, uom_name TEXT)');
       await db.execute(
@@ -27,9 +27,9 @@ class DatabaseHelper {
       await db.execute(
           'CREATE TABLE material_product_line_multi_select(id INTEGER PRIMARY KEY, isSelect INTEGER, material_product_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, uom_id INTEGER, uom_name TEXT)');
       await db.execute(
-          'CREATE TABLE stock_move(id INTEGER PRIMARY KEY, isSelect INTEGER, picking_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, reserved TEXT, done TEXT, remaining_stock TEXT, damage_qty TEXT, uom_id INTEGER, uom_name TEXT)');
+          'CREATE TABLE stock_move(id INTEGER PRIMARY KEY, isSelect INTEGER, picking_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, reserved TEXT, done TEXT, remaining_stock TEXT, damage_qty TEXT, uom_id INTEGER, uom_name TEXT, location_id INTEGER, location_name TEXT, location_dest_id INTEGER, location_dest_name TEXT)');
       await db.execute(
-          'CREATE TABLE stock_move_update(id INTEGER PRIMARY KEY, isSelect INTEGER, picking_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, reserved TEXT, done TEXT, remaining_stock TEXT, damage_qty TEXT, uom_id INTEGER, uom_name TEXT)');
+          'CREATE TABLE stock_move_update(id INTEGER PRIMARY KEY, isSelect INTEGER, picking_id INTEGER, product_code_id INTEGER, product_code_name TEXT, description TEXT, full_name TEXT, quantity TEXT, reserved TEXT, done TEXT, remaining_stock TEXT, damage_qty TEXT, uom_id INTEGER, uom_name TEXT, location_id INTEGER, location_name TEXT, location_dest_id INTEGER, location_dest_name TEXT)');
       await db.execute(
           'CREATE TABLE hr_employee_line(id INTEGER PRIMARY KEY,trip_line INTEGER, emp_id INTEGER, emp_name TEXT, department_id INTEGER, department_name TEXT, job_id INTEGER, job_name TEXT, responsible INTEGER)');
       await db.execute(
@@ -679,6 +679,10 @@ class DatabaseHelper {
         done: stockmoveMap[i]['done'],
         remainingstock: stockmoveMap[i]['remaining_stock'],
         damageQty: stockmoveMap[i]['damage_qty'],
+        locationDestId: stockmoveMap[i]['location_dest_id'],
+        locationDestName: stockmoveMap[i]['location_dest_name'],
+        locationId: stockmoveMap[i]['location_id'],
+        locationName: stockmoveMap[i]['location_name'],
       );
     });
   } // get datas list from stock_move table
@@ -703,6 +707,10 @@ class DatabaseHelper {
         done: stockmoveMap[i]['done'],
         remainingstock: stockmoveMap[i]['remaining_stock'],
         damageQty: stockmoveMap[i]['damage_qty'],
+        locationDestId: stockmoveMap[i]['location_dest_id'],
+        locationDestName: stockmoveMap[i]['location_dest_name'],
+        locationId: stockmoveMap[i]['location_id'],
+        locationName: stockmoveMap[i]['location_name'],
       );
     });
   } // get datas list from stock_move_update table
@@ -942,7 +950,7 @@ class DatabaseHelper {
       int? uomId,
       String? uomName,
       String? unitPrice,
-      int? taxId,
+      String? taxId,
       String? taxName,
       String? subTotal}) async {
     Database _db = await database();
@@ -961,7 +969,7 @@ class DatabaseHelper {
       int? uomId,
       String? uomName,
       String? unitPrice,
-      int? taxId,
+      String? taxId,
       String? taxName,
       String? subTotal}) async {
     Database _db = await database();
@@ -980,7 +988,7 @@ class DatabaseHelper {
       int? uomId,
       String? uomName,
       String? unitPrice,
-      int? taxId,
+      String? taxId,
       String? taxName,
       String? subTotal}) async {
     Database _db = await database();

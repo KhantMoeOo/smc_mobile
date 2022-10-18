@@ -586,7 +586,7 @@ class SaleOrderLineBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'sale.pricelist.product.line',
-            [],
+            [['state', '=', 'approved']],
             [
               'id',
               'product_id',
@@ -601,6 +601,8 @@ class SaleOrderLineBloc {
               'state',
               'priority',
               'price',
+              'ctn_price',
+              'custom_price',
               'uom_id',
               'formula',
             ],
@@ -653,6 +655,7 @@ class SaleOrderLineBloc {
             [
               id,
               segmentId,
+              ['state', '=', 'approved']
             ],
             [
               'id',
@@ -668,6 +671,8 @@ class SaleOrderLineBloc {
               'state',
               'priority',
               'price',
+              'ctn_price',
+              'custom_price',
               'uom_id',
               'formula',
             ],
@@ -719,7 +724,7 @@ class SaleOrderLineBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'sale.pricelist.product.line',
-            [zoneId, type, filter],
+            [zoneId, type, filter,['state', '=', 'approved']],
             [
               'id',
               'product_id',
@@ -734,6 +739,8 @@ class SaleOrderLineBloc {
               'state',
               'priority',
               'price',
+              'ctn_price',
+              'custom_price',
               'uom_id',
               'formula',
             ],
@@ -785,6 +792,7 @@ class SaleOrderLineBloc {
             'sale.pricelist',
             [
               name,
+              ['state', '=', 'approved']
             ],
             [
               'id',

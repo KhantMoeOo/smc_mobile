@@ -93,6 +93,7 @@ class MaterialRequisitionBloc {
   }
 
   getMaterialRequisitionListWithIdData(id) {
+    String userId = '';
     print('EntergetMaterialRequisitionListWithidData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     materialrequisitionListWithIdStreamController.sink.add(responseOb);
@@ -103,6 +104,7 @@ class MaterialRequisitionBloc {
       Sharef.getOdooClientInstance().then((value) async {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
+        userId = value['uid'];
         OdooResponse res = await odoo.searchRead(
             'material.requisition',
             [
@@ -126,8 +128,7 @@ class MaterialRequisitionBloc {
               'desc',
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
-          print('result');
+        if (!res.hasError()) {
           print('MaterialRequisitionWithIdResult:' +
               res.getResult()['records'].toString());
           data = res.getResult()['records'];
@@ -135,7 +136,6 @@ class MaterialRequisitionBloc {
           responseOb.data = data;
           materialrequisitionListWithIdStreamController.sink.add(responseOb);
         } else {
-          print('error');
           data = null;
           print('GetMaterialRequisitionWithIdError:' +
               res.getErrorMessage().toString());
@@ -160,7 +160,7 @@ class MaterialRequisitionBloc {
     }
   } // materialrequisitionListWithId
 
-  getStockLocationList() {
+  getStockLocationList(name) {
     print('EntergetStockLocation');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     stocklocationStreamController.sink.add(responseOb);
@@ -173,11 +173,10 @@ class MaterialRequisitionBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'stock.location',
-            [],
             [
-              'id',
-              'name',
+              name,
             ],
+            ['id', 'name', 'location_id'],
             order: 'name asc');
         if (res.getResult() != null) {
           print('result');

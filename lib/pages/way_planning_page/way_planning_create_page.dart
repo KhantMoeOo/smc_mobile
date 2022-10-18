@@ -136,9 +136,7 @@ class _WayPlanningCreatePageState extends State<WayPlanningCreatePage>
       leaderId = widget.leaderId[0];
       leaderName = widget.leaderId[1];
     }
-    saleorderlineBloc
-        .waitingproductlineListStream()
-        .listen(listenCreateorNot);
+    saleorderlineBloc.waitingproductlineListStream().listen(listenCreateorNot);
   }
 
   @override
@@ -396,18 +394,21 @@ class _WayPlanningCreatePageState extends State<WayPlanningCreatePage>
 
   void updatetripPlanListen(ResponseOb responseOb) async {
     if (responseOb.msgState == MsgState.data) {
-      if(SaleTeamWidgetState.hremployeelineDeleteList.isNotEmpty){
-        for(var element in SaleTeamWidgetState.hremployeelineDeleteList){
-          bool saleteamDeleteFound = SaleTeamWidgetState.hremployeelineListInt.contains(element);
-          if(saleteamDeleteFound){
+      if (SaleTeamWidgetState.hremployeelineDeleteList.isNotEmpty) {
+        for (var element in SaleTeamWidgetState.hremployeelineDeleteList) {
+          bool saleteamDeleteFound =
+              SaleTeamWidgetState.hremployeelineListInt.contains(element);
+          if (saleteamDeleteFound) {
             await tripplandeleteBloc.deleteHrEmployeeLineData(element);
           }
         }
       }
-      if(ScheduleCreateWidgetState.tripplanscheduleDeleteList.isNotEmpty){
-        for (var element in ScheduleCreateWidgetState.tripplanscheduleDeleteList){
-          bool scheduleDeleteFound = ScheduleCreateWidgetState.tripplanscheduleInt.contains(element);
-          if(scheduleDeleteFound){
+      if (ScheduleCreateWidgetState.tripplanscheduleDeleteList.isNotEmpty) {
+        for (var element
+            in ScheduleCreateWidgetState.tripplanscheduleDeleteList) {
+          bool scheduleDeleteFound =
+              ScheduleCreateWidgetState.tripplanscheduleInt.contains(element);
+          if (scheduleDeleteFound) {
             await tripplandeleteBloc.deleteTripPlanScheduleData(element);
           }
         }
@@ -652,8 +653,12 @@ class _WayPlanningCreatePageState extends State<WayPlanningCreatePage>
           builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
             ResponseOb? responseOb = snapshot.data;
             if (responseOb?.msgState == MsgState.loading) {
-              return const Center(
-                child: CircularProgressIndicator(),
+              return Center(
+                child: Image.asset(
+                  'assets/gifs/three_circle_loading.gif',
+                  width: 150,
+                  height: 150,
+                ),
               );
             }
             return SafeArea(
@@ -670,8 +675,7 @@ class _WayPlanningCreatePageState extends State<WayPlanningCreatePage>
                               : createTripPlan,
                           child: Text(
                             widget.neworedit == 1 ? 'Update' : "Create",
-                            style: const TextStyle(
-                                color:  Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           )),
                     ],
                   ),
@@ -711,7 +715,9 @@ class _WayPlanningCreatePageState extends State<WayPlanningCreatePage>
                               //     // ]
                               //     ),
                               child: StreamBuilder<ResponseOb>(
-                                  initialData: hasNotTrip == false ? null : ResponseOb(msgState: MsgState.loading),
+                                  initialData: hasNotTrip == false
+                                      ? null
+                                      : ResponseOb(msgState: MsgState.loading),
                                   stream:
                                       wayplanningBloc.getTripConfigListStream(),
                                   builder: (context,
@@ -719,8 +725,12 @@ class _WayPlanningCreatePageState extends State<WayPlanningCreatePage>
                                     ResponseOb? responseOb = snapshot.data;
                                     if (responseOb?.msgState ==
                                         MsgState.loading) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
+                                      return Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       );
                                     } else if (responseOb?.msgState ==
                                         MsgState.error) {
@@ -858,15 +868,21 @@ class _WayPlanningCreatePageState extends State<WayPlanningCreatePage>
                               ),
                               height: 40,
                               child: StreamBuilder<ResponseOb>(
-                                  initialData: hasNotZone == false? null: ResponseOb(msgState: MsgState.loading),
+                                  initialData: hasNotZone == false
+                                      ? null
+                                      : ResponseOb(msgState: MsgState.loading),
                                   stream: quotationBloc.getZoneListStream(),
                                   builder: (context,
                                       AsyncSnapshot<ResponseOb> snapshot) {
                                     ResponseOb? responseOb = snapshot.data;
                                     if (responseOb?.msgState ==
                                         MsgState.loading) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
+                                      return Center(
+                                        child: Image.asset(
+                                          'assets/gifs/three_circle_loading.gif',
+                                          width: 150,
+                                          height: 150,
+                                        ),
                                       );
                                     } else if (responseOb?.msgState ==
                                         MsgState.error) {

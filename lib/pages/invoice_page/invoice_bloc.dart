@@ -40,6 +40,7 @@ class InvoiceBloc {
               'name',
               'invoice_origin',
               'type',
+              'invoice_payments_widget',
               'partner_id',
               'invoice_user_id',
               'invoice_partner_display_name',
@@ -63,8 +64,12 @@ class InvoiceBloc {
               'amount_untaxed',
               'amount_sale_discount',
               'amount_by_group',
+              'amount_residual',
               'amount_total',
-              'state'
+              'state',
+              'invoice_payment_state',
+              'type',
+              'authorized_transaction_ids'
             ],
             order: 'id desc');
         if (res.getResult() != null) {
@@ -118,7 +123,10 @@ class InvoiceBloc {
             [
               'id',
               'name',
-              'currency_id'
+              'currency_id',
+              'company_id',
+              'type',
+              'inbound_payment_method_ids',
             ],
             order: 'id desc');
         if (res.getResult() != null) {

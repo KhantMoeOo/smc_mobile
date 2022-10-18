@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../obs/response_ob.dart';
 import '../../utils/app_const.dart';
 import '../../widgets/drawer_widget.dart';
+import '../quotation_page/quotation_bloc.dart';
 import '../quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
 
 class SalePricelistPage extends StatefulWidget {
@@ -23,26 +24,48 @@ class SalePricelistPage extends StatefulWidget {
 
 class _SalePricelistPageState extends State<SalePricelistPage> {
   final saleorderlineBloc = SaleOrderLineBloc();
+  final quotationBloc = QuotationBloc();
   List<dynamic> salepricelistList = [];
   List<dynamic> salepricelistproductlineList = [];
   List<dynamic> salepricelistproductlineUpdateList = [];
+  List<dynamic> currencyList = [];
+  String currencysymbol = '';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    quotationBloc.getCurrencyList();
     saleorderlineBloc.getSalePricelistProductLineListDataWithFilter(
         ['pricelist_id', '=', widget.salepricelistId],
         ['segment_id.id', '=', widget.segmentId]);
     saleorderlineBloc
         .getSalePricelistProductLineListWithFilterStream()
         .listen(getSalePricelistProductLineListen);
+    quotationBloc.getCurrencyStream().listen(getCurrencyListen);
   }
 
   void getSalePricelistProductLineListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       salepricelistproductlineList = responseOb.data;
       salepricelistproductlineUpdateList = salepricelistproductlineList;
+    }
+  }
+
+  void getCurrencyListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      currencyList = responseOb.data;
+    }
+  }
+
+  void getCurrencySymbol(int i) {
+    print('work');
+    for (var currency in currencyList) {
+      print('loop');
+      if (salepricelistproductlineList[i]['currency_id'][0] == currency['id']) {
+        print('same');
+        currencysymbol = currency['symbol'];
+      }
     }
   }
 
@@ -108,9 +131,9 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
                                     children: [
                                       Container(
                                           padding: const EdgeInsets.all(8),
-                                          width: 250,
+                                          width: 150,
                                           child: const Text(
-                                            'Product Code',
+                                            'Product',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
@@ -118,17 +141,7 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
                                           )),
                                       Container(
                                           padding: const EdgeInsets.all(8),
-                                          width: 100,
-                                          child: const Text(
-                                            'UOM',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                            ),
-                                          )),
-                                      Container(
-                                          padding: const EdgeInsets.all(8),
-                                          width: 100,
+                                          width: 80,
                                           child: const Text(
                                             'Unit Price',
                                             style: TextStyle(
@@ -138,14 +151,26 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
                                           )),
                                       Container(
                                           padding: const EdgeInsets.all(8),
-                                          width: 100,
+                                          width: 80,
                                           child: const Text(
-                                            'Formula',
+                                            'Unit Price (ctn)',
+                                            //textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
                                             ),
-                                          ))
+                                          )),
+                                      Expanded(
+                                        child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            child: const Text(
+                                              'Formula',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                              ),
+                                            )),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -156,6 +181,7 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
                                           salepricelistproductlineUpdateList
                                               .length,
                                       itemBuilder: (c, i) {
+                                        getCurrencySymbol(i);
                                         return Column(
                                           children: [
                                             Container(
@@ -167,54 +193,60 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
                                                       padding:
                                                           const EdgeInsets.all(
                                                               8),
-                                                      width: 250,
+                                                      width: 150,
                                                       child: Text(
                                                         '${salepricelistproductlineUpdateList[i]['product_id'][1]} ${salepricelistproductlineUpdateList[i]['code']}',
                                                         style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 15,
+                                                          fontSize: 13,
                                                         ),
                                                       )),
                                                   Container(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               8),
-                                                      width: 100,
+                                                      width: 80,
                                                       child: Text(
-                                                        '${salepricelistproductlineUpdateList[i]['uom_id'][1]}',
+                                                        '${salepricelistproductlineUpdateList[i]['custom_price']} $currencysymbol',
+                                                        textAlign:
+                                                            TextAlign.end,
                                                         style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 15,
+                                                          fontSize: 13,
                                                         ),
                                                       )),
                                                   Container(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               8),
-                                                      width: 100,
+                                                      width: 80,
                                                       child: Text(
-                                                        '${salepricelistproductlineUpdateList[i]['price']}',
+                                                        '${salepricelistproductlineUpdateList[i]['ctn_price']} $currencysymbol',
+                                                        textAlign:
+                                                            TextAlign.end,
                                                         style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 15,
+                                                          fontSize: 13,
                                                         ),
                                                       )),
-                                                  Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8),
-                                                      width: 100,
-                                                      child: Text(
-                                                        '${salepricelistproductlineUpdateList[i]['formula'] == false ? '' : salepricelistproductlineUpdateList[i]['formula']}',
-                                                        style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 15,
-                                                        ),
-                                                      ))
+                                                  Expanded(
+                                                    child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8),
+                                                        child: Text(
+                                                          '${salepricelistproductlineUpdateList[i]['formula'] == false ? '' : salepricelistproductlineUpdateList[i]['formula']}',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 13,
+                                                          ),
+                                                        )),
+                                                  )
                                                 ],
                                               ),
                                             ),
@@ -238,7 +270,13 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
               } else {
                 return Container(
                   color: Colors.white,
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/gifs/three_circle_loading.gif',
+                      width: 150,
+                      height: 150,
+                    ),
+                  ),
                 );
               }
             }));

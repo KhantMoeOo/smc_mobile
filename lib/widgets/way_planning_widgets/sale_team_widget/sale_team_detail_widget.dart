@@ -293,9 +293,13 @@ class _SaleTeamDetailWidgetState extends State<SaleTeamDetailWidget> {
                         childCount: hremployeelineListDB!.length,
                       ));
                     } else {
-                      saleteamWidget = const SliverToBoxAdapter(
+                      saleteamWidget = SliverToBoxAdapter(
                         child: Center(
-                          child: CircularProgressIndicator(),
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         ),
                       );
                     }

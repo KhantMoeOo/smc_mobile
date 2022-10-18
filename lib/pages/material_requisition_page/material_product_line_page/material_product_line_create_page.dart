@@ -190,8 +190,12 @@ class _MaterialProductLineCreatePageState
                   builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                     ResponseOb? responseOb = snapshot.data;
                     if (responseOb?.msgState == MsgState.loading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return const Center(
@@ -269,8 +273,12 @@ class _MaterialProductLineCreatePageState
                   builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                     ResponseOb? responseOb = snapshot.data;
                     if (responseOb?.msgState == MsgState.loading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     } else if (responseOb?.msgState == MsgState.error) {
                       return const Center(

@@ -499,8 +499,12 @@ class _CustomerListPageState extends State<CustomerListPage> {
             } else {
               return Container(
                 color: Colors.white,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                child: Center(
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ),
               );
             }

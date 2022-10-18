@@ -292,8 +292,12 @@ class _WayPlanningDetailPageState extends State<WayPlanningDetailPage>
           if (responseOb?.msgState == MsgState.loading) {
             return Container(
                 color: Colors.white,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                child: Center(
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ));
           } else if (responseOb?.msgState == MsgState.error) {
             return const Center(child: Text('Error'));
@@ -670,8 +674,12 @@ class _WayPlanningDetailPageState extends State<WayPlanningDetailPage>
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                             color: Colors.white,
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/three_circle_loading.gif',
+                                width: 150,
+                                height: 150,
+                              ),
                             ));
                       }
                       return Container();

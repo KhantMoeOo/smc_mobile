@@ -116,6 +116,7 @@ class _SaleOrderLineMultiCreatePageState
   List<dynamic> taxslistUpload = [];
 
   List<SaleOrderLineOb>? saleorderlineDBList = [];
+  List<SaleOrderLineOb>? saleorderlineDBAllList = [];
   List<SaleOrderLineOb>? saleorderlinemultiselectList = [];
 
   List list = ['one', 'two', 'three'];
@@ -140,6 +141,10 @@ class _SaleOrderLineMultiCreatePageState
   void initState() {
     // TODO: implement initState
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     print("SOLIDS: ${widget.solId}");
     print("NewOrEdit: ${widget.newOrEditSOL}");
     print('CurrencyId: ${widget.currencyId}');
@@ -227,10 +232,12 @@ class _SaleOrderLineMultiCreatePageState
               ? product['product_code']
               : '${product['product_code']} ${product['name']}',
           quantity: '0',
+          qtyDelivered: product['qty_delivered'].toString(),
+          qtyInvoiced: product['qty_invoiced'].toString(),
           uomName: '',
           uomId: 0,
           unitPrice: '0',
-          taxId: 1,
+          taxId: product['tax_ids'].toString(),
           taxName: '',
           subTotal: '');
       await databaseHelper.insertOrderLineMultiSelect(saleorderlineOb);
@@ -685,6 +692,9 @@ class _SaleOrderLineMultiCreatePageState
 
   @override
   Widget build(BuildContext context) {
+    // Widget saleOrderLineWidget = SliverToBoxAdapter(
+    //   child: Container(),
+    // );
     return Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
@@ -711,8 +721,12 @@ class _SaleOrderLineMultiCreatePageState
             if (responseOb?.msgState == MsgState.loading) {
               return Container(
                 color: Colors.white,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                child: Center(
+                  child: Image.asset(
+                    'assets/gifs/loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ),
               );
             } else if (responseOb?.msgState == MsgState.error) {
@@ -741,8 +755,16 @@ class _SaleOrderLineMultiCreatePageState
                             setState(() {});
                           },
                           controller: productsearchController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  productsearchController.clear();
+                                  setState(() {
+                                    searchProductName = '';
+                                  });
+                                },
+                                icon: const Icon(Icons.clear)),
+                            border: const OutlineInputBorder(),
                           )),
                     ),
                   ),
@@ -813,8 +835,12 @@ class _SaleOrderLineMultiCreatePageState
                           );
                         } else {
                           return Container(
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/loading.gif',
+                                width: 150,
+                                height: 150,
+                              ),
                             ),
                           );
                         }
@@ -828,7 +854,7 @@ class _SaleOrderLineMultiCreatePageState
                       children: [
                         Container(
                             padding: const EdgeInsets.all(8),
-                            width: 200,
+                            width: 300,
                             child: const Text(
                               'Product Code',
                               style: TextStyle(
@@ -836,36 +862,45 @@ class _SaleOrderLineMultiCreatePageState
                                 fontSize: 15,
                               ),
                             )),
-                        Container(
-                            padding: const EdgeInsets.all(8),
-                            width: 50,
-                            child: const Text(
-                              'QTY',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            )),
-                        Container(
-                            padding: const EdgeInsets.all(8),
-                            width: 100,
-                            child: const Text(
-                              'UOM',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            )),
-                        Container(
-                            padding: const EdgeInsets.all(8),
-                            width: 100,
-                            child: const Text(
-                              'Unit Price',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ))
+                        Expanded(
+                          child: Container(
+                              padding: const EdgeInsets.all(8),
+                              width: 50,
+                              child: const Text(
+                                'QTY',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: Container(
+                              padding: const EdgeInsets.all(8),
+                              width: 100,
+                              child: const Text(
+                                'UOM',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: Container(
+                              padding: const EdgeInsets.all(8),
+                              width: 100,
+                              child: const Text(
+                                'Unit Price',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              )),
+                        ),
+                        const Expanded(
+                          child: SizedBox(),
+                        )
                       ],
                     ),
                   ),
@@ -874,6 +909,7 @@ class _SaleOrderLineMultiCreatePageState
                     future: databaseHelper.searchProductName(searchProductName),
                     builder: (c, snapshot) {
                       saleorderlineDBList = snapshot.data;
+                      saleorderlineDBAllList = snapshot.data;
                       if (snapshot.hasData) {
                         return Column(
                           children: [
@@ -928,10 +964,9 @@ class _SaleOrderLineMultiCreatePageState
                                                             //   //     .toString();
                                                             // });
                                                             await databaseHelper.updateSaleOrderLineMultiSelect(
-                                                                id:
-                                                                    saleorderlineDBList![
-                                                                            i]
-                                                                        .id,
+                                                                id: saleorderlineDBList![
+                                                                        i]
+                                                                    .id,
                                                                 quotationId: 0,
                                                                 isSelect: 1,
                                                                 productCodeId:
@@ -955,8 +990,7 @@ class _SaleOrderLineMultiCreatePageState
                                                                 unitPrice:
                                                                     unitPriceController
                                                                         .text,
-                                                                taxId:
-                                                                    accounttaxesId,
+                                                                taxId: '[]',
                                                                 taxName:
                                                                     accounttaxesName,
                                                                 subTotal:
@@ -976,302 +1010,313 @@ class _SaleOrderLineMultiCreatePageState
                                                         ),
                                                       )
                                                     ],
-                                                    content: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Text(
-                                                          "Quantity:",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 20,
-                                                              color:
-                                                                  hasQuantity ==
-                                                                          true
-                                                                      ? Colors
-                                                                          .black
-                                                                      : Colors
-                                                                          .red),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 40,
-                                                          child: TextFormField(
-                                                            readOnly:
-                                                                hasNotProductProduct ==
+                                                    content: Container(
+                                                      width: 300,
+                                                      height: 300,
+                                                      child: ListView(
+                                                        // mainAxisSize:
+                                                        //     MainAxisSize.min,
+                                                        // crossAxisAlignment:
+                                                        //     CrossAxisAlignment
+                                                        //         .start,
+                                                        children: [
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            "Quantity:",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                                color: hasQuantity ==
                                                                         true
-                                                                    ? true
-                                                                    : false,
-                                                            focusNode:
-                                                                quantityFocus,
-                                                            onChanged: (value) {
-                                                              if (value == '') {
-                                                                setState(() {
-                                                                  hasQuantity =
-                                                                      false;
-                                                                });
-                                                              } else {
-                                                                setState(() {
-                                                                  hasQuantity =
-                                                                      true;
-                                                                });
-                                                              }
-                                                            },
-                                                            autovalidateMode:
-                                                                AutovalidateMode
-                                                                    .onUserInteraction,
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return 'Please enter Quantity';
-                                                              }
-                                                              return null;
-                                                            },
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            inputFormatters: <
-                                                                TextInputFormatter>[
-                                                              FilteringTextInputFormatter
-                                                                  .digitsOnly
-                                                            ],
-                                                            onFieldSubmitted:
-                                                                (value) {
-                                                              subTotalController
-                                                                  .text = (double
-                                                                          .parse(
-                                                                              value) *
-                                                                      double.parse(
-                                                                          unitPriceController
-                                                                              .text))
-                                                                  .toString();
-                                                              print(
-                                                                  'subtotal: ${subTotalController.text}');
-                                                            },
-                                                            controller:
-                                                                quantityController,
-                                                            decoration:
-                                                                const InputDecoration(
-                                                                    border:
-                                                                        OutlineInputBorder()),
+                                                                    ? Colors
+                                                                        .black
+                                                                    : Colors
+                                                                        .red),
                                                           ),
-                                                        ), // Quantity from Order Line
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        const Text(
-                                                          "UOM:",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 20),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 40,
-                                                          child: StreamBuilder<
-                                                                  ResponseOb>(
-                                                              initialData: hasUOMData ==
-                                                                      true
-                                                                  ? null
-                                                                  : ResponseOb(
-                                                                      msgState:
-                                                                          MsgState
-                                                                              .loading),
-                                                              stream: saleorderlineBloc
-                                                                  .getUOMListStream(),
-                                                              builder: (context,
-                                                                  AsyncSnapshot<
-                                                                          ResponseOb>
-                                                                      snapshot) {
-                                                                ResponseOb?
-                                                                    responseOb =
-                                                                    snapshot
-                                                                        .data;
-                                                                if (responseOb
-                                                                        ?.msgState ==
-                                                                    MsgState
-                                                                        .loading) {
-                                                                  return const Center(
-                                                                    child:
-                                                                        CircularProgressIndicator(),
-                                                                  );
-                                                                } else if (responseOb
-                                                                        ?.msgState ==
-                                                                    MsgState
-                                                                        .error) {
-                                                                  return const Center(
-                                                                    child: Text(
-                                                                        "Something went Wrong!"),
-                                                                  );
-                                                                } else {
-                                                                  return DropdownSearch<
-                                                                      String>(
-                                                                    dialogMaxWidth:
-                                                                        10,
-                                                                    maxHeight:
-                                                                        200,
-                                                                    autoValidateMode:
-                                                                        AutovalidateMode
-                                                                            .onUserInteraction,
-                                                                    validator:
-                                                                        (value) {
-                                                                      if (value ==
-                                                                              null ||
-                                                                          value
-                                                                              .isEmpty) {
-                                                                        return 'Please select UOM';
-                                                                      }
-                                                                      return null;
-                                                                    },
-                                                                    popupItemBuilder:
-                                                                        (context,
-                                                                            item,
-                                                                            isSelected) {
-                                                                      return Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.all(8.0),
-                                                                        child:
-                                                                            Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: [
-                                                                            Text(item.toString().split(',')[1]),
-                                                                            const Divider(),
-                                                                          ],
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                    // showSearchBox:
-                                                                    //     true,
-                                                                    showSelectedItems:
-                                                                        true,
-                                                                    // showClearButton:
-                                                                    //     !hasNotUOM,
-                                                                    items: uomListUpdate
-                                                                        .map((e) =>
-                                                                            '${e['id']},${e['name']}')
-                                                                        .toList(),
-                                                                    onChanged:
-                                                                        getUOMListId,
-                                                                    selectedItem:
-                                                                        uomName,
-                                                                  );
-                                                                }
-                                                              }),
-                                                        ), // UOM Many2one from Order Line
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Text(
-                                                          "Unit Price:",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 20,
-                                                              color:
-                                                                  hasUnitPrice ==
+                                                          SizedBox(
+                                                            height: 40,
+                                                            child:
+                                                                TextFormField(
+                                                              readOnly:
+                                                                  hasNotProductProduct ==
                                                                           true
-                                                                      ? Colors
-                                                                          .black
-                                                                      : Colors
-                                                                          .red),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 40,
-                                                          child: TextFormField(
-                                                            readOnly: true,
-                                                            focusNode:
-                                                                unitpriceFocus,
-                                                            onChanged: (value) {
-                                                              if (value == '') {
-                                                                setState(() {
-                                                                  hasUnitPrice =
-                                                                      false;
-                                                                });
-                                                              } else {
-                                                                setState(() {
-                                                                  hasUnitPrice =
-                                                                      true;
-                                                                });
-                                                              }
-                                                            },
-                                                            autovalidateMode:
-                                                                AutovalidateMode
-                                                                    .onUserInteraction,
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return 'Please enter Unit Price';
-                                                              }
-                                                              return null;
-                                                            },
-                                                            keyboardType:
-                                                                const TextInputType
-                                                                        .numberWithOptions(
-                                                                    decimal:
-                                                                        true),
-                                                            inputFormatters: <
-                                                                TextInputFormatter>[
-                                                              FilteringTextInputFormatter
-                                                                  .allow(RegExp(
-                                                                      r'^(\d+)?\.?\d{0,2}'))
-                                                            ],
-                                                            onFieldSubmitted:
-                                                                (value) {
-                                                              subTotalController
-                                                                  .text = (double.parse(
-                                                                          quantityController
-                                                                              .text) *
-                                                                      double.parse(
-                                                                          value))
-                                                                  .toString();
-                                                              print(
-                                                                  'subtotal: ${subTotalController.text}');
-                                                            },
-                                                            controller:
-                                                                unitPriceController,
-                                                            decoration:
-                                                                const InputDecoration(
-                                                                    border:
-                                                                        OutlineInputBorder()),
+                                                                      ? true
+                                                                      : false,
+                                                              focusNode:
+                                                                  quantityFocus,
+                                                              onChanged:
+                                                                  (value) {
+                                                                if (value ==
+                                                                    '') {
+                                                                  setState(() {
+                                                                    hasQuantity =
+                                                                        false;
+                                                                  });
+                                                                } else {
+                                                                  setState(() {
+                                                                    hasQuantity =
+                                                                        true;
+                                                                  });
+                                                                }
+                                                              },
+                                                              autovalidateMode:
+                                                                  AutovalidateMode
+                                                                      .onUserInteraction,
+                                                              validator:
+                                                                  (value) {
+                                                                if (value ==
+                                                                        null ||
+                                                                    value
+                                                                        .isEmpty) {
+                                                                  return 'Please enter Quantity';
+                                                                }
+                                                                return null;
+                                                              },
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .number,
+                                                              inputFormatters: <
+                                                                  TextInputFormatter>[
+                                                                FilteringTextInputFormatter
+                                                                    .digitsOnly
+                                                              ],
+                                                              onFieldSubmitted:
+                                                                  (value) {
+                                                                subTotalController
+                                                                    .text = (double.parse(
+                                                                            value) *
+                                                                        double.parse(
+                                                                            unitPriceController.text))
+                                                                    .toString();
+                                                                print(
+                                                                    'subtotal: ${subTotalController.text}');
+                                                              },
+                                                              controller:
+                                                                  quantityController,
+                                                              decoration:
+                                                                  const InputDecoration(
+                                                                      border:
+                                                                          OutlineInputBorder()),
+                                                            ),
+                                                          ), // Quantity from Order Line
+                                                          const SizedBox(
+                                                            height: 10,
                                                           ),
-                                                        ), // Unit Price from Order Line
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        const Text(
-                                                          "Subtotal:",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 20),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 40,
-                                                          child: TextField(
-                                                            readOnly: true,
-                                                            controller:
-                                                                subTotalController,
-                                                            decoration:
-                                                                const InputDecoration(
-                                                                    border:
-                                                                        OutlineInputBorder()),
+                                                          const Text(
+                                                            "UOM:",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20),
                                                           ),
-                                                        ), // Subtotal from Order Line
-                                                      ],
+                                                          SizedBox(
+                                                            height: 40,
+                                                            child: StreamBuilder<
+                                                                    ResponseOb>(
+                                                                initialData: hasUOMData ==
+                                                                        true
+                                                                    ? null
+                                                                    : ResponseOb(
+                                                                        msgState:
+                                                                            MsgState
+                                                                                .loading),
+                                                                stream: saleorderlineBloc
+                                                                    .getUOMListStream(),
+                                                                builder: (context,
+                                                                    AsyncSnapshot<
+                                                                            ResponseOb>
+                                                                        snapshot) {
+                                                                  ResponseOb?
+                                                                      responseOb =
+                                                                      snapshot
+                                                                          .data;
+                                                                  if (responseOb
+                                                                          ?.msgState ==
+                                                                      MsgState
+                                                                          .loading) {
+                                                                    return Center(
+                                                                      child: Image
+                                                                          .asset(
+                                                                        'assets/gifs/loading.gif',
+                                                                        width:
+                                                                            150,
+                                                                        height:
+                                                                            150,
+                                                                      ),
+                                                                    );
+                                                                  } else if (responseOb
+                                                                          ?.msgState ==
+                                                                      MsgState
+                                                                          .error) {
+                                                                    return const Center(
+                                                                      child: Text(
+                                                                          "Something went Wrong!"),
+                                                                    );
+                                                                  } else {
+                                                                    return DropdownSearch<
+                                                                        String>(
+                                                                      dialogMaxWidth:
+                                                                          10,
+                                                                      maxHeight:
+                                                                          200,
+                                                                      autoValidateMode:
+                                                                          AutovalidateMode
+                                                                              .onUserInteraction,
+                                                                      validator:
+                                                                          (value) {
+                                                                        if (value ==
+                                                                                null ||
+                                                                            value.isEmpty) {
+                                                                          return 'Please select UOM';
+                                                                        }
+                                                                        return null;
+                                                                      },
+                                                                      popupItemBuilder: (context,
+                                                                          item,
+                                                                          isSelected) {
+                                                                        return Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(8.0),
+                                                                          child:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text(item.toString().split(',')[1]),
+                                                                              const Divider(),
+                                                                            ],
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                      // showSearchBox:
+                                                                      //     true,
+                                                                      showSelectedItems:
+                                                                          true,
+                                                                      // showClearButton:
+                                                                      //     !hasNotUOM,
+                                                                      items: uomListUpdate
+                                                                          .map((e) =>
+                                                                              '${e['id']},${e['name']}')
+                                                                          .toList(),
+                                                                      onChanged:
+                                                                          getUOMListId,
+                                                                      selectedItem:
+                                                                          uomName,
+                                                                    );
+                                                                  }
+                                                                }),
+                                                          ), // UOM Many2one from Order Line
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            "Unit Price:",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                                color: hasUnitPrice ==
+                                                                        true
+                                                                    ? Colors
+                                                                        .black
+                                                                    : Colors
+                                                                        .red),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 40,
+                                                            child:
+                                                                TextFormField(
+                                                              readOnly: true,
+                                                              focusNode:
+                                                                  unitpriceFocus,
+                                                              onChanged:
+                                                                  (value) {
+                                                                if (value ==
+                                                                    '') {
+                                                                  setState(() {
+                                                                    hasUnitPrice =
+                                                                        false;
+                                                                  });
+                                                                } else {
+                                                                  setState(() {
+                                                                    hasUnitPrice =
+                                                                        true;
+                                                                  });
+                                                                }
+                                                              },
+                                                              autovalidateMode:
+                                                                  AutovalidateMode
+                                                                      .onUserInteraction,
+                                                              validator:
+                                                                  (value) {
+                                                                if (value ==
+                                                                        null ||
+                                                                    value
+                                                                        .isEmpty) {
+                                                                  return 'Please enter Unit Price';
+                                                                }
+                                                                return null;
+                                                              },
+                                                              keyboardType:
+                                                                  const TextInputType
+                                                                          .numberWithOptions(
+                                                                      decimal:
+                                                                          true),
+                                                              inputFormatters: <
+                                                                  TextInputFormatter>[
+                                                                FilteringTextInputFormatter
+                                                                    .allow(RegExp(
+                                                                        r'^(\d+)?\.?\d{0,2}'))
+                                                              ],
+                                                              onFieldSubmitted:
+                                                                  (value) {
+                                                                subTotalController
+                                                                    .text = (double.parse(quantityController
+                                                                            .text) *
+                                                                        double.parse(
+                                                                            value))
+                                                                    .toString();
+                                                                print(
+                                                                    'subtotal: ${subTotalController.text}');
+                                                              },
+                                                              controller:
+                                                                  unitPriceController,
+                                                              decoration:
+                                                                  const InputDecoration(
+                                                                      border:
+                                                                          OutlineInputBorder()),
+                                                            ),
+                                                          ), // Unit Price from Order Line
+                                                          const SizedBox(
+                                                              height: 10),
+                                                          const Text(
+                                                            "Subtotal:",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 40,
+                                                            child: TextField(
+                                                              readOnly: true,
+                                                              controller:
+                                                                  subTotalController,
+                                                              decoration:
+                                                                  const InputDecoration(
+                                                                      border:
+                                                                          OutlineInputBorder()),
+                                                            ),
+                                                          ), // Subtotal from Order Line
+                                                        ],
+                                                      ),
                                                     ),
                                                   );
                                                 });
@@ -1283,8 +1328,8 @@ class _SaleOrderLineMultiCreatePageState
                                             ),
                                             child: Row(
                                               children: [
-                                                Container(
-                                                  width: 200,
+                                                SizedBox(
+                                                  width: 300,
                                                   child: Column(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
@@ -1309,48 +1354,48 @@ class _SaleOrderLineMultiCreatePageState
                                                     ],
                                                   ),
                                                 ),
-                                                Container(
-                                                  width: 50,
+                                                Expanded(
                                                   child: Text(
                                                       saleorderlineDBList![i]
                                                           .quantity),
                                                 ),
-                                                Container(
-                                                  width: 100,
+                                                Expanded(
                                                   child: Text(
                                                       saleorderlineDBList![i]
                                                           .uomName),
                                                 ),
-                                                Container(
-                                                  width: 100,
+                                                Expanded(
                                                   child: Text(
                                                       saleorderlineDBList![i]
                                                           .unitPrice),
                                                 ),
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        saleorderlineDBList![i]
-                                                                    .isSelect ==
-                                                                1
-                                                            ? Colors.green
-                                                            : Colors.grey,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  width: 80,
-                                                  child: Text(
-                                                    saleorderlineDBList![i]
-                                                                .isSelect ==
-                                                            1
-                                                        ? 'Selected'
-                                                        : 'Unselect',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        color: Colors.white),
+                                                Expanded(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: saleorderlineDBList![
+                                                                      i]
+                                                                  .isSelect ==
+                                                              1
+                                                          ? Colors.green
+                                                          : Colors.grey,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    width: 80,
+                                                    child: Text(
+                                                      saleorderlineDBList![i]
+                                                                  .isSelect ==
+                                                              1
+                                                          ? 'Selected'
+                                                          : 'Unselect',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: const TextStyle(
+                                                          color: Colors.white),
+                                                    ),
                                                   ),
                                                 )
                                               ],
@@ -1369,6 +1414,7 @@ class _SaleOrderLineMultiCreatePageState
                           child: Text('No Data'),
                         );
                       }
+                      return Container();
                     },
                   )),
                 ],

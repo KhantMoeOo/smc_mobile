@@ -100,8 +100,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: 150,
                                 width: 150,
                                 child: CircleAvatar(
-                                  backgroundImage: MemoryImage(
-                                      base64Decode(profileList[i]['image_128'])),
+                                  backgroundImage: MemoryImage(base64Decode(
+                                      profileList[i]['image_128'])),
                                 ),
                               )),
                               const SizedBox(height: 50),
@@ -132,7 +132,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                         Text(
                                           profileList[i]['name'],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -162,11 +163,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                         Text(
-                                          profileList[i]['mobile_phone'] == false
+                                          profileList[i]['mobile_phone'] ==
+                                                  false
                                               ? ''
                                               : profileList[i]['mobile_phone'],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -200,7 +203,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ? ''
                                               : profileList[i]['work_phone'],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -234,7 +238,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ? ''
                                               : profileList[i]['work_email'],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -267,10 +272,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                           profileList[i]['work_location_id'] ==
                                                   false
                                               ? ''
-                                              : profileList[i]['work_location_id']
-                                                  [1],
+                                              : profileList[i]
+                                                  ['work_location_id'][1],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -300,12 +306,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                         Text(
-                                          profileList[i]['department_id'] == false
+                                          profileList[i]['department_id'] ==
+                                                  false
                                               ? ''
                                               : profileList[i]['department_id']
                                                   [1],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -339,7 +347,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ? ''
                                               : profileList[i]['job_id'][1],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -372,9 +381,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                           profileList[i]['ssb_register_no'] ==
                                                   false
                                               ? ''
-                                              : profileList[i]['ssb_register_no'],
+                                              : profileList[i]
+                                                  ['ssb_register_no'],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -408,7 +419,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ? ''
                                               : profileList[i]['parent_id'][1],
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 18),
+                                              color: Colors.black,
+                                              fontSize: 18),
                                         )
                                       ])),
                                 ],
@@ -425,7 +437,13 @@ class _ProfilePageState extends State<ProfilePage> {
           } else {
             return Container(
                 color: Colors.white,
-                child: const Center(child: CircularProgressIndicator()));
+                child: Center(
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
+                ));
           }
         },
       )),

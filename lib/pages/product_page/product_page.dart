@@ -7,6 +7,7 @@ import '../../obs/response_ob.dart';
 import '../../utils/app_const.dart';
 import '../../widgets/drawer_widget.dart';
 import '../../widgets/product_widgets/product_card_widget.dart';
+import '../profile_page/profile_bloc.dart';
 import 'product_bloc.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -18,34 +19,77 @@ class ProductListPage extends StatefulWidget {
 
 class _ProductListPageState extends State<ProductListPage> {
   final productListBloc = ProductBloc();
+  final profileBloc = ProfileBloc();
   List<dynamic> productList = [];
+  List<dynamic> userList = [];
+  List<dynamic> stockwarehouseList = [];
+  List<dynamic> stockquantList = [];
   ScrollController scrollController = ScrollController();
   bool isScroll = false;
   final productSearchController = TextEditingController();
   bool searchDone = false;
   bool isSearch = false;
+  String stockonhand = '';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    productListBloc.getProductListData(name: ['name', 'ilike', '']);
+    profileBloc.getResUsersData();
+    profileBloc.getResUsersStream().listen(getResUsersData);
+    productListBloc.getStockWarehouseStream().listen(getStockWarehouseListen);
+    productListBloc.getStockQuantStream().listen(getStockQuantListen);
+    productListBloc.getProductListStream().listen(getProductListListen);
   }
 
-  // void _scrollListener() {
-  //   if (scrollController.position.userScrollDirection ==
-  //       ScrollDirection.reverse) {
-  //     setState(() {
-  //       isScroll = true;
-  //     });
-  //   }
-  //   if (scrollController.position.userScrollDirection ==
-  //       ScrollDirection.forward) {
-  //     setState(() {
-  //       isScroll = false;
-  //     });
-  //   }
-  // } // listen to Control show or hide of search bar from product list page
+  void getResUsersData(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      userList = responseOb.data;
+      if (userList.isNotEmpty) {
+        productListBloc.getStockWarehouseData(
+            zoneId: userList[0]['zone_id'][0]);
+      }
+    }
+  }
+
+  void getStockWarehouseListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      stockwarehouseList = responseOb.data;
+      productListBloc.getStockQuantData(
+          locationId: stockwarehouseList[0]['lot_stock_id'][0]);
+    }
+  }
+
+  void getProductListListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      productList = responseOb.data;
+      // if (productList.isNotEmpty && stockwarehouseList.isNotEmpty) {
+
+      // }
+    }
+  }
+
+  void getStockQuantListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      stockquantList = responseOb.data;
+      productListBloc.getProductListData(name: ['name', 'ilike', '']);
+    }
+  }
+
+  void getStockOnHand(int i) {
+    print('workgetStockOnHand');
+    for (var stockquant in stockquantList) {
+      print('loop stockquant________');
+      if (productList[i]['id'] == stockquant['product_id'][0]) {
+        print('StockonHand ${stockquant['detail_qty']}');
+        print('StockproductId: ${stockquant['product_id']}');
+        stockonhand = stockquant['detail_qty'];
+      } else {
+        print('NotSame productId');
+        stockonhand = '';
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -182,6 +226,7 @@ class _ProductListPageState extends State<ProductListPage> {
                                           left: 10, right: 10),
                                       itemCount: productList.length,
                                       itemBuilder: (context, i) {
+                                        getStockOnHand(i);
                                         return ProductCardWidget(
                                           productid: productList[i]['id'],
                                           productName: productList[i]['name'],
@@ -198,11 +243,7 @@ class _ProductListPageState extends State<ProductListPage> {
                                                   false
                                               ? 0.0
                                               : productList[i]['list_price'],
-                                          qtyAvailable: productList[i]
-                                                      ['qty_available'] ==
-                                                  false
-                                              ? 0.0
-                                              : productList[i]['qty_available'],
+                                          qtyAvailable: stockonhand,
                                           uomId:
                                               productList[i]['uom_id'] == false
                                                   ? []
@@ -508,8 +549,12 @@ class _ProductListPageState extends State<ProductListPage> {
             } else {
               return Container(
                 color: Colors.white,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                child: Center(
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ),
               );
             }

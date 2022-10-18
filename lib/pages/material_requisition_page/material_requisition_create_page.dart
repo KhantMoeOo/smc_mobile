@@ -1,8 +1,10 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:smc_mobile/features/pages/material_requisition/material_requisition_list.dart';
 import '../../dbs/database_helper.dart';
 import '../../dbs/sharef.dart';
 import '../../obs/product_line_ob.dart';
@@ -100,13 +102,20 @@ class _MaterialRequisitionCreatePageState
 
   String priorityrate = 'a';
 
+  List<dynamic> userList = [];
+
   final slidableController = SlidableController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    profileBloc.getHrEmployeeData();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    profileBloc.getResUsersData();
+    profileBloc.getResUsersStream().listen(getResUsersData);
     profileBloc.getHrEmployeeStream().listen(getHrEmployeeListen);
     saleteamBloc.getHrDeparmentListData();
     saleteamBloc.getHrDeparmentListStream().listen(getHrDepartmentListen);
@@ -114,7 +123,7 @@ class _MaterialRequisitionCreatePageState
     quotationBloc.getZoneListWithUserIdStream().listen(getZonelist);
     deliveryBloc.getAccountMoveListData();
     deliveryBloc.getAccountMoveListStream().listen(getAccountMoveListListen);
-    materialrequisitionBloc.getStockLocationList();
+    materialrequisitionBloc.getStockLocationList(['id', 'ilike', '']);
     materialrequisitionBloc
         .getStockLocationListStream()
         .listen(getStockLocationListListen);
@@ -132,17 +141,33 @@ class _MaterialRequisitionCreatePageState
     scheduleddateController.text = DateTime.now().toString().split('.')[0];
   }
 
+  void getResUsersData(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      userList = responseOb.data;
+      setState(() {
+        hasZoneData = true;
+      });
+      if (userList.isNotEmpty) {
+        profileBloc.getHrEmployeeData();
+      }
+    }
+  }
+
   void getHrEmployeeListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       hremployeeList = responseOb.data;
-      hasHrEmployeeData = true;
+      setState(() {
+        hasHrEmployeeData = true;
+      });
     }
   }
 
   void getHrDepartmentListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       hrdepartmentList = responseOb.data;
-      hasHrDepartmentData = true;
+      setState(() {
+        hasHrDepartmentData = true;
+      });
     }
   }
 
@@ -294,12 +319,12 @@ class _MaterialRequisitionCreatePageState
         isCreateMaterialRequisition = true;
       });
       materialrequisitioncreateBloc.createMaterialRequisition(
-          refno: refnoController.text,
-          zoneId: zoneList[0]['id'],
-          requestPerson: hremployeeId,
-          departmentId: hrdepartmentId,
+          //refno: refnoController.text,
+          zoneId: userList[0]['zone_id'][0],
+          requestPerson: hremployeeList[0]['id'],
+          departmentId: hremployeeList[0]['department_id'][0],
           locationId: stocklocationId,
-          invoiceId: invoiceId,
+          //invoiceId: invoiceId,
           priority: priorityrate,
           orderdate: dateorderController.text,
           scheduledDate: scheduleddateController.text,
@@ -348,7 +373,7 @@ class _MaterialRequisitionCreatePageState
                 textAlign: TextAlign.center));
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) {
-          return MaterialRequisitionPage();
+          return MaterialRequisitionList();
         }), (route) => false);
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
@@ -377,7 +402,7 @@ class _MaterialRequisitionCreatePageState
               const Text('Create Successfully!', textAlign: TextAlign.center));
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) {
-        return MaterialRequisitionPage();
+        return MaterialRequisitionList();
       }), (route) => false);
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
@@ -707,8 +732,14 @@ class _MaterialRequisitionCreatePageState
                             childCount: productlineList!.length,
                           ));
                         } else {
-                          productlineWidget = const SliverToBoxAdapter(
-                            child: Center(child: CircularProgressIndicator()),
+                          productlineWidget = SliverToBoxAdapter(
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/three_circle_loading.gif',
+                                width: 150,
+                                height: 150,
+                              ),
+                            ),
                           );
                         }
                         return Form(
@@ -721,319 +752,611 @@ class _MaterialRequisitionCreatePageState
                                       SliverList(
                                         delegate: SliverChildListDelegate(
                                           [
-                                            const Text(
-                                              "Ref No.:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
+                                            // const Text(
+                                            //   "Ref No.:",
+                                            //   style: TextStyle(
+                                            //       fontWeight: FontWeight.bold,
+                                            //       fontSize: 20),
+                                            // ),
+                                            // Container(
+                                            //     height: 40,
+                                            //     color: Colors.white,
+                                            //     child: TextField(
+                                            //       decoration:
+                                            //           const InputDecoration(
+                                            //         border:
+                                            //             OutlineInputBorder(),
+                                            //       ),
+                                            //       readOnly: true,
+                                            //       controller: refnoController,
+                                            //     )),
+                                            const SizedBox(
+                                              height: 10,
                                             ),
-                                            Container(
-                                                height: 40,
-                                                color: Colors.white,
-                                                child: TextField(
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
+                                            // const Text(
+                                            //   "Request Person:",
+                                            //   style: TextStyle(
+                                            //       fontWeight: FontWeight.bold,
+                                            //       fontSize: 20),
+                                            // ),
+                                            // Container(
+                                            //   color: Colors.white,
+                                            //   height: 40,
+                                            //   child: StreamBuilder<ResponseOb>(
+                                            //       initialData:
+                                            //           hasHrEmployeeData == false
+                                            //               ? ResponseOb(
+                                            //                   msgState: MsgState
+                                            //                       .loading)
+                                            //               : null,
+                                            //       stream: profileBloc
+                                            //           .getHrEmployeeStream(),
+                                            //       builder: (context,
+                                            //           AsyncSnapshot<ResponseOb>
+                                            //               snapshot) {
+                                            //         ResponseOb? responseOb =
+                                            //             snapshot.data;
+                                            //         if (responseOb?.msgState ==
+                                            //             MsgState.loading) {
+                                            //           return const Center(
+                                            //             child:
+                                            //                 CircularProgressIndicator(),
+                                            //           );
+                                            //         } else if (responseOb
+                                            //                 ?.msgState ==
+                                            //             MsgState.error) {
+                                            //           return const Center(
+                                            //             child: Text(
+                                            //                 "Something went Wrong!"),
+                                            //           );
+                                            //         } else {
+                                            //           return DropdownSearch<
+                                            //               String>(
+                                            //             // enabled: false,
+                                            //             popupItemBuilder:
+                                            //                 (context, item,
+                                            //                     isSelected) {
+                                            //               return Padding(
+                                            //                 padding:
+                                            //                     const EdgeInsets
+                                            //                         .all(8.0),
+                                            //                 child: Column(
+                                            //                   crossAxisAlignment:
+                                            //                       CrossAxisAlignment
+                                            //                           .start,
+                                            //                   children: [
+                                            //                     Text(item
+                                            //                         .toString()
+                                            //                         .split(
+                                            //                             ',')[1]),
+                                            //                     const Divider(),
+                                            //                   ],
+                                            //                 ),
+                                            //               );
+                                            //             },
+                                            //             showSearchBox: true,
+                                            //             showSelectedItems: true,
+                                            //             showClearButton:
+                                            //                 !hasNotHrEmployee,
+                                            //             items: hremployeeList
+                                            //                 .map((e) =>
+                                            //                     '${e['id']},${e['name']}')
+                                            //                 .toList(),
+                                            //             onChanged:
+                                            //                 getHrEmployeeId,
+                                            //             selectedItem:
+                                            //                 hremployeeName,
+                                            //           );
+                                            //         }
+                                            //       }),
+                                            // ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const SizedBox(
+                                                  width: 200,
+                                                  child: Text(
+                                                    'Request Person',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
                                                   ),
-                                                  readOnly: true,
-                                                  controller: refnoController,
-                                                )),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            const Text(
-                                              "Request Person:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: StreamBuilder<ResponseOb>(
-                                                  initialData:
-                                                      hasHrEmployeeData == false
-                                                          ? ResponseOb(
-                                                              msgState: MsgState
-                                                                  .loading)
-                                                          : null,
-                                                  stream: profileBloc
-                                                      .getHrEmployeeStream(),
-                                                  builder: (context,
-                                                      AsyncSnapshot<ResponseOb>
-                                                          snapshot) {
-                                                    ResponseOb? responseOb =
-                                                        snapshot.data;
-                                                    if (responseOb?.msgState ==
-                                                        MsgState.loading) {
-                                                      return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
-                                                      );
-                                                    } else if (responseOb
-                                                            ?.msgState ==
-                                                        MsgState.error) {
-                                                      return const Center(
-                                                        child: Text(
-                                                            "Something went Wrong!"),
-                                                      );
-                                                    } else {
-                                                      return DropdownSearch<
-                                                          String>(
-                                                        // enabled: false,
-                                                        popupItemBuilder:
-                                                            (context, item,
-                                                                isSelected) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child: Column(
+                                                ),
+                                                const Text(
+                                                  ":",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                StreamBuilder<ResponseOb>(
+                                                    initialData:
+                                                        hasHrEmployeeData ==
+                                                                true
+                                                            ? null
+                                                            : ResponseOb(
+                                                                msgState: MsgState
+                                                                    .loading),
+                                                    stream: profileBloc
+                                                        .getHrEmployeeStream(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      ResponseOb? responseOb =
+                                                          snapshot.data;
+                                                      if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.error) {
+                                                        return const Center(
+                                                            child:
+                                                                Text('Error'));
+                                                      } else if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.loading) {
+                                                        return Expanded(
+                                                            child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          color: Colors.white,
+                                                          child: Center(
+                                                            child: Image.asset(
+                                                              'assets/gifs/three_circle_loading.gif',
+                                                              width: 150,
+                                                              height: 150,
+                                                            ),
+                                                          ),
+                                                        ));
+                                                      } else {
+                                                        return Expanded(
+                                                            child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .grey),
+                                                            color: Colors.white,
+                                                          ),
+                                                          child: Column(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                Text(item
-                                                                    .toString()
-                                                                    .split(
-                                                                        ',')[1]),
-                                                                const Divider(),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                        showSearchBox: true,
-                                                        showSelectedItems: true,
-                                                        showClearButton:
-                                                            !hasNotHrEmployee,
-                                                        items: hremployeeList
-                                                            .map((e) =>
-                                                                '${e['id']},${e['name']}')
-                                                            .toList(),
-                                                        onChanged:
-                                                            getHrEmployeeId,
-                                                        selectedItem:
-                                                            hremployeeName,
-                                                      );
-                                                    }
-                                                  }),
+                                                                Text(
+                                                                    '${hremployeeList.isNotEmpty ? hremployeeList[0]['name'] : ''}',
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            18))
+                                                              ]),
+                                                        ));
+                                                      }
+                                                    }),
+                                              ],
                                             ),
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            const Text(
-                                              "Department:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: StreamBuilder<ResponseOb>(
-                                                  initialData:
-                                                      hasHrDepartmentData ==
-                                                              false
-                                                          ? ResponseOb(
-                                                              msgState: MsgState
-                                                                  .loading)
-                                                          : null,
-                                                  stream: saleteamBloc
-                                                      .getHrDeparmentListStream(),
-                                                  builder: (context,
-                                                      AsyncSnapshot<ResponseOb>
-                                                          snapshot) {
-                                                    ResponseOb? responseOb =
-                                                        snapshot.data;
-                                                    if (responseOb?.msgState ==
-                                                        MsgState.loading) {
-                                                      return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
-                                                      );
-                                                    } else if (responseOb
-                                                            ?.msgState ==
-                                                        MsgState.error) {
-                                                      return const Center(
-                                                        child: Text(
-                                                            "Something went Wrong!"),
-                                                      );
-                                                    } else {
-                                                      return DropdownSearch<
-                                                          String>(
-                                                        // enabled: false,
-                                                        popupItemBuilder:
-                                                            (context, item,
-                                                                isSelected) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child: Column(
+                                            // const Text(
+                                            //   "Department:",
+                                            //   style: TextStyle(
+                                            //       fontWeight: FontWeight.bold,
+                                            //       fontSize: 20),
+                                            // ),
+                                            // Container(
+                                            //   color: Colors.white,
+                                            //   height: 40,
+                                            //   child: StreamBuilder<ResponseOb>(
+                                            //       initialData:
+                                            //           hasHrDepartmentData ==
+                                            //                   false
+                                            //               ? ResponseOb(
+                                            //                   msgState: MsgState
+                                            //                       .loading)
+                                            //               : null,
+                                            //       stream: saleteamBloc
+                                            //           .getHrDeparmentListStream(),
+                                            //       builder: (context,
+                                            //           AsyncSnapshot<ResponseOb>
+                                            //               snapshot) {
+                                            //         ResponseOb? responseOb =
+                                            //             snapshot.data;
+                                            //         if (responseOb?.msgState ==
+                                            //             MsgState.loading) {
+                                            //           return const Center(
+                                            //             child:
+                                            //                 CircularProgressIndicator(),
+                                            //           );
+                                            //         } else if (responseOb
+                                            //                 ?.msgState ==
+                                            //             MsgState.error) {
+                                            //           return const Center(
+                                            //             child: Text(
+                                            //                 "Something went Wrong!"),
+                                            //           );
+                                            //         } else {
+                                            //           return DropdownSearch<
+                                            //               String>(
+                                            //             // enabled: false,
+                                            //             popupItemBuilder:
+                                            //                 (context, item,
+                                            //                     isSelected) {
+                                            //               return Padding(
+                                            //                 padding:
+                                            //                     const EdgeInsets
+                                            //                         .all(8.0),
+                                            //                 child: Column(
+                                            //                   crossAxisAlignment:
+                                            //                       CrossAxisAlignment
+                                            //                           .start,
+                                            //                   children: [
+                                            //                     Text(item
+                                            //                         .toString()
+                                            //                         .split(
+                                            //                             ',')[1]),
+                                            //                     const Divider(),
+                                            //                   ],
+                                            //                 ),
+                                            //               );
+                                            //             },
+                                            //             showSearchBox: true,
+                                            //             showSelectedItems: true,
+                                            //             showClearButton:
+                                            //                 !hasNotHrDepartment,
+                                            //             items: hrdepartmentList
+                                            //                 .map((e) =>
+                                            //                     '${e['id']},${e['name']}')
+                                            //                 .toList(),
+                                            //             onChanged:
+                                            //                 getHrDepartmentId,
+                                            //             selectedItem:
+                                            //                 hrdepartmentName,
+                                            //           );
+                                            //         }
+                                            //       }),
+                                            // ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const SizedBox(
+                                                  width: 200,
+                                                  child: Text(
+                                                    'Department',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                                const Text(
+                                                  ":",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                StreamBuilder<ResponseOb>(
+                                                    initialData:
+                                                        hasHrEmployeeData ==
+                                                                true
+                                                            ? null
+                                                            : ResponseOb(
+                                                                msgState: MsgState
+                                                                    .loading),
+                                                    stream: profileBloc
+                                                        .getHrEmployeeStream(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      ResponseOb? responseOb =
+                                                          snapshot.data;
+                                                      if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.error) {
+                                                        return const Center(
+                                                            child:
+                                                                Text('Error'));
+                                                      } else if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.loading) {
+                                                        return Expanded(
+                                                            child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          color: Colors.white,
+                                                          child: Center(
+                                                            child: Image.asset(
+                                                              'assets/gifs/three_circle_loading.gif',
+                                                              width: 150,
+                                                              height: 150,
+                                                            ),
+                                                          ),
+                                                        ));
+                                                      } else {
+                                                        return Expanded(
+                                                            child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .grey),
+                                                            color: Colors.white,
+                                                          ),
+                                                          child: Column(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                Text(item
-                                                                    .toString()
-                                                                    .split(
-                                                                        ',')[1]),
-                                                                const Divider(),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                        showSearchBox: true,
-                                                        showSelectedItems: true,
-                                                        showClearButton:
-                                                            !hasNotHrDepartment,
-                                                        items: hrdepartmentList
-                                                            .map((e) =>
-                                                                '${e['id']},${e['name']}')
-                                                            .toList(),
-                                                        onChanged:
-                                                            getHrDepartmentId,
-                                                        selectedItem:
-                                                            hrdepartmentName,
-                                                      );
-                                                    }
-                                                  }),
+                                                                Text(
+                                                                    '${hremployeeList.isNotEmpty ? hremployeeList[0]['department_id'][1] : ''}',
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            18))
+                                                              ]),
+                                                        ));
+                                                      }
+                                                    }),
+                                              ],
                                             ),
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            const Text(
-                                              "Zone:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              child: StreamBuilder<ResponseOb>(
-                                                  initialData: hasZoneData ==
-                                                          false
-                                                      ? ResponseOb(
-                                                          msgState:
-                                                              MsgState.loading)
-                                                      : null,
-                                                  stream: quotationBloc
-                                                      .getZoneListWithUserIdStream(),
-                                                  builder: (context,
-                                                      AsyncSnapshot<ResponseOb>
-                                                          snapshot) {
-                                                    ResponseOb? responseOb =
-                                                        snapshot.data;
-                                                    if (responseOb?.msgState ==
-                                                        MsgState.loading) {
-                                                      return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
-                                                      );
-                                                    } else if (responseOb
-                                                            ?.msgState ==
-                                                        MsgState.error) {
-                                                      return const Center(
-                                                        child: Text(
-                                                            "Something went Wrong!"),
-                                                      );
-                                                    } else {
-                                                      return TextField(
-                                                        readOnly: true,
-                                                        controller:
-                                                            zonenameController,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          border:
-                                                              OutlineInputBorder(),
-                                                        ),
-                                                      );
-                                                    }
-                                                  }),
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            const Text(
-                                              "Invoice No:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              child: StreamBuilder<ResponseOb>(
-                                                  initialData: hasInvoiceData ==
-                                                          true
-                                                      ? null
-                                                      : ResponseOb(
-                                                          msgState:
-                                                              MsgState.loading),
-                                                  stream: deliveryBloc
-                                                      .getAccountMoveListStream(),
-                                                  builder: (context,
-                                                      AsyncSnapshot<ResponseOb>
-                                                          snapshot) {
-                                                    ResponseOb? responseOb =
-                                                        snapshot.data;
-                                                    if (responseOb?.msgState ==
-                                                        MsgState.loading) {
-                                                      return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
-                                                      );
-                                                    } else if (responseOb
-                                                            ?.msgState ==
-                                                        MsgState.error) {
-                                                      return const Center(
-                                                        child: Text(
-                                                            "Something went Wrong!"),
-                                                      );
-                                                    } else {
-                                                      return DropdownSearch
-                                                          .multiSelection(
-                                                        popupItemBuilder:
-                                                            (context, item,
-                                                                isSelected) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child: Column(
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const SizedBox(
+                                                  width: 200,
+                                                  child: Text(
+                                                    'Zone',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                                const Text(
+                                                  ":",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                StreamBuilder<ResponseOb>(
+                                                    initialData: hasZoneData ==
+                                                            true
+                                                        ? null
+                                                        : ResponseOb(
+                                                            msgState: MsgState
+                                                                .loading),
+                                                    stream: profileBloc
+                                                        .getResUsersStream(),
+                                                    builder: (context,
+                                                        AsyncSnapshot<
+                                                                ResponseOb>
+                                                            snapshot) {
+                                                      ResponseOb? responseOb =
+                                                          snapshot.data;
+                                                      if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.loading) {
+                                                        return Center(
+                                                          child: Image.asset(
+                                                            'assets/gifs/three_circle_loading.gif',
+                                                            width: 150,
+                                                            height: 150,
+                                                          ),
+                                                        );
+                                                      } else if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.error) {
+                                                        return const Center(
+                                                          child: Text(
+                                                              "Something went Wrong!"),
+                                                        );
+                                                      } else {
+                                                        return Expanded(
+                                                            child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .grey),
+                                                            color: Colors.white,
+                                                          ),
+                                                          child: Column(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                Text(item
-                                                                    .toString()
-                                                                    .split(
-                                                                        ',')[1]),
-                                                                const Divider(),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                        showSearchBox: true,
-                                                        showSelectedItems: true,
-                                                        showClearButton:
-                                                            !hasNotInvoice,
-                                                        items: invoiceList
-                                                            .map((e) =>
-                                                                '${e['id']},${e['name']}')
-                                                            .toList(),
-                                                        onChanged:
-                                                            getAccountMoveListId,
-                                                        // selectedItem:
-                                                        //     invoiceName,
-                                                      );
-                                                    }
-                                                  }),
+                                                                Text(
+                                                                    '${userList.isNotEmpty ? userList[0]['zone_id'][1] : ''}',
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            18))
+                                                              ]),
+                                                        ));
+                                                      }
+                                                    }),
+                                              ],
                                             ),
+                                            // const Text(
+                                            //   "Zone:",
+                                            //   style: TextStyle(
+                                            //       fontWeight: FontWeight.bold,
+                                            //       fontSize: 20),
+                                            // ),
+                                            // Container(
+                                            //   color: Colors.white,
+                                            //   height: 40,
+                                            //   child: StreamBuilder<ResponseOb>(
+                                            //       initialData: hasZoneData ==
+                                            //               false
+                                            //           ? ResponseOb(
+                                            //               msgState:
+                                            //                   MsgState.loading)
+                                            //           : null,
+                                            //       stream: quotationBloc
+                                            //           .getZoneListWithUserIdStream(),
+                                            //       builder: (context,
+                                            //           AsyncSnapshot<ResponseOb>
+                                            //               snapshot) {
+                                            //         ResponseOb? responseOb =
+                                            //             snapshot.data;
+                                            //         if (responseOb?.msgState ==
+                                            //             MsgState.loading) {
+                                            //           return Center(
+                                            //             child: Image.asset(
+                                            //               'assets/gifs/three_circle_loading.gif',
+                                            //               width: 150,
+                                            //               height: 150,
+                                            //             ),
+                                            //           );
+                                            //         } else if (responseOb
+                                            //                 ?.msgState ==
+                                            //             MsgState.error) {
+                                            //           return const Center(
+                                            //             child: Text(
+                                            //                 "Something went Wrong!"),
+                                            //           );
+                                            //         } else {
+                                            //           return TextField(
+                                            //             readOnly: true,
+                                            //             controller:
+                                            //                 zonenameController,
+                                            //             decoration:
+                                            //                 InputDecoration(
+                                            //               border:
+                                            //                   OutlineInputBorder(),
+                                            //             ),
+                                            //           );
+                                            //         }
+                                            //       }),
+                                            // ),
                                             const SizedBox(
                                               height: 10,
                                             ),
+                                            // const Text(
+                                            //   "Invoice No:",
+                                            //   style: TextStyle(
+                                            //       fontWeight: FontWeight.bold,
+                                            //       fontSize: 20),
+                                            // ),
+                                            // Container(
+                                            //   color: Colors.white,
+                                            //   child: StreamBuilder<ResponseOb>(
+                                            //       initialData: hasInvoiceData ==
+                                            //               true
+                                            //           ? null
+                                            //           : ResponseOb(
+                                            //               msgState:
+                                            //                   MsgState.loading),
+                                            //       stream: deliveryBloc
+                                            //           .getAccountMoveListStream(),
+                                            //       builder: (context,
+                                            //           AsyncSnapshot<ResponseOb>
+                                            //               snapshot) {
+                                            //         ResponseOb? responseOb =
+                                            //             snapshot.data;
+                                            //         if (responseOb?.msgState ==
+                                            //             MsgState.loading) {
+                                            //           return const Center(
+                                            //             child:
+                                            //                 CircularProgressIndicator(),
+                                            //           );
+                                            //         } else if (responseOb
+                                            //                 ?.msgState ==
+                                            //             MsgState.error) {
+                                            //           return const Center(
+                                            //             child: Text(
+                                            //                 "Something went Wrong!"),
+                                            //           );
+                                            //         } else {
+                                            //           return DropdownSearch
+                                            //               .multiSelection(
+                                            //             popupItemBuilder:
+                                            //                 (context, item,
+                                            //                     isSelected) {
+                                            //               return Padding(
+                                            //                 padding:
+                                            //                     const EdgeInsets
+                                            //                         .all(8.0),
+                                            //                 child: Column(
+                                            //                   crossAxisAlignment:
+                                            //                       CrossAxisAlignment
+                                            //                           .start,
+                                            //                   children: [
+                                            //                     Text(item
+                                            //                         .toString()
+                                            //                         .split(
+                                            //                             ',')[1]),
+                                            //                     const Divider(),
+                                            //                   ],
+                                            //                 ),
+                                            //               );
+                                            //             },
+                                            //             showSearchBox: true,
+                                            //             showSelectedItems: true,
+                                            //             showClearButton:
+                                            //                 !hasNotInvoice,
+                                            //             items: invoiceList
+                                            //                 .map((e) =>
+                                            //                     '${e['id']},${e['name']}')
+                                            //                 .toList(),
+                                            //             onChanged:
+                                            //                 getAccountMoveListId,
+                                            //             // selectedItem:
+                                            //             //     invoiceName,
+                                            //           );
+                                            //         }
+                                            //       }),
+                                            // ),
+                                            // const SizedBox(
+                                            //   height: 10,
+                                            // ),
                                             const Text(
                                               "Priority:",
                                               style: TextStyle(
@@ -1218,9 +1541,12 @@ class _MaterialRequisitionCreatePageState
                                                         snapshot.data;
                                                     if (responseOb?.msgState ==
                                                         MsgState.loading) {
-                                                      return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
+                                                      return Center(
+                                                        child: Image.asset(
+                                                          'assets/gifs/three_circle_loading.gif',
+                                                          width: 150,
+                                                          height: 150,
+                                                        ),
                                                       );
                                                     } else if (responseOb
                                                             ?.msgState ==
@@ -1372,6 +1698,15 @@ class _MaterialRequisitionCreatePageState
                                                       );
                                                     })).then(
                                                         (value) => setState(() {
+                                                              // SystemChrome
+                                                              //     .setPreferredOrientations([
+                                                              //   DeviceOrientation
+                                                              //       .landscapeRight,
+                                                              //   DeviceOrientation
+                                                              //       .landscapeLeft,
+                                                              //   // DeviceOrientation.portraitUp,
+                                                              //   // DeviceOrientation.portraitDown,
+                                                              // ]);
                                                               databaseHelper
                                                                   .deleteAllProductLineMultiSelect();
                                                             }));
@@ -1408,8 +1743,12 @@ class _MaterialRequisitionCreatePageState
                         if (responseOb?.msgState == MsgState.loading) {
                           return Container(
                             color: Colors.black.withOpacity(0.5),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/three_circle_loading.gif',
+                                width: 150,
+                                height: 150,
+                              ),
                             ),
                           );
                         }
@@ -1428,8 +1767,12 @@ class _MaterialRequisitionCreatePageState
                         if (responseOb?.msgState == MsgState.loading) {
                           return Container(
                             color: Colors.black.withOpacity(0.5),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/three_circle_loading.gif',
+                                width: 150,
+                                height: 150,
+                              ),
                             ),
                           );
                         }

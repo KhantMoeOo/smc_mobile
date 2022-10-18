@@ -48,7 +48,7 @@ class SaleTeamWidgetState extends State<SaleTeamWidget> {
     // TODO: implement initState
     super.initState();
     print(widget.leaderId);
-    profileBloc.getHrEmployeeData();
+    //profileBloc.getHrEmployeeData();
     profileBloc.getHrEmployeeStream().listen(getHrEmployeeListListen);
     transferData();
   }
@@ -96,7 +96,7 @@ class SaleTeamWidgetState extends State<SaleTeamWidget> {
           await databaseHelper.insertTable2TableHrEmployeeLine();
       print('HrEmployeeLineListLength: ${hremployeelineList?.length}');
     }
-    if(mounted){
+    if (mounted) {
       setState(() {});
     }
   }
@@ -126,13 +126,25 @@ class SaleTeamWidgetState extends State<SaleTeamWidget> {
                         actionPane: const SlidableBehindActionPane(),
                         actions: [
                           IconSlideAction(
-                            onTap: (){
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                                return SaleTeamCreatePage(tripLine: widget.tripId, hremployeelineId: hremployeelineList![i].id, newOrEdit: widget.neworedit, neworeditHEL: 1, empId: hremployeelineList![i].empId, departmentId: hremployeelineList![i].departmentId, departmentName: hremployeelineList![i].departmentName, jobId: hremployeelineList![i].jobId, jobName: hremployeelineList![i].jobName, responsible: hremployeelineList![i].responsible);
+                            onTap: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return SaleTeamCreatePage(
+                                    tripLine: widget.tripId,
+                                    hremployeelineId: hremployeelineList![i].id,
+                                    newOrEdit: widget.neworedit,
+                                    neworeditHEL: 1,
+                                    empId: hremployeelineList![i].empId,
+                                    departmentId:
+                                        hremployeelineList![i].departmentId,
+                                    departmentName:
+                                        hremployeelineList![i].departmentName,
+                                    jobId: hremployeelineList![i].jobId,
+                                    jobName: hremployeelineList![i].jobName,
+                                    responsible:
+                                        hremployeelineList![i].responsible);
                               })).then((value) {
-                                setState(() {
-                                  
-                                });
+                                setState(() {});
                               });
                             },
                             color: Colors.yellow,
@@ -159,9 +171,7 @@ class SaleTeamWidgetState extends State<SaleTeamWidget> {
                                   hremployeelineList![i].id);
                               hremployeelineDeleteList
                                   .add(hremployeelineList![i].id);
-                              setState(() {
-                                
-                              });
+                              setState(() {});
                             },
                             color: Colors.red,
                             iconWidget: Column(
@@ -258,9 +268,13 @@ class SaleTeamWidgetState extends State<SaleTeamWidget> {
                               // ])),
                               Row(
                                 children: [
-                                  const Text("Responsible For MR: ",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
-                                  Icon(hremployeelineList![i]
-                                    .responsible == 1? Icons.check_box: Icons.check_box_outline_blank),
+                                  const Text("Responsible For MR: ",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold)),
+                                  Icon(hremployeelineList![i].responsible == 1
+                                      ? Icons.check_box
+                                      : Icons.check_box_outline_blank),
                                 ],
                               )
                             ],
@@ -275,9 +289,13 @@ class SaleTeamWidgetState extends State<SaleTeamWidget> {
                 }), childCount: hremployeelineList!.length));
               } else {
                 print(snapshot.hasError.toString());
-                saleteamWidget = const SliverToBoxAdapter(
+                saleteamWidget = SliverToBoxAdapter(
                     child: Center(
-                  child: CircularProgressIndicator(),
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ));
               }
               return CustomScrollView(

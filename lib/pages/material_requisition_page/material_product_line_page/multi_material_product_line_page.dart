@@ -141,6 +141,10 @@ class _MultiMaterialProductLinePageState
   void initState() {
     // TODO: implement initState
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     print("SOLIDS: ${widget.solId}");
     print("NewOrEdit: ${widget.newOrEditSOL}");
     print('CurrencyId: ${widget.currencyId}');
@@ -201,6 +205,12 @@ class _MultiMaterialProductLinePageState
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.landscapeRight,
+    //   DeviceOrientation.landscapeLeft,
+    //   DeviceOrientation.portraitUp,
+    //   DeviceOrientation.portraitDown,
+    // ]);
     saleorderlineBloc.dispose();
     descriptionController.dispose();
     quantityController.dispose();
@@ -705,8 +715,12 @@ class _MultiMaterialProductLinePageState
             if (responseOb?.msgState == MsgState.loading) {
               return Container(
                 color: Colors.white,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                child: Center(
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ),
               );
             } else if (responseOb?.msgState == MsgState.error) {
@@ -807,8 +821,12 @@ class _MultiMaterialProductLinePageState
                           );
                         } else {
                           return Container(
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/three_circle_loading.gif',
+                                width: 150,
+                                height: 150,
+                              ),
                             ),
                           );
                         }
@@ -1081,9 +1099,15 @@ class _MultiMaterialProductLinePageState
                                                                         ?.msgState ==
                                                                     MsgState
                                                                         .loading) {
-                                                                  return const Center(
-                                                                    child:
-                                                                        CircularProgressIndicator(),
+                                                                  return Center(
+                                                                    child: Image
+                                                                        .asset(
+                                                                      'assets/gifs/three_circle_loading.gif',
+                                                                      width:
+                                                                          150,
+                                                                      height:
+                                                                          150,
+                                                                    ),
                                                                   );
                                                                 } else if (responseOb
                                                                         ?.msgState ==

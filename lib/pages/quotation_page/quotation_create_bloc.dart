@@ -15,7 +15,8 @@ class QuotationCreateBloc {
   late Odoo odoo;
 
   quotationCreate(
-      {customerId,
+      {warehouseId,
+      customerId,
       currencyId,
       exchangeRate,
       dateOrder,
@@ -36,6 +37,7 @@ class QuotationCreateBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.create('sale.order', {
+          'warehouse_id': warehouseId,
           'partner_id': customerId,
           'currency_id': currencyId,
           'exchange_rate': exchangeRate,

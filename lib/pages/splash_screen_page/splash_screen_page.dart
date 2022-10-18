@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../dbs/sharef.dart';
+import '../../features/pages/login/login.dart';
+import '../../features/pages/quotation/quotation_list.dart';
 import '../login_page/login_page.dart';
 import '../quotation_page/quotation_page.dart';
 
@@ -24,12 +26,16 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
       if (userInfo == true) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return const QuotationListPage();
+          return const QuotationList();
         }), (route) => false);
       } else {
+        // Navigator.of(context).pushAndRemoveUntil(
+        //     MaterialPageRoute(builder: (BuildContext context) {
+        //   return const LoginPage();
+        // }), (route) => false);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return const LoginPage();
+          return const Login();
         }), (route) => false);
       }
     });
@@ -42,7 +48,10 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
         body: Container(
           color: Colors.white,
           child: const Center(
-            child: Text('Please Wait...', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),),
+            child: Text(
+              'Please Wait...',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
           ),
         ),
       ),

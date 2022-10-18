@@ -1,4 +1,6 @@
 // import 'package:dropdown_search/dropdown_search.dart';
+import 'dart:convert';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../../dbs/database_helper.dart';
 import '../../dbs/sharef.dart';
+import '../../features/pages/quotation/quotation_list.dart';
 import '../../obs/response_ob.dart';
 import '../../obs/sale_order_line_ob.dart';
 import '../../utils/app_const.dart';
@@ -13,6 +16,8 @@ import '../delivery_page/delivery_bloc.dart';
 import '../delivery_page/delivery_create_bloc.dart';
 import '../home_page/home_page.dart';
 import '../invoice_page/invoice_line_page/invoice_line_bloc.dart';
+import '../product_page/product_bloc.dart';
+import '../profile_page/profile_bloc.dart';
 import 'quotation_bloc.dart';
 import 'quotation_create_bloc.dart';
 import 'quotation_delete_bloc.dart';
@@ -76,8 +81,10 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
   final quotationEditBloc = QuotationEditBloc();
   final quotationDeleteBloc = DeleteQuoBloc();
   final invoicelineBloc = InvoiceLineBloc();
+  final profileBloc = ProfileBloc();
+  final productBloc = ProductBloc();
 
-  List<dynamic> filterbyList = ['No Filter', 'By Zone', 'By Segment'];
+  List<dynamic> filterbyList = ['No Filter', 'By Segment'];
   List<dynamic> customerList = [];
   List<dynamic> currencyList = [];
   List<dynamic> pricelistList = [];
@@ -158,6 +165,8 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
   List<SaleOrderLineOb>? productlineListUpdate;
   List<dynamic> productlineListInt = [];
   List<dynamic> saleorderlineDeleteList = [];
+  List<dynamic> userList = [];
+  List<dynamic> stockwarehouseList = [];
 
   int newPage = 0;
 
@@ -188,8 +197,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
     transferData();
 
     debugPrint('New or Edit:' + widget.newOrEdit.toString());
+    profileBloc.getResUsersData();
+    profileBloc.getResUsersStream().listen(getResUsersData);
     print('QuoId:' + widget.quotationId.toString());
-    quotationBloc.getCustomerList(['name', 'ilike', '']);
     quotationBloc.getCustomerStream().listen(getCustomerList);
     quotationBloc.getCurrencyList();
     quotationBloc.getCurrencyStream().listen(getCurrencyList);
@@ -208,6 +218,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
     quotationDeleteBloc
         .deleteSaleOrderLineStream()
         .listen(listenDeleteSaleOrderLine);
+    productBloc.getStockWarehouseStream().listen(getStockWarehouseListen);
     if (widget.newOrEdit == 1) {
       // newPage = -1;
       hasNotQuoDate = false;
@@ -293,9 +304,28 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
               const Text('Create Successfully!', textAlign: TextAlign.center));
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) {
-        return QuotationListPage();
+        return QuotationList();
       }), (route) => false);
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
+  }
+
+  void getResUsersData(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      userList = responseOb.data;
+      if (userList.isNotEmpty) {
+        productBloc.getStockWarehouseData(zoneId: userList[0]['zone_id'][0]);
+        quotationBloc.getCustomerList(
+          ['name', 'ilike', ''],
+          ['zone_id.id', '=', userList[0]['zone_id'][0]],
+        );
+      }
+    }
+  }
+
+  void getStockWarehouseListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      stockwarehouseList = responseOb.data;
     }
   }
 
@@ -333,7 +363,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                 textAlign: TextAlign.center));
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) {
-          return QuotationListPage();
+          return QuotationList();
         }), (route) => false);
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
@@ -344,15 +374,18 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
     if (v != null) {
       hasNotFilter = false;
       setState(() {
-        if (v == 'By Zone') {
-          filterName = 'zone';
-          zoneFilter = true;
-        } else if (v == 'By Segment') {
+        if (v == 'By Segment') {
           filterName = 'segment';
+          customerId = 0;
+          customerName = '';
+          hasNotCustomer = true;
           segFilter = true;
         } else {
           filterName = '';
-          quotationBloc.getCustomerList(['name', 'ilike', '']);
+          quotationBloc.getCustomerList(['name', 'ilike', ''],
+              ['zone_id.id', '=', userList[0]['zone_id'][0]]);
+          customerId = 0;
+          customerName = '';
           zoneFilter = false;
           segFilter = false;
         }
@@ -360,36 +393,36 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
     }
   }
 
-  void getZoneFilterId(String? v) {
-    if (v != null) {
-      setState(() {
-        zoneFilterId = int.parse(v.toString().split(',')[0]);
-        hasNotZoneFilter = false;
-        hasCustomerData = false;
-        for (var element in zoneList) {
-          if (element['id'] == zoneFilterId) {
-            zoneFilterName = element['name'];
-            zoneFilterId = element['id'];
-            print('zoneFilterName:$zoneFilterName');
-            print('zoneFilterId:$zoneFilterId');
-            // customerList = customerList.where((customer) =>
-            //   customer['zone_id'][0] == element['id']).toList();
-            quotationBloc.getCustomerList(['zone_id', 'ilike', zoneFilterName]);
-            // for(var filterCustomer in customerList){
-            //   if(filterCustomer['zone_id'][0] == element['id']){
-            //     customerFilterList.add(filterCustomer);
-            //   }
-            // }
+  // void getZoneFilterId(String? v) {
+  //   if (v != null) {
+  //     setState(() {
+  //       zoneFilterId = int.parse(v.toString().split(',')[0]);
+  //       hasNotZoneFilter = false;
+  //       hasCustomerData = false;
+  //       for (var element in zoneList) {
+  //         if (element['id'] == zoneFilterId) {
+  //           zoneFilterName = element['name'];
+  //           zoneFilterId = element['id'];
+  //           print('zoneFilterName:$zoneFilterName');
+  //           print('zoneFilterId:$zoneFilterId');
+  //           // customerList = customerList.where((customer) =>
+  //           //   customer['zone_id'][0] == element['id']).toList();
+  //           quotationBloc.getCustomerList(['zone_id', 'ilike', zoneFilterName]);
+  //           // for(var filterCustomer in customerList){
+  //           //   if(filterCustomer['zone_id'][0] == element['id']){
+  //           //     customerFilterList.add(filterCustomer);
+  //           //   }
+  //           // }
 
-          }
-        }
-      });
-    } else {
-      setState(() {
-        hasNotZoneFilter = true;
-      });
-    }
-  }
+  //         }
+  //       }
+  //     });
+  //   } else {
+  //     setState(() {
+  //       hasNotZoneFilter = true;
+  //     });
+  //   }
+  // }
 
   void setZoneFilterNameMethod() {
     if (widget.newOrEdit == 1) {
@@ -437,8 +470,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
             print('segmentFilterId:$segmentFilterId');
             // customerList = customerList.where((customer) =>
             //   customer['zone_id'][0] == element['id']).toList();
-            quotationBloc
-                .getCustomerList(['segment_id', 'ilike', segmentFilterName]);
+            quotationBloc.getCustomerList(
+                ['segment_id.id', '=', segmentFilterId],
+                ['zone_id.id', '=', userList[0]['zone_id'][0]]);
             // for(var filterCustomer in customerList){
             //   if(filterCustomer['zone_id'][0] == element['id']){
             //     customerFilterList.add(filterCustomer);
@@ -886,7 +920,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                 productUOMQty: element.quantity,
                 uomId: element.uomId,
                 priceUnit: element.unitPrice,
-                taxesId: [1],
+                taxesId: json.decode(element.taxId),
                 subtotal: element.subTotal);
             print('DbId: ${element.id}');
           }
@@ -903,7 +937,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                   textAlign: TextAlign.center));
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) {
-            return QuotationListPage();
+            return QuotationList();
           }), (route) => false);
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
         }
@@ -1019,7 +1053,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                 productUOMQty: double.parse(element.quantity),
                 uomId: element.uomId,
                 priceUnit: double.parse(element.unitPrice),
-                taxesId: [1],
+                taxesId: json.decode(element.taxId),
                 subtotal: element.subTotal);
             print('Found');
             print('FOund: ${element.id}');
@@ -1037,7 +1071,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                 productUOMQty: element.quantity,
                 uomId: element.uomId,
                 priceUnit: element.unitPrice,
-                taxesId: [1],
+                taxesId: json.decode(element.taxId),
                 subtotal: element.subTotal);
             print('DbId: ${element.id}');
             print('NotFound');
@@ -1057,7 +1091,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                   textAlign: TextAlign.center));
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) {
-            return QuotationListPage();
+            return QuotationList();
           }), (route) => false);
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
         }
@@ -1092,25 +1126,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
   createNewRecord() async {
     SharefCount.setTotal(productlineList!.length);
     bool isValid = _formKey.currentState!.validate();
-    if (isValid) {
-      setState(() {
-        isCreateQuo = true;
-        print('Iscreatequo: $isCreateQuo');
-      });
-      await quotationCreateBloc.quotationCreate(
-          customerId: customerId,
-          currencyId: 119,
-          exchangeRate: '1',
-          dateOrder: dateOrderController.text,
-          priceListId: 2,
-          paymentTermId: paymentTermsId,
-          zoneId: zoneListId,
-          segmentId: segmentListId,
-          regionId: regionListId,
-          customFilter: filterName,
-          zoneFilter: zoneFilterId,
-          segFilter: segmentFilterId);
-    } else {
+    if (stockwarehouseList.isEmpty || stockwarehouseList.length > 1) {
       final snackbar = SnackBar(
           elevation: 0.0,
           shape:
@@ -1118,9 +1134,42 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 1),
           backgroundColor: Colors.red,
-          content: const Text('Please fill first required fields!',
+          content: const Text(
+              'Please fill Warehouse name first or Check Warehouse Number Must be One',
               textAlign: TextAlign.center));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } else {
+      if (isValid) {
+        setState(() {
+          isCreateQuo = true;
+          print('Iscreatequo: $isCreateQuo');
+        });
+        await quotationCreateBloc.quotationCreate(
+            warehouseId: stockwarehouseList[0]['id'],
+            customerId: customerId,
+            currencyId: 119,
+            exchangeRate: '1',
+            dateOrder: dateOrderController.text,
+            priceListId: 2,
+            paymentTermId: paymentTermsId,
+            zoneId: zoneListId,
+            segmentId: segmentListId,
+            regionId: regionListId,
+            customFilter: filterName,
+            zoneFilter: zoneFilterId,
+            segFilter: segmentFilterId);
+      } else {
+        final snackbar = SnackBar(
+            elevation: 0.0,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 1),
+            backgroundColor: Colors.red,
+            content: const Text('Please fill first required fields!',
+                textAlign: TextAlign.center));
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      }
     }
   }
 
@@ -1249,8 +1298,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                               return OrderLineCreatePage(
                                                 newOrEdit: 1,
                                                 newOrEditSOL: 1,
-                                                solId:
-                                                    productlineList![i].id!,
+                                                solId: productlineList![i].id!,
                                                 quotationId: widget.quotationId,
                                                 productCodeId:
                                                     productlineList![i]
@@ -1273,8 +1321,8 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                     .subTotal,
                                                 taxesId:
                                                     productlineList![i].taxId,
-                                                taxesName: productlineList![i]
-                                                    .taxName,
+                                                taxesName:
+                                                    productlineList![i].taxName,
                                                 isFOC:
                                                     productlineList![i].isFOC,
                                               );
@@ -1375,8 +1423,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            productlineList![
-                                                                    i]
+                                                            productlineList![i]
                                                                 .productCodeName,
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -1440,8 +1487,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                    i]
+                                                            productlineList![i]
                                                                 .description,
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -1472,8 +1518,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                    i]
+                                                            productlineList![i]
                                                                 .quantity,
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -1504,8 +1549,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                    i]
+                                                            productlineList![i]
                                                                 .uomName,
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -1536,8 +1580,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                    i]
+                                                            productlineList![i]
                                                                 .unitPrice,
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -1568,8 +1611,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                        i]
+                                                            productlineList![i]
                                                                     .saleDiscount ??
                                                                 '',
                                                             style: const TextStyle(
@@ -1601,8 +1643,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                        i]
+                                                            productlineList![i]
                                                                     .promotionName ??
                                                                 '',
                                                             style: const TextStyle(
@@ -1634,8 +1675,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                        i]
+                                                            productlineList![i]
                                                                     .discountName ??
                                                                 '',
                                                             style: const TextStyle(
@@ -1667,8 +1707,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                        i]
+                                                            productlineList![i]
                                                                     .promotionDiscount ??
                                                                 '',
                                                             style: const TextStyle(
@@ -1700,9 +1739,18 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                    i]
-                                                                .taxName,
+                                                            productlineList![i]
+                                                                        .taxName ==
+                                                                    ''
+                                                                ? ''
+                                                                : productlineList![i]
+                                                                    .taxName
+                                                                    .toString()
+                                                                    .split(
+                                                                        '[')[1]
+                                                                    .toString()
+                                                                    .split(
+                                                                        ']')[0],
                                                             style: const TextStyle(
                                                                 color: Colors
                                                                     .black,
@@ -1759,8 +1807,7 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                                     .start,
                                                             children: [
                                                           Text(
-                                                            productlineList![
-                                                                    i]
+                                                            productlineList![i]
                                                                 .subTotal,
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -1783,8 +1830,14 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                         childCount: productlineList!.length,
                       ));
                     } else {
-                      saleOrderLineWidget = const SliverToBoxAdapter(
-                        child: Center(child: CircularProgressIndicator()),
+                      saleOrderLineWidget = SliverToBoxAdapter(
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
+                        ),
                       );
                     }
                     return Form(
@@ -1842,90 +1895,89 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                 .map((e) => e.toString())
                                                 .toList(),
                                             onChanged: getFilterName,
-                                            selectedItem: filterName == 'zone'
-                                                ? 'By Zone'
-                                                : filterName == 'segment'
+                                            selectedItem:
+                                                filterName == 'segment'
                                                     ? 'By Segment'
                                                     : '',
                                           ),
                                         ),
                                       ),
                                       const Text(" - "),
-                                      Visibility(
-                                        visible: zoneFilter,
-                                        child: Expanded(
-                                          child: Container(
-                                            color: Colors.white,
-                                            height: 40,
-                                            child: StreamBuilder<ResponseOb>(
-                                                initialData: hasZoneData ==
-                                                        false
-                                                    ? ResponseOb(
-                                                        msgState:
-                                                            MsgState.loading)
-                                                    : null,
-                                                stream: quotationBloc
-                                                    .getZoneListStream(),
-                                                builder: (context,
-                                                    AsyncSnapshot<ResponseOb>
-                                                        snapshot) {
-                                                  ResponseOb? responseOb =
-                                                      snapshot.data;
-                                                  if (responseOb?.msgState ==
-                                                      MsgState.loading) {
-                                                    return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
-                                                    );
-                                                  } else if (responseOb
-                                                          ?.msgState ==
-                                                      MsgState.error) {
-                                                    return const Center(
-                                                      child: Text(
-                                                          "Something went Wrong!"),
-                                                    );
-                                                  } else {
-                                                    return DropdownSearch<
-                                                        String>(
-                                                      popupItemBuilder:
-                                                          (context, item,
-                                                              isSelected) {
-                                                        return Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(item
-                                                                  .toString()
-                                                                  .split(
-                                                                      ',')[1]),
-                                                              const Divider(),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                      showSearchBox: true,
-                                                      showSelectedItems: true,
-                                                      showClearButton:
-                                                          !hasNotZoneFilter,
-                                                      items: zoneList
-                                                          .map((e) =>
-                                                              '${e['id']},${e['name']}')
-                                                          .toList(),
-                                                      onChanged:
-                                                          getZoneFilterId,
-                                                      selectedItem:
-                                                          zoneFilterName,
-                                                    );
-                                                  }
-                                                }),
-                                          ),
-                                        ),
-                                      ),
+                                      // Visibility(
+                                      //   visible: zoneFilter,
+                                      //   child: Expanded(
+                                      //     child: Container(
+                                      //       color: Colors.white,
+                                      //       height: 40,
+                                      //       child: StreamBuilder<ResponseOb>(
+                                      //           initialData: hasZoneData ==
+                                      //                   false
+                                      //               ? ResponseOb(
+                                      //                   msgState:
+                                      //                       MsgState.loading)
+                                      //               : null,
+                                      //           stream: quotationBloc
+                                      //               .getZoneListStream(),
+                                      //           builder: (context,
+                                      //               AsyncSnapshot<ResponseOb>
+                                      //                   snapshot) {
+                                      //             ResponseOb? responseOb =
+                                      //                 snapshot.data;
+                                      //             if (responseOb?.msgState ==
+                                      //                 MsgState.loading) {
+                                      //               return const Center(
+                                      //                 child:
+                                      //                     CircularProgressIndicator(),
+                                      //               );
+                                      //             } else if (responseOb
+                                      //                     ?.msgState ==
+                                      //                 MsgState.error) {
+                                      //               return const Center(
+                                      //                 child: Text(
+                                      //                     "Something went Wrong!"),
+                                      //               );
+                                      //             } else {
+                                      //               return DropdownSearch<
+                                      //                   String>(
+                                      //                 popupItemBuilder:
+                                      //                     (context, item,
+                                      //                         isSelected) {
+                                      //                   return Padding(
+                                      //                     padding:
+                                      //                         const EdgeInsets
+                                      //                             .all(8.0),
+                                      //                     child: Column(
+                                      //                       crossAxisAlignment:
+                                      //                           CrossAxisAlignment
+                                      //                               .start,
+                                      //                       children: [
+                                      //                         Text(item
+                                      //                             .toString()
+                                      //                             .split(
+                                      //                                 ',')[1]),
+                                      //                         const Divider(),
+                                      //                       ],
+                                      //                     ),
+                                      //                   );
+                                      //                 },
+                                      //                 showSearchBox: true,
+                                      //                 showSelectedItems: true,
+                                      //                 showClearButton:
+                                      //                     !hasNotZoneFilter,
+                                      //                 items: zoneList
+                                      //                     .map((e) =>
+                                      //                         '${e['id']},${e['name']}')
+                                      //                     .toList(),
+                                      //                 onChanged:
+                                      //                     getZoneFilterId,
+                                      //                 selectedItem:
+                                      //                     zoneFilterName,
+                                      //               );
+                                      //             }
+                                      //           }),
+                                      //     ),
+                                      //   ),
+                                      // ),
                                       Visibility(
                                         visible: segFilter,
                                         child: Expanded(
@@ -1948,9 +2000,12 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                       snapshot.data;
                                                   if (responseOb?.msgState ==
                                                       MsgState.loading) {
-                                                    return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
+                                                    return Center(
+                                                      child: Image.asset(
+                                                        'assets/gifs/three_circle_loading.gif',
+                                                        width: 150,
+                                                        height: 150,
+                                                      ),
                                                     );
                                                   } else if (responseOb
                                                           ?.msgState ==
@@ -2029,9 +2084,12 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                               snapshot.data;
                                           if (responseOb?.msgState ==
                                               MsgState.loading) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+                                            return Center(
+                                              child: Image.asset(
+                                                'assets/gifs/three_circle_loading.gif',
+                                                width: 150,
+                                                height: 150,
+                                              ),
                                             );
                                           } else if (responseOb?.msgState ==
                                               MsgState.error) {
@@ -2403,9 +2461,12 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                               snapshot.data;
                                           if (responseOb?.msgState ==
                                               MsgState.loading) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+                                            return Center(
+                                              child: Image.asset(
+                                                'assets/gifs/three_circle_loading.gif',
+                                                width: 150,
+                                                height: 150,
+                                              ),
                                             );
                                           } else if (responseOb?.msgState ==
                                               MsgState.error) {
@@ -2448,24 +2509,57 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                         }),
                                   ),
                                   const SizedBox(
-                                    height: 10,
+                                    height: 20,
                                   ),
-                                  const Text(
-                                    "Zone:",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                  Container(
-                                      height: 40,
-                                      color: Colors.white,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(
+                                        width: 200,
+                                        child: Text(
+                                          'Zone',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
                                         ),
-                                        readOnly: true,
-                                        controller: zoneController,
+                                      ),
+                                      const Text(
+                                        ":",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Expanded(
+                                          child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          color: Colors.white,
+                                        ),
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(zoneListName,
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18))
+                                            ]),
                                       )),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
                                   // Container(
                                   //   color: Colors.white,
                                   //   height: 40,
@@ -2526,15 +2620,6 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                   //         }
                                   //       }),
                                   // ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Text(
-                                    "Segment:",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
                                   // Container(
                                   //   color: Colors.white,
                                   //   height: 40,
@@ -2595,35 +2680,55 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                   //         }
                                   //       }),
                                   // ),
-                                  Container(
-                                      height: 40,
-                                      color: Colors.white,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(
+                                        width: 200,
+                                        child: Text(
+                                          'Segment',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
                                         ),
-                                        readOnly: true,
-                                        controller: segmentController,
+                                      ),
+                                      const Text(
+                                        ":",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Expanded(
+                                          child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          color: Colors.white,
+                                        ),
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(segmentListName,
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18))
+                                            ]),
                                       )),
+                                    ],
+                                  ),
                                   const SizedBox(
-                                    height: 10,
+                                    height: 20,
                                   ),
-                                  const Text(
-                                    "Region:",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                  Container(
-                                      height: 40,
-                                      color: Colors.white,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        readOnly: true,
-                                        controller: regionController,
-                                      )),
                                   // Container(
                                   //   color: Colors.white,
                                   //   height: 40,
@@ -2684,8 +2789,139 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                   //         }
                                   //       }),
                                   // ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(
+                                        width: 200,
+                                        child: Text(
+                                          'Region',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                      const Text(
+                                        ":",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Expanded(
+                                          child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          color: Colors.white,
+                                        ),
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(regionListName,
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18))
+                                            ]),
+                                      )),
+                                    ],
+                                  ),
                                   const SizedBox(
-                                    height: 30,
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(
+                                        width: 200,
+                                        child: Text(
+                                          'Warehouse',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                      const Text(
+                                        ":",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      StreamBuilder<ResponseOb>(
+                                          initialData: ResponseOb(
+                                              msgState: MsgState.loading),
+                                          stream: productBloc
+                                              .getStockWarehouseStream(),
+                                          builder: (context, snapshot) {
+                                            ResponseOb? responseOb =
+                                                snapshot.data;
+                                            if (responseOb?.msgState ==
+                                                MsgState.error) {
+                                              return const Center(
+                                                  child: Text('Error'));
+                                            } else if (responseOb?.msgState ==
+                                                MsgState.loading) {
+                                              return Expanded(
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  color: Colors.white,
+                                                  child: Center(
+                                                    child: Image.asset(
+                                                      'assets/gifs/three_circle_loading.gif',
+                                                      width: 150,
+                                                      height: 150,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              return Expanded(
+                                                  child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  border: Border.all(
+                                                      color: Colors.grey),
+                                                  color: Colors.white,
+                                                ),
+                                                child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                          '${stockwarehouseList.isNotEmpty ? stockwarehouseList[0]['name'] : ''}',
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 18))
+                                                    ]),
+                                              ));
+                                            }
+                                          }),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
                                   ),
                                 ])),
                                 // const SliverToBoxAdapter(
@@ -2724,48 +2960,53 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                   const Color.fromARGB(
                                                       255, 12, 41, 92),
                                             ),
-                                            onPressed: () {
-                                              // Navigator.of(context).push(
-                                              //     MaterialPageRoute(
-                                              //         builder: (context) {
-                                              //   return OrderLineCreatePage(
-                                              //     newOrEditSOL: 0,
-                                              //     newOrEdit: widget.newOrEdit,
-                                              //     quotationId:
-                                              //         widget.quotationId,
-                                              //     solId: 0,
-                                              //     partnerId: customerId,
-                                              //     zoneId: zoneListId,
-                                              //     segmentId: segmentListId,
-                                              //     regionId: regionListId,
-                                              //     currencyId: currencyId,
-                                              //   );
-                                              // })).then((value) => setState(() {
-                                              //       newPage = -1;
-                                              //     }));
-                                              Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                      builder: (context) {
-                                                return SaleOrderLineMultiCreatePage(
-                                                  newOrEditSOL: 0,
-                                                  newOrEdit: widget.newOrEdit,
-                                                  quotationId:
-                                                      widget.quotationId,
-                                                  solId: 0,
-                                                  partnerId: customerId,
-                                                  zoneId: zoneListId,
-                                                  segmentId: segmentListId,
-                                                  regionId: regionListId,
-                                                  currencyId: 119,
-                                                );
-                                              })).then((value) => setState(() {
-                                                    newPage = -1;
-                                                    //databaseHelper
-                                                    //.deleteAllSaleOrderLineUpdate();
-                                                    databaseHelper
-                                                        .deleteAllSaleOrderLineMultiSelect();
-                                                  }));
-                                            },
+                                            onPressed: customerId == 0
+                                                ? null
+                                                : () {
+                                                    // Navigator.of(context).push(
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (context) {
+                                                    //   return OrderLineCreatePage(
+                                                    //     newOrEditSOL: 0,
+                                                    //     newOrEdit: widget.newOrEdit,
+                                                    //     quotationId:
+                                                    //         widget.quotationId,
+                                                    //     solId: 0,
+                                                    //     partnerId: customerId,
+                                                    //     zoneId: zoneListId,
+                                                    //     segmentId: segmentListId,
+                                                    //     regionId: regionListId,
+                                                    //     currencyId: currencyId,
+                                                    //   );
+                                                    // })).then((value) => setState(() {
+                                                    //       newPage = -1;
+                                                    //     }));
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder: (context) {
+                                                      return SaleOrderLineMultiCreatePage(
+                                                        newOrEditSOL: 0,
+                                                        newOrEdit:
+                                                            widget.newOrEdit,
+                                                        quotationId:
+                                                            widget.quotationId,
+                                                        solId: 0,
+                                                        partnerId: customerId,
+                                                        zoneId: zoneListId,
+                                                        segmentId:
+                                                            segmentListId,
+                                                        regionId: regionListId,
+                                                        currencyId: 119,
+                                                      );
+                                                    })).then(
+                                                        (value) => setState(() {
+                                                              newPage = -1;
+                                                              //databaseHelper
+                                                              //.deleteAllSaleOrderLineUpdate();
+                                                              databaseHelper
+                                                                  .deleteAllSaleOrderLineMultiSelect();
+                                                            }));
+                                                  },
                                             child: const Text(
                                               "Add an Order",
                                               style: TextStyle(
@@ -2801,8 +3042,12 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
                           ),
                         );
                       }
@@ -2820,15 +3065,23 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
                           ),
                         );
                       }
                       return Container(
                         color: Colors.black.withOpacity(0.5),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         ),
                       );
                     })
@@ -2842,15 +3095,23 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
                           ),
                         );
                       }
                       return Container(
                         color: Colors.black.withOpacity(0.5),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         ),
                       );
                     })
@@ -2864,15 +3125,23 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
                           ),
                         );
                       }
                       return Container(
                         color: Colors.black.withOpacity(0.5),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         ),
                       );
                     })
@@ -2886,15 +3155,23 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
                           ),
                         );
                       }
                       return Container(
                         color: Colors.black.withOpacity(0.5),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         ),
                       );
                     })
@@ -2909,15 +3186,23 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                       if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/three_circle_loading.gif',
+                              width: 150,
+                              height: 150,
+                            ),
                           ),
                         );
                       }
                       return Container(
                         color: Colors.black.withOpacity(0.5),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/three_circle_loading.gif',
+                            width: 150,
+                            height: 150,
+                          ),
                         ),
                       );
                     })

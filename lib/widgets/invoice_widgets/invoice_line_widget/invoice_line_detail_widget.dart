@@ -412,9 +412,13 @@ class InvoiceLineDetailWidgetState extends State<InvoiceLineDetailWidget> {
               ),
             );
           } else {
-            invoicelineWidget = const SliverToBoxAdapter(
+            invoicelineWidget = SliverToBoxAdapter(
               child: Center(
-                child: CircularProgressIndicator(),
+                child: Image.asset(
+                  'assets/gifs/three_circle_loading.gif',
+                  width: 150,
+                  height: 150,
+                ),
               ),
             );
           }
@@ -428,7 +432,8 @@ class InvoiceLineDetailWidgetState extends State<InvoiceLineDetailWidget> {
               SliverToBoxAdapter(
                 child: Container(
                   padding: MediaQuery.of(context).size.width > 400.0
-                      ? const EdgeInsets.only(left: 220, right: 20)
+                      ? const EdgeInsets.only(
+                          left: 220, right: 20, top: 20, bottom: 20)
                       : const EdgeInsets.only(left: 10, right: 10),
                   decoration: const BoxDecoration(color: Colors.white),
                   child: Column(
@@ -438,78 +443,188 @@ class InvoiceLineDetailWidgetState extends State<InvoiceLineDetailWidget> {
                           flex: 2,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
-                            children: const [
-                              Text(
-                                "Untaxed Amount:    ",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              Text(
-                                "Taxes:    ",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              Text(
-                                "Total Discount:    ",
-                                style: TextStyle(fontSize: 20),
-                              )
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
-                                "${widget.invoiceList[0]['amount_untaxed']} K",
-                                style: const TextStyle(fontSize: 20),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(
+                                    width: 200,
+                                    child: Text(
+                                      'Untaxed Amount',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  const Text(
+                                    ':',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Expanded(
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                        Text(
+                                            '${widget.invoiceList[0]['amount_untaxed']} K',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18))
+                                      ])),
+                                ],
                               ),
-                              Text(
-                                "${widget.invoiceList[0]['amount_sale_discount']} K",
-                                style: const TextStyle(fontSize: 20),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(
+                                    width: 200,
+                                    child: Text(
+                                      'Taxes',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  const Text(
+                                    ':',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Expanded(
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                        Text(
+                                            '${widget.invoiceList[0]['amount_by_group'].isEmpty ? '0.0' : widget.invoiceList[0]['amount_by_group'][0][1]} K',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18))
+                                      ])),
+                                ],
                               ),
-                              Text(
-                                "${widget.invoiceList[0]['amount_by_group'].isEmpty ? '0.0' : widget.invoiceList[0]['amount_by_group'][0][1]} K",
-                                style: const TextStyle(fontSize: 20),
-                              )
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(
+                                    width: 200,
+                                    child: Text(
+                                      'Total Discount',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  const Text(
+                                    ':',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Expanded(
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                        Text(
+                                            '${widget.invoiceList[0]['amount_sale_discount']} K',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18))
+                                      ])),
+                                ],
+                              ),
                             ],
                           ),
                         ),
                       ]),
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          left: 50,
-                        ),
-                        child: Divider(
-                          thickness: 1.5,
-                          color: Colors.black,
-                        ),
+                      const Divider(
+                        thickness: 1.5,
+                        color: Colors.black,
                       ),
-                      Row(children: [
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: const [
-                              Text(
-                                "Total:    ",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                            ],
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            width: 200,
+                            child: Text(
+                              'Total',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "${widget.invoiceList[0]['amount_total']} K",
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                            ],
+                          const Text(
+                            ':',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
                           ),
-                        ),
-                      ]),
+                          Expanded(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                Text(
+                                    '${widget.invoiceList[0]['amount_total']} K',
+                                    style: const TextStyle(
+                                        color: Colors.black, fontSize: 18))
+                              ])),
+                        ],
+                      ),
+                      const Divider(
+                        thickness: 1.5,
+                        color: Colors.black,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            width: 200,
+                            child: Text(
+                              'Amount Due',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                          ),
+                          const Text(
+                            ':',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          Expanded(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                Text(
+                                    '${widget.invoiceList[0]['amount_residual']} K',
+                                    style: const TextStyle(
+                                        color: Colors.black, fontSize: 18))
+                              ])),
+                        ],
+                      ),
                     ],
                   ),
                 ),

@@ -18,17 +18,18 @@ class SaleTeamCreatePage extends StatefulWidget {
   int jobId;
   String? jobName;
   int? responsible;
-  SaleTeamCreatePage({Key? key,
-  required this.tripLine,
-  required this.hremployeelineId,
-  required this.newOrEdit,
-  required this.neworeditHEL,
-  required this.empId,
-  required this.departmentId,
-  required this.departmentName,
-  required this.jobId,
-  required this.jobName,
-  required this.responsible,
+  SaleTeamCreatePage({
+    Key? key,
+    required this.tripLine,
+    required this.hremployeelineId,
+    required this.newOrEdit,
+    required this.neworeditHEL,
+    required this.empId,
+    required this.departmentId,
+    required this.departmentName,
+    required this.jobId,
+    required this.jobName,
+    required this.responsible,
   }) : super(key: key);
 
   @override
@@ -64,7 +65,7 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    profileBloc.getHrEmployeeData();
+    //profileBloc.getHrEmployeeData();
     profileBloc.getHrEmployeeStream().listen(getHrEmployeeListListen);
     saleTeamBloc.getHrDeparmentListData();
     saleTeamBloc.getHrDeparmentListStream().listen(getHrDepartmentListListen);
@@ -131,7 +132,7 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
         }
       }
     }
-  }  
+  }
 
   void getHrDepartmentListListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
@@ -200,52 +201,60 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
           actions: [
             TextButton(
                 onPressed: () async {
-                  if(widget.newOrEdit == 1){
-                    if(widget.neworeditHEL == 1){
-                    await databaseHelper.updateHrEmployeeLine(widget.hremployeelineId, widget.tripLine, hremployeeId, hremployeeName, hrDepartmentId, departmentController.text, hrJobInt, jobController.text, isCheck == true ? 1 : 0);
-                    Navigator.of(context).pop();
-                  }else{
-                    HrEmployeeLineOb hremployeelineOb = HrEmployeeLineOb(
-                      tripLine: widget.tripLine,
-                      empName: hremployeeName,
-                      empId: hremployeeId,
-                      departmentId: hrDepartmentId,
-                      departmentName: departmentController.text,
-                      jobId: hrJobInt,
-                      jobName: jobController.text,
-                      responsible: isCheck == true ? 1 : 0);
-                  int isCreated = await databaseHelper
-                      .insertHrEmployeeLine(hremployeelineOb);
-                  if (isCreated > 0) {
-                    print('Success Created a member');
-                    Navigator.of(context).pop();
+                  if (widget.newOrEdit == 1) {
+                    if (widget.neworeditHEL == 1) {
+                      await databaseHelper.updateHrEmployeeLine(
+                          widget.hremployeelineId,
+                          widget.tripLine,
+                          hremployeeId,
+                          hremployeeName,
+                          hrDepartmentId,
+                          departmentController.text,
+                          hrJobInt,
+                          jobController.text,
+                          isCheck == true ? 1 : 0);
+                      Navigator.of(context).pop();
+                    } else {
+                      HrEmployeeLineOb hremployeelineOb = HrEmployeeLineOb(
+                          tripLine: widget.tripLine,
+                          empName: hremployeeName,
+                          empId: hremployeeId,
+                          departmentId: hrDepartmentId,
+                          departmentName: departmentController.text,
+                          jobId: hrJobInt,
+                          jobName: jobController.text,
+                          responsible: isCheck == true ? 1 : 0);
+                      int isCreated = await databaseHelper
+                          .insertHrEmployeeLine(hremployeelineOb);
+                      if (isCreated > 0) {
+                        print('Success Created a member');
+                        Navigator.of(context).pop();
+                      } else {
+                        print('Error');
+                      }
+                    }
                   } else {
-                    print('Error');
-                  }
-                  }
-                  }
-                  else{
                     HrEmployeeLineOb hremployeelineOb = HrEmployeeLineOb(
-                      tripLine: 0,
-                      empName: hremployeeName,
-                      empId: hremployeeId,
-                      departmentId: hrDepartmentId,
-                      departmentName: departmentController.text,
-                      jobId: hrJobInt,
-                      jobName: jobController.text,
-                      responsible: isCheck == true ? 1 : 0);
-                  int isCreated = await databaseHelper
-                      .insertHrEmployeeLine(hremployeelineOb);
-                  if (isCreated > 0) {
-                    print('Success Created a member');
-                    Navigator.of(context).pop();
-                  } else {
-                    print('Error');
-                  }
+                        tripLine: 0,
+                        empName: hremployeeName,
+                        empId: hremployeeId,
+                        departmentId: hrDepartmentId,
+                        departmentName: departmentController.text,
+                        jobId: hrJobInt,
+                        jobName: jobController.text,
+                        responsible: isCheck == true ? 1 : 0);
+                    int isCreated = await databaseHelper
+                        .insertHrEmployeeLine(hremployeelineOb);
+                    if (isCreated > 0) {
+                      print('Success Created a member');
+                      Navigator.of(context).pop();
+                    } else {
+                      print('Error');
+                    }
                   }
                 },
-                child:
-                    Text(widget.newOrEdit == 1? "Update": "Create", style: const TextStyle(color: Colors.white)))
+                child: Text(widget.newOrEdit == 1 ? "Update" : "Create",
+                    style: const TextStyle(color: Colors.white)))
           ],
         ),
         body: Column(
@@ -260,16 +269,16 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
                   ),
                   Container(
                     decoration: const BoxDecoration(
-                        color: Colors.white,
-                        // borderRadius: BorderRadius.circular(5),
-                        // boxShadow: const [
-                        //   BoxShadow(
-                        //     color: Colors.black,
-                        //     offset: Offset(0, 0),
-                        //     blurRadius: 2,
-                        //   )
-                        // ]
-                        ),
+                      color: Colors.white,
+                      // borderRadius: BorderRadius.circular(5),
+                      // boxShadow: const [
+                      //   BoxShadow(
+                      //     color: Colors.black,
+                      //     offset: Offset(0, 0),
+                      //     blurRadius: 2,
+                      //   )
+                      // ]
+                    ),
                     height: 40,
                     child: StreamBuilder<ResponseOb>(
                         initialData: ResponseOb(msgState: MsgState.loading),
@@ -277,8 +286,12 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
                         builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                           ResponseOb? responseOb = snapshot.data;
                           if (responseOb?.msgState == MsgState.loading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
+                            return Center(
+                              child: Image.asset(
+                                'assets/gifs/three_circle_loading.gif',
+                                width: 150,
+                                height: 150,
+                              ),
                             );
                           } else if (responseOb?.msgState == MsgState.error) {
                             return const Center(
@@ -320,16 +333,16 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
                   ),
                   Container(
                     decoration: const BoxDecoration(
-                        color: Colors.white,
-                        // borderRadius: BorderRadius.circular(5),
-                        // boxShadow: const [
-                        //   BoxShadow(
-                        //     color: Colors.black,
-                        //     offset: Offset(0, 0),
-                        //     blurRadius: 2,
-                        //   )
-                        // ]
-                        ),
+                      color: Colors.white,
+                      // borderRadius: BorderRadius.circular(5),
+                      // boxShadow: const [
+                      //   BoxShadow(
+                      //     color: Colors.black,
+                      //     offset: Offset(0, 0),
+                      //     blurRadius: 2,
+                      //   )
+                      // ]
+                    ),
                     height: 40,
                     child: TextField(
                       readOnly: true,
@@ -348,16 +361,16 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
                   ),
                   Container(
                     decoration: const BoxDecoration(
-                        color: Colors.white,
-                        // borderRadius: BorderRadius.circular(5),
-                        // boxShadow: const [
-                        //   BoxShadow(
-                        //     color: Colors.black,
-                        //     offset: Offset(0, 0),
-                        //     blurRadius: 2,
-                        //   )
-                        // ]
-                        ),
+                      color: Colors.white,
+                      // borderRadius: BorderRadius.circular(5),
+                      // boxShadow: const [
+                      //   BoxShadow(
+                      //     color: Colors.black,
+                      //     offset: Offset(0, 0),
+                      //     blurRadius: 2,
+                      //   )
+                      // ]
+                    ),
                     height: 40,
                     child: TextField(
                       readOnly: true,
@@ -367,7 +380,7 @@ class _SaleTeamCreatePageState extends State<SaleTeamCreatePage> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(
                     height: 10,
                   ),

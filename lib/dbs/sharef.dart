@@ -38,7 +38,7 @@ class Sharef {
         userInfo.database +
         '",'
             '"session_id": "' +
-        userInfo.sessionId +
+        userInfo.sessionId + 
         '"'
             '}';
     SharedPreferences preferences = await SharedPreferences.getInstance();

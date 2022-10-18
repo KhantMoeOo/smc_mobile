@@ -62,21 +62,30 @@ class ScheduleCreateWidgetState extends State<ScheduleCreateWidget> {
               alignment: Alignment.centerRight,
               child: Container(
                 decoration: const BoxDecoration(
-              color: AppColors.appBarColor,
-              // boxShadow: const[
-              //   BoxShadow(
-              //     offset: Offset(0,0),
-              //     blurRadius: 2,
-              //   )
-              // ],
-              // borderRadius: BorderRadius.circular(10)
-                      ),
+                  color: AppColors.appBarColor,
+                  // boxShadow: const[
+                  //   BoxShadow(
+                  //     offset: Offset(0,0),
+                  //     blurRadius: 2,
+                  //   )
+                  // ],
+                  // borderRadius: BorderRadius.circular(10)
+                ),
                 width: 130,
                 child: TextButton(
                     onPressed: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) {
-                        return ScheduleCreatePage(newOrEdit: widget.neworedit, neworeditTPS: 0, tripId: 0, tripplanscheduleId: 0, fromDate: '', toDate: '', locationId: 0, locationName: '', remark: '');
+                        return ScheduleCreatePage(
+                            newOrEdit: widget.neworedit,
+                            neworeditTPS: 0,
+                            tripId: 0,
+                            tripplanscheduleId: 0,
+                            fromDate: '',
+                            toDate: '',
+                            locationId: 0,
+                            locationName: '',
+                            remark: '');
                       })).then((value) {
                         setState(() {});
                       });
@@ -87,7 +96,9 @@ class ScheduleCreateWidgetState extends State<ScheduleCreateWidget> {
                     )),
               ),
             ),
-            const SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             Expanded(
               child: FutureBuilder<List<TripPlanScheduleOb>>(
                   future: databaseHelper.getTripPlanScheduleList(),
@@ -107,77 +118,98 @@ class ScheduleCreateWidgetState extends State<ScheduleCreateWidget> {
                               children: [
                                 Slidable(
                                   controller: slidableController,
-                              actionPane: const SlidableBehindActionPane(),
-                              actions: [
-                                IconSlideAction(
-                                  onTap: (){
-                                    Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                                      return ScheduleCreatePage(newOrEdit: widget.neworedit, neworeditTPS: 1, tripId: widget.tripId, tripplanscheduleId: tripplanscheduleList![i].id, fromDate: tripplanscheduleList![i].fromDate, toDate: tripplanscheduleList![i].toDate, locationId: tripplanscheduleList![i].locationId, locationName: tripplanscheduleList![i].locationName, remark: tripplanscheduleList![i].remark);
-
-                                    })).then((value) {
-                                      setState(() {
-                                        
-                                      });
-                                    });
-                                  },
-                                  color: Colors.yellow,
-                                  iconWidget: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(
-                                  Icons.edit,
-                                  size: 25,
-                                ),
-                                Text(
-                                  "Edit",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                ),
-                              ],
-                            ),
-                                ),
-                              ],
-                              secondaryActions: [
-                                IconSlideAction(
-                                  onTap: ()async{
-                                    await databaseHelper.deleteTripPlanScheduleManul(tripplanscheduleList![i].id);
-                                    tripplanscheduleDeleteList.add(tripplanscheduleList![i].id);
-                                    setState(() {
-                                      
-                                    });
-                                  },
-                                  color: Colors.red,
-                                  iconWidget: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(
-                                  Icons.delete,
-                                  size: 25,
-                                ),
-                                Text(
-                                  "Delete",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                ),
-                              ],
-                            ),
-                                )
-                              ],
+                                  actionPane: const SlidableBehindActionPane(),
+                                  actions: [
+                                    IconSlideAction(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          return ScheduleCreatePage(
+                                              newOrEdit: widget.neworedit,
+                                              neworeditTPS: 1,
+                                              tripId: widget.tripId,
+                                              tripplanscheduleId:
+                                                  tripplanscheduleList![i].id,
+                                              fromDate: tripplanscheduleList![i]
+                                                  .fromDate,
+                                              toDate: tripplanscheduleList![i]
+                                                  .toDate,
+                                              locationId:
+                                                  tripplanscheduleList![i]
+                                                      .locationId,
+                                              locationName:
+                                                  tripplanscheduleList![i]
+                                                      .locationName,
+                                              remark: tripplanscheduleList![i]
+                                                  .remark);
+                                        })).then((value) {
+                                          setState(() {});
+                                        });
+                                      },
+                                      color: Colors.yellow,
+                                      iconWidget: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          Icon(
+                                            Icons.edit,
+                                            size: 25,
+                                          ),
+                                          Text(
+                                            "Edit",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                  secondaryActions: [
+                                    IconSlideAction(
+                                      onTap: () async {
+                                        await databaseHelper
+                                            .deleteTripPlanScheduleManul(
+                                                tripplanscheduleList![i].id);
+                                        tripplanscheduleDeleteList
+                                            .add(tripplanscheduleList![i].id);
+                                        setState(() {});
+                                      },
+                                      color: Colors.red,
+                                      iconWidget: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          Icon(
+                                            Icons.delete,
+                                            size: 25,
+                                          ),
+                                          Text(
+                                            "Delete",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
                                   child: Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(10),
                                     decoration: const BoxDecoration(
-                                                    color: Colors.white,
-                                                    // borderRadius:
-                                                    //     BorderRadius.circular(10),
-                                                    // boxShadow: const [
-                                                    //   BoxShadow(
-                                                    //     color: Colors.black,
-                                                    //     offset: Offset(0, 0),
-                                                    //     blurRadius: 2,
-                                                    //   )
-                                                    // ]
-                                                    ),
+                                      color: Colors.white,
+                                      // borderRadius:
+                                      //     BorderRadius.circular(10),
+                                      // boxShadow: const [
+                                      //   BoxShadow(
+                                      //     color: Colors.black,
+                                      //     offset: Offset(0, 0),
+                                      //     blurRadius: 2,
+                                      //   )
+                                      // ]
+                                    ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -208,8 +240,8 @@ class ScheduleCreateWidgetState extends State<ScheduleCreateWidget> {
                                                 color: Colors.black),
                                           ),
                                           TextSpan(
-                                              text:
-                                                  tripplanscheduleList![i].toDate,
+                                              text: tripplanscheduleList![i]
+                                                  .toDate,
                                               style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18))
@@ -259,8 +291,12 @@ class ScheduleCreateWidgetState extends State<ScheduleCreateWidget> {
                           });
                     } else {
                       print(snapshot.hasError.toString());
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Center(
+                        child: Image.asset(
+                          'assets/gifs/three_circle_loading.gif',
+                          width: 150,
+                          height: 150,
+                        ),
                       );
                     }
                   }),

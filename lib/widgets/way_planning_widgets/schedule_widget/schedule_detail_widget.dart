@@ -33,7 +33,7 @@ class _TripPlanScheduleDetailWidgetState
               tripplanscheduleDB = snapshot.data;
               scheduleWidget = SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context , i){
+                  (context, i) {
                     print('TriplineId: ${tripplanscheduleDB!.length}');
                     print('TripLine: ${tripplanscheduleDB![i].tripId}');
                     return tripplanscheduleDB![i].tripId != widget.wayplanId
@@ -45,16 +45,16 @@ class _TripPlanScheduleDetailWidgetState
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(10),
                                 decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            // borderRadius: BorderRadius.circular(10),
-                                            // boxShadow: const [
-                                            //   BoxShadow(
-                                            //     color: Colors.black,
-                                            //     offset: Offset(0, 0),
-                                            //     blurRadius: 2,
-                                            //   )
-                                            // ]
-                                            ),
+                                  color: Colors.white,
+                                  // borderRadius: BorderRadius.circular(10),
+                                  // boxShadow: const [
+                                  //   BoxShadow(
+                                  //     color: Colors.black,
+                                  //     offset: Offset(0, 0),
+                                  //     blurRadius: 2,
+                                  //   )
+                                  // ]
+                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -132,9 +132,13 @@ class _TripPlanScheduleDetailWidgetState
                 ),
               );
             } else {
-              scheduleWidget = const SliverToBoxAdapter(
+              scheduleWidget = SliverToBoxAdapter(
                 child: Center(
-                  child: CircularProgressIndicator(),
+                  child: Image.asset(
+                    'assets/gifs/three_circle_loading.gif',
+                    width: 150,
+                    height: 150,
+                  ),
                 ),
               );
             }
@@ -142,8 +146,9 @@ class _TripPlanScheduleDetailWidgetState
               slivers: [
                 scheduleWidget,
                 const SliverToBoxAdapter(
-                  child: SizedBox(height: 100,)
-                )
+                    child: SizedBox(
+                  height: 100,
+                ))
               ],
             );
           }),
