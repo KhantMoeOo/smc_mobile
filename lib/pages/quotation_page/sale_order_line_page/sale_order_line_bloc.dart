@@ -134,7 +134,7 @@ class SaleOrderLineBloc {
               'invoice_lines'
             ],
             order: 'id desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('sale order line result');
           print('Sale Order Line Result:' +
               res.getResult()['records'].toString());
@@ -247,7 +247,7 @@ class SaleOrderLineBloc {
           'tax_id': taxesId,
           'price_subtotal': subtotal
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Created Sale Order Line');
           print('Sale Order Line Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
@@ -315,7 +315,7 @@ class SaleOrderLineBloc {
           'tax_id': taxesId,
           'price_subtotal': subtotal
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -373,7 +373,7 @@ class SaleOrderLineBloc {
               'product_code'
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('Product Product Result:' +
               res.getResult()['records'].toString());
@@ -433,7 +433,7 @@ class SaleOrderLineBloc {
               'product_code'
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('ProductProductDataWithFilter Result:' +
               res.getResult()['records'].toString());
@@ -487,7 +487,7 @@ class SaleOrderLineBloc {
               'property_account_income_categ_id',
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('Product Category Result:' +
               res.getResult()['records'].toString());
@@ -541,7 +541,7 @@ class SaleOrderLineBloc {
             ],
             ['id', 'name', 'category_id', 'factor'],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('UOM Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];
@@ -586,7 +586,9 @@ class SaleOrderLineBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'sale.pricelist.product.line',
-            [['state', '=', 'approved']],
+            [
+              ['state', '=', 'approved']
+            ],
             [
               'id',
               'product_id',
@@ -607,7 +609,7 @@ class SaleOrderLineBloc {
               'formula',
             ],
             order: 'priority desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print(
               'SalePricelistProductLineListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
@@ -677,7 +679,7 @@ class SaleOrderLineBloc {
               'formula',
             ],
             order: 'priority desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print(
               'SalePricelistProductLineListwithfilterresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
@@ -724,7 +726,12 @@ class SaleOrderLineBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'sale.pricelist.product.line',
-            [zoneId, type, filter,['state', '=', 'approved']],
+            [
+              zoneId,
+              type,
+              filter,
+              ['state', '=', 'approved']
+            ],
             [
               'id',
               'product_id',
@@ -745,7 +752,7 @@ class SaleOrderLineBloc {
               'formula',
             ],
             order: 'priority desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print(
               'getSalePricelistProductLineListByRegionresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
@@ -804,7 +811,7 @@ class SaleOrderLineBloc {
               'priority'
             ],
             order: 'priority desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('SalePricelistresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -852,7 +859,7 @@ class SaleOrderLineBloc {
             ],
             ['id', 'name', 'sale_type'],
             order: 'priority desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('SaleDiscountlistresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -900,7 +907,7 @@ class SaleOrderLineBloc {
           ],
           ['id', 'name', 'type_tax_use', 'company_id'],
         );
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('AccountTaxeslistresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

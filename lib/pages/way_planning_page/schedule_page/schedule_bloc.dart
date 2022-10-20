@@ -37,7 +37,7 @@ class ScheduleBloc {
           ['id', 'trip_id', 'from_date', 'to_date', 'location_id', 'remark'],
           // order: 'emp_name asc'
         );
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Trip Plan Schedule Result:' +
               res.getResult()['records'].toString());
           data = res.getResult()['records'];
@@ -85,20 +85,18 @@ class ScheduleBloc {
           [
             ['city_id.id', '=', cityId]
           ],
-          ['id', 'name','city_id'],
+          ['id', 'name', 'city_id'],
           // order: 'emp_name asc'
         );
-        if (res.getResult() != null) {
-          print('Township Result:' +
-              res.getResult()['records'].toString());
+        if (!res.hasError()) {
+          print('Township Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = data;
           townshipListStreamController.sink.add(responseOb);
         } else {
           data = null;
-          print('Get township Error:' +
-              res.getErrorMessage().toString());
+          print('Get township Error:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           townshipListStreamController.sink.add(responseOb);

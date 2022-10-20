@@ -55,7 +55,7 @@ class InvoiceLineBloc {
               'price_subtotal'
             ],
             order: 'id desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('InvoiceLineResult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -131,7 +131,7 @@ class InvoiceLineBloc {
           //'credit': credit,
           //'price_subtotal': pricesubtotal,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Invoice Line Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

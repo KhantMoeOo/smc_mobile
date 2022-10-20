@@ -171,56 +171,73 @@ class _QuotationListState extends State<QuotationList> {
                   icon: const Icon(Icons.menu),
                 ),
                 title: const Text('Quotation'),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return
-                              // QuotationNewPage(
-                              //   quotationId: 0,
-                              //   name: '',
-                              //   userid: '',
-                              //   customerId: [],
-                              //   dateOrder: '',
-                              //   validityDate: '',
-                              //   currencyId: [],
-                              //   exchangeRate: '',
-                              //   pricelistId: [],
-                              //   paymentTermId: [],
-                              //   zoneId: [],
-                              //   segmentId: [],
-                              //   regionId: [],
-                              //   newOrEdit: 2,
-                              //   productlineList: [],
-                              //   filter: '',
-                              //   zoneFilterId: 0,
-                              //   segmentFilterId: 0,
-                              // );
-                              QuotationCreate(
-                            newOrEdit: 0,
-                            quotationList: {},
-                          );
-                        })).then((value) {
-                          quotationBloc.getQuotationData(
-                              name: ['name', 'ilike', ''],
-                              state: ['id', 'ilike', '']);
-                          SystemChrome.setPreferredOrientations([
-                            DeviceOrientation.landscapeLeft,
-                            DeviceOrientation.landscapeRight
-                          ]);
-                        });
-                      },
-                      child: const Text(
-                        'Create',
-                        style: TextStyle(color: Colors.white),
-                      ))
-                ],
               ),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                            style: TextButton.styleFrom(
+                                backgroundColor: AppColors.appBarColor),
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return
+                                    // QuotationNewPage(
+                                    //   quotationId: 0,
+                                    //   name: '',
+                                    //   userid: '',
+                                    //   customerId: [],
+                                    //   dateOrder: '',
+                                    //   validityDate: '',
+                                    //   currencyId: [],
+                                    //   exchangeRate: '',
+                                    //   pricelistId: [],
+                                    //   paymentTermId: [],
+                                    //   zoneId: [],
+                                    //   segmentId: [],
+                                    //   regionId: [],
+                                    //   newOrEdit: 2,
+                                    //   productlineList: [],
+                                    //   filter: '',
+                                    //   zoneFilterId: 0,
+                                    //   segmentFilterId: 0,
+                                    // );
+                                    QuotationCreate(
+                                  newOrEdit: 0,
+                                  quotationList: {},
+                                );
+                              })).then((value) {
+                                quotationBloc.getQuotationData(
+                                    name: ['name', 'ilike', ''],
+                                    state: ['id', 'ilike', '']);
+                                SystemChrome.setPreferredOrientations([
+                                  DeviceOrientation.landscapeLeft,
+                                  DeviceOrientation.landscapeRight
+                                ]);
+                              });
+                            },
+                            child: const Text('Create',
+                                style: TextStyle(color: Colors.white))),
+                        Container(
+                            width: 300,
+                            height: 40,
+                            color: Colors.white,
+                            child: TextField(
+                              decoration: InputDecoration(
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.search))),
+                            )),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     Container(
                       color: Colors.white,
                       padding: const EdgeInsets.only(

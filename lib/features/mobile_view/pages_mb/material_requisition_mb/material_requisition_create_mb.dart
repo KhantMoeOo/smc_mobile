@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:smc_mobile/features/mobile_view/pages_mb/material_requisition_mb/material_product_line/material_product_line_multi_selection_mb.dart';
-import 'package:smc_mobile/features/mobile_view/pages_mb/material_requisition_mb/material_requisition_list_mb.dart';
 import '../../../../dbs/database_helper.dart';
 import '../../../../dbs/sharef.dart';
 import '../../../../obs/product_line_ob.dart';
@@ -21,6 +19,8 @@ import '../../../../pages/way_planning_page/delivery_page/delivery_bloc.dart';
 import '../../../../pages/way_planning_page/sale_team_page/sale_team_bloc.dart';
 import '../../../../utils/app_const.dart';
 import '../../../pages/material_requisition/material_requisition_list.dart';
+import 'material_product_line/material_product_line_multi_selection_mb.dart';
+import 'material_requisition_list_mb.dart';
 
 class MaterialRequisitionCreateMB extends StatefulWidget {
   String name;

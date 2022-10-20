@@ -203,7 +203,7 @@ class QuotationBloc {
               'order_line'
             ],
             order: 'name desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('getQuotationWithIdDataResult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -272,7 +272,7 @@ class QuotationBloc {
               'property_stock_customer'
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Customerresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -316,7 +316,7 @@ class QuotationBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.searchRead('res.currency', [], ['id', 'name', 'symbol']);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Currencyresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -360,7 +360,7 @@ class QuotationBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead('product.pricelist', [],
             ['id', 'name', 'company_id', 'currency_id']);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('PriceListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -404,7 +404,7 @@ class QuotationBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'account.payment.term', [], ['id', 'name', 'company_id']);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('PaymentTermsListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -448,7 +448,7 @@ class QuotationBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.searchRead('zone.zone', [], ['id', 'name']);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('ZoneListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -496,7 +496,7 @@ class QuotationBloc {
           'id',
           'name'
         ]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('ZoneListWithUserIdresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -541,7 +541,7 @@ class QuotationBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.searchRead('res.partner.segment', [], ['id', 'name']);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('SegmentListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -585,7 +585,7 @@ class QuotationBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.searchRead('res.cities', [], ['id', 'name', 'state_id']);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('RegionListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

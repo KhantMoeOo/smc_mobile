@@ -29,7 +29,7 @@ class PurchaseRequisitionBloc {
       orderdate,
       scheduledDate,
       multiMRId,
-      description}){
+      description}) {
     print('Create Purchase Requisition');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     createPurchaseRequisitionStreamController.sink.add(responseOb);
@@ -50,7 +50,7 @@ class PurchaseRequisitionBloc {
           'multi_mr_id': multiMRId,
           'desc': description,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('PurchaseRequisition Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -103,7 +103,7 @@ class PurchaseRequisitionBloc {
           'qty': qty,
           'product_uom_id': uomId,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('MaterialProductLine Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

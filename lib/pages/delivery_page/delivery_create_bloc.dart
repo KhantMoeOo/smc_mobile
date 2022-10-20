@@ -68,7 +68,7 @@ class StockPickingCreateBloc {
           'sale_id': saleId,
           'state': 'confirmed',
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Create Stock Picking Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -111,7 +111,7 @@ class StockPickingCreateBloc {
         ], {
           'state': state,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Update Stock Picking Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -167,7 +167,7 @@ class StockPickingCreateBloc {
           'picking_id': pickingId,
           'origin': origin,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Create Stock Move Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -207,7 +207,7 @@ class StockPickingCreateBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.callKW('sale.order', 'action_confirm', [id]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Call Action Confirm Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -248,7 +248,7 @@ class StockPickingCreateBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.write('stock.move', [ids], {'quantity_done': qtyDone});
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('updateQtyDoneDataresult');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

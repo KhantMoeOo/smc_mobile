@@ -57,7 +57,7 @@ class CustomerBloc {
               'company_type'
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('CustomerListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -103,14 +103,9 @@ class CustomerBloc {
             [
               ['country_id.id', '=?', countryId]
             ],
-            [
-              'id',
-              'name',
-              'country_id',
-              'code'
-            ],
+            ['id', 'name', 'country_id', 'code'],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('ResCountryStateListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -118,7 +113,8 @@ class CustomerBloc {
           rescountrystateStreamController.sink.add(responseOb);
         } else {
           data = null;
-          print('GetResCountryStateListError:' + res.getErrorMessage().toString());
+          print('GetResCountryStateListError:' +
+              res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           rescountrystateStreamController.sink.add(responseOb);
@@ -152,16 +148,9 @@ class CustomerBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
-            'res.country',
-            [
-            ],
-            [
-              'id',
-              'name',
-              'code'
-            ],
+            'res.country', [], ['id', 'name', 'code'],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('ResCountryListresult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

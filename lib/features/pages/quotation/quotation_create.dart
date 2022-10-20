@@ -1155,572 +1155,339 @@ class _QuotationCreateState extends State<QuotationCreate> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          backgroundColor: Colors.grey[200],
-          appBar: AppBar(
-            backgroundColor: const Color.fromARGB(255, 12, 41, 92),
-            elevation: 0.0,
-            title: const Text('New'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Discard',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              TextButton(
-                  onPressed: widget.newOrEdit == 1
-                      ? updateExistingRecord
-                      : createNewRecord,
+    return WillPopScope(
+      onWillPop: () async {
+        await databaseHelper.deleteAllSaleOrderLine();
+        await SharefCount.clearCount();
+        Navigator.of(context).pop();
+        return true;
+      },
+      child: Stack(
+        children: [
+          Scaffold(
+            backgroundColor: Colors.grey[200],
+            appBar: AppBar(
+              backgroundColor: const Color.fromARGB(255, 12, 41, 92),
+              elevation: 0.0,
+              title: const Text('New'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   child: const Text(
-                    'Save',
-                    style: TextStyle(color: Colors.white),
-                  )),
-            ],
-          ),
-          body: FutureBuilder<List<SaleOrderLineOb>>(
-              future: databaseHelper.getproductlineList(),
-              builder: (context, snapshot) {
-                productlineList = snapshot.data;
-                Widget saleOrderLineWidget = SliverToBoxAdapter(
-                  child: Container(),
-                );
-                if (snapshot.hasData) {
-                  saleOrderLineWidget = SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                    (context, i) {
-                      print(
-                          'SOLLength------------: ${productlineList?.length}');
-                      return productlineList![i].isSelect != 1
-                          ? Container()
-                          : Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  color: Colors.white,
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 130,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  '[${productlineList![i].productCodeName}] ${productlineList![i].description}',
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 80,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(productlineList![i].quantity,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 80,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  productlineList![i]
-                                                      .qtyDelivered!,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 80,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  productlineList![i]
-                                                      .qtyInvoiced!,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 80,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(productlineList![i].uomName,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      Container(
-                                        width: 100,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  productlineList![i].unitPrice,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 80,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  productlineList![i]
-                                                      .saleDiscount!,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 100,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  productlineList![i]
-                                                      .discountName!,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 80,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(productlineList![i].taxName,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      SizedBox(
-                                        width: 50,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              productlineList![i].isFOC! == 0
-                                                  ? const Icon(Icons
-                                                      .check_box_outline_blank)
-                                                  : const Icon(Icons.check_box),
-                                            ]),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(productlineList![i].subTotal,
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15))
-                                            ]),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                              ],
-                            );
-                    },
-                    childCount: productlineList!.length,
-                  ));
-                } else {
-                  saleOrderLineWidget = SliverToBoxAdapter(
-                    child: Center(
-                      child: Image.asset(
-                        'assets/gifs/loading.gif',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
+                    'Discard',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: widget.newOrEdit == 1
+                        ? updateExistingRecord
+                        : createNewRecord,
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ],
+            ),
+            body: FutureBuilder<List<SaleOrderLineOb>>(
+                future: databaseHelper.getproductlineList(),
+                builder: (context, snapshot) {
+                  productlineList = snapshot.data;
+                  Widget saleOrderLineWidget = SliverToBoxAdapter(
+                    child: Container(),
                   );
-                }
-                return Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: CustomScrollView(
-                            slivers: [
-                              SliverPadding(
-                                  padding: const EdgeInsets.all(8),
-                                  sliver: SliverList(
-                                      delegate: SliverChildListDelegate([
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      color: Colors.white,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const SizedBox(
-                                            height: 30,
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  'Filter By: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                  if (snapshot.hasData) {
+                    saleOrderLineWidget = SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                      (context, i) {
+                        print(
+                            'SOLLength------------: ${productlineList?.length}');
+                        print(
+                            'SOLlist fromm DB: discountname: ${productlineList![i].discountName} delivered: ${productlineList![i].qtyDelivered} invoiced: ${productlineList![i].qtyInvoiced} salediscount ${productlineList![i].saleDiscount} discount: ${productlineList![i].discountName}');
+                        return productlineList![i].isSelect != 1
+                            ? Container()
+                            : Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    color: Colors.white,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 130,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    '[${productlineList![i].productCodeName}] ${productlineList![i].description}',
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 80,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    productlineList![i]
+                                                        .quantity,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 80,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                // Text(
+                                                //     productlineList![i]
+                                                //         .qtyDelivered!,
+                                                //     style: const TextStyle(
+                                                //         color: Colors.black,
+                                                //         fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 80,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                // Text(
+                                                //     productlineList![i]
+                                                //         .qtyInvoiced!,
+                                                //     style: const TextStyle(
+                                                //         color: Colors.black,
+                                                //         fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 80,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    productlineList![i].uomName,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        Container(
+                                          width: 100,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    productlineList![i]
+                                                        .unitPrice,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 80,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                // Text(
+                                                //     productlineList![i]
+                                                //                 .saleDiscount ==
+                                                //             ''
+                                                //         ? ''
+                                                //         : productlineList![i]
+                                                //             .saleDiscount!,
+                                                //     style: const TextStyle(
+                                                //         color: Colors.black,
+                                                //         fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 100,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                // Text(
+                                                //     productlineList![i]
+                                                //                 .discountName ==
+                                                //             ''
+                                                //         ? ''
+                                                //         : productlineList![i]
+                                                //             .discountName!,
+                                                //     style: const TextStyle(
+                                                //         color: Colors.black,
+                                                //         fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 80,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    productlineList![i].taxName,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15))
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        SizedBox(
+                                          width: 50,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                productlineList![i].isFOC! == 0
+                                                    ? const Icon(Icons
+                                                        .check_box_outline_blank)
+                                                    : const Icon(
+                                                        Icons.check_box),
+                                              ]),
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    productlineList![i]
+                                                        .subTotal,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15))
+                                              ]),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                ],
+                              );
+                      },
+                      childCount: productlineList!.length,
+                    ));
+                  } else {
+                    saleOrderLineWidget = SliverToBoxAdapter(
+                      child: Center(
+                        child: Image.asset(
+                          'assets/gifs/loading.gif',
+                          width: 100,
+                          height: 100,
+                        ),
+                      ),
+                    );
+                  }
+                  return Stack(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: CustomScrollView(
+                              slivers: [
+                                SliverPadding(
+                                    padding: const EdgeInsets.all(8),
+                                    sliver: SliverList(
+                                        delegate: SliverChildListDelegate([
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        color: Colors.white,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(
+                                              height: 30,
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Filter By: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Container(
-                                                        height: 40,
-                                                        color: Colors.white,
-                                                        child: DropdownSearch<
-                                                            String>(
-                                                          popupItemBuilder:
-                                                              (context, item,
-                                                                  isSelected) {
-                                                            return Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8.0),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(item
-                                                                      .toString()),
-                                                                  const Divider(),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                          showSearchBox: false,
-                                                          showSelectedItems:
-                                                              true,
-                                                          items: filterbyList
-                                                              .map((e) =>
-                                                                  e.toString())
-                                                              .toList(),
-                                                          onChanged:
-                                                              getFilterName,
-                                                          selectedItem:
-                                                              filterName ==
-                                                                      'segment'
-                                                                  ? 'By Segment'
-                                                                  : '',
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const Text(" - "),
-                                                    Visibility(
-                                                      visible: segFilter,
-                                                      child: Expanded(
+                                                Expanded(
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
                                                         child: Container(
-                                                          color: Colors.white,
                                                           height: 40,
-                                                          child: StreamBuilder<
-                                                                  ResponseOb>(
-                                                              initialData: hasSegmentData ==
-                                                                      false
-                                                                  ? ResponseOb(
-                                                                      msgState:
-                                                                          MsgState
-                                                                              .loading)
-                                                                  : null,
-                                                              stream: quotationBloc
-                                                                  .getSegmentListStream(),
-                                                              builder: (context,
-                                                                  AsyncSnapshot<
-                                                                          ResponseOb>
-                                                                      snapshot) {
-                                                                ResponseOb?
-                                                                    responseOb =
-                                                                    snapshot
-                                                                        .data;
-                                                                if (responseOb
-                                                                        ?.msgState ==
-                                                                    MsgState
-                                                                        .loading) {
-                                                                  return Center(
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/gifs/loading.gif',
-                                                                      width:
-                                                                          100,
-                                                                      height:
-                                                                          100,
-                                                                    ),
-                                                                  );
-                                                                } else if (responseOb
-                                                                        ?.msgState ==
-                                                                    MsgState
-                                                                        .error) {
-                                                                  return const Center(
-                                                                    child: Text(
-                                                                        "Something went Wrong!"),
-                                                                  );
-                                                                } else {
-                                                                  return DropdownSearch<
-                                                                      String>(
-                                                                    popupItemBuilder:
-                                                                        (context,
-                                                                            item,
-                                                                            isSelected) {
-                                                                      return Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.all(8.0),
-                                                                        child:
-                                                                            Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: [
-                                                                            Text(item.toString().split(',')[1]),
-                                                                            const Divider(),
-                                                                          ],
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                    showSearchBox:
-                                                                        false,
-                                                                    showSelectedItems:
-                                                                        true,
-                                                                    showClearButton:
-                                                                        !hasNotSegmentFilter,
-                                                                    items: segmentList
-                                                                        .map((e) =>
-                                                                            '${e['id']},${e['name']}')
-                                                                        .toList(),
-                                                                    onChanged:
-                                                                        getSegmentFilterId,
-                                                                    selectedItem:
-                                                                        segmentFilterName,
-                                                                  );
-                                                                }
-                                                              }),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Quotation: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                    color: Colors.white,
-                                                    height: 40,
-                                                    child: TextFormField(
-                                                        readOnly: true,
-                                                        autovalidateMode:
-                                                            AutovalidateMode
-                                                                .onUserInteraction,
-                                                        validator: (value) {
-                                                          if (value == null ||
-                                                              value.isEmpty) {
-                                                            return 'Please select Quotation Date';
-                                                          }
-                                                          return null;
-                                                        },
-                                                        controller:
-                                                            dateOrderController,
-                                                        decoration:
-                                                            InputDecoration(
-                                                                border:
-                                                                    const OutlineInputBorder(),
-                                                                suffixIcon:
-                                                                    IconButton(
-                                                                  icon: const Icon(
-                                                                      Icons
-                                                                          .arrow_drop_down),
-                                                                  onPressed:
-                                                                      () async {
-                                                                    final DateTime? selected = await showDatePicker(
-                                                                        context:
-                                                                            context,
-                                                                        initialDate:
-                                                                            DateTime
-                                                                                .now(),
-                                                                        firstDate:
-                                                                            DateTime
-                                                                                .now(),
-                                                                        lastDate:
-                                                                            DateTime(2023));
-
-                                                                    if (selected !=
-                                                                        null) {
-                                                                      setState(
-                                                                          () {
-                                                                        dateOrder =
-                                                                            '${selected.toString().split(' ')[0]} ${DateTime.now().toString().split(' ')[1].split('.')[0]}';
-                                                                        dateOrderController.text =
-                                                                            '${selected.toString().split(' ')[0]} ${DateTime.now().toString().split(' ')[1].split('.')[0]}';
-                                                                        hasNotQuoDate =
-                                                                            false;
-                                                                        print(
-                                                                            dateOrder);
-                                                                      });
-                                                                    }
-                                                                  },
-                                                                )))),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  'Customer: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  color: Colors.white,
-                                                  height: 40,
-                                                  child: StreamBuilder<
-                                                          ResponseOb>(
-                                                      initialData:
-                                                          hasCustomerData ==
-                                                                  false
-                                                              ? ResponseOb(
-                                                                  msgState:
-                                                                      MsgState
-                                                                          .loading)
-                                                              : null,
-                                                      stream: quotationBloc
-                                                          .getCustomerStream(),
-                                                      builder: (context,
-                                                          AsyncSnapshot<
-                                                                  ResponseOb>
-                                                              snapshot) {
-                                                        ResponseOb? responseOb =
-                                                            snapshot.data;
-                                                        if (responseOb
-                                                                ?.msgState ==
-                                                            MsgState.loading) {
-                                                          return Center(
-                                                            child: Image.asset(
-                                                              'assets/gifs/loading.gif',
-                                                              width: 100,
-                                                              height: 100,
-                                                            ),
-                                                          );
-                                                        } else if (responseOb
-                                                                ?.msgState ==
-                                                            MsgState.error) {
-                                                          return const Center(
-                                                            child: Text(
-                                                                "Something went Wrong!"),
-                                                          );
-                                                        } else {
-                                                          return DropdownSearch<
+                                                          color: Colors.white,
+                                                          child: DropdownSearch<
                                                               String>(
                                                             popupItemBuilder:
                                                                 (context, item,
@@ -1736,689 +1503,1004 @@ class _QuotationCreateState extends State<QuotationCreate> {
                                                                           .start,
                                                                   children: [
                                                                     Text(item
-                                                                        .toString()
-                                                                        .split(
-                                                                            ',')[1]),
+                                                                        .toString()),
                                                                     const Divider(),
                                                                   ],
                                                                 ),
                                                               );
                                                             },
-                                                            autoValidateMode:
-                                                                AutovalidateMode
-                                                                    .onUserInteraction,
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return 'Please select Customer Name';
-                                                              }
-                                                              return null;
-                                                            },
-                                                            showSearchBox: true,
+                                                            showSearchBox:
+                                                                false,
                                                             showSelectedItems:
                                                                 true,
-                                                            showClearButton:
-                                                                !hasNotCustomer,
-                                                            items: customerList
-                                                                .map((e) {
-                                                              return e['code'] !=
-                                                                      false
-                                                                  ? '${e['id']},${e['code']} ${e['name']}'
-                                                                  : '${e['id']},${e['name']}';
-                                                            }).toList(),
-                                                            onChanged:
-                                                                getCustomerId,
-                                                            selectedItem:
-                                                                customerName,
-                                                          );
-                                                        }
-                                                      }),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Payment Terms: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  color: Colors.white,
-                                                  height: 40,
-                                                  child: StreamBuilder<
-                                                          ResponseOb>(
-                                                      initialData:
-                                                          hasPaymentTermsData ==
-                                                                  false
-                                                              ? ResponseOb(
-                                                                  msgState:
-                                                                      MsgState
-                                                                          .loading)
-                                                              : null,
-                                                      stream: quotationBloc
-                                                          .getPaymentTermsStream(),
-                                                      builder: (context,
-                                                          AsyncSnapshot<
-                                                                  ResponseOb>
-                                                              snapshot) {
-                                                        ResponseOb? responseOb =
-                                                            snapshot.data;
-                                                        if (responseOb
-                                                                ?.msgState ==
-                                                            MsgState.loading) {
-                                                          return Center(
-                                                            child: Image.asset(
-                                                              'assets/gifs/loading.gif',
-                                                              width: 100,
-                                                              height: 100,
-                                                            ),
-                                                          );
-                                                        } else if (responseOb
-                                                                ?.msgState ==
-                                                            MsgState.error) {
-                                                          return const Center(
-                                                            child: Text(
-                                                                "Something went Wrong!"),
-                                                          );
-                                                        } else {
-                                                          return DropdownSearch<
-                                                              String>(
-                                                            popupItemBuilder:
-                                                                (context, item,
-                                                                    isSelected) {
-                                                              return Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        8.0),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(item
-                                                                        .toString()
-                                                                        .split(
-                                                                            ',')[1]),
-                                                                    const Divider(),
-                                                                  ],
-                                                                ),
-                                                              );
-                                                            },
-                                                            showSearchBox: true,
-                                                            showSelectedItems:
-                                                                true,
-                                                            showClearButton:
-                                                                !hasNotPaymentTerms,
-                                                            items: paymentTermsList
-                                                                .map((e) =>
-                                                                    '${e['id']},${e['name']}')
+                                                            items: filterbyList
+                                                                .map((e) => e
+                                                                    .toString())
                                                                 .toList(),
                                                             onChanged:
-                                                                getPaymentTermsId,
+                                                                getFilterName,
                                                             selectedItem:
-                                                                paymentTermsName,
-                                                          );
-                                                        }
-                                                      }),
+                                                                filterName ==
+                                                                        'segment'
+                                                                    ? 'By Segment'
+                                                                    : '',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const Text(" - "),
+                                                      Visibility(
+                                                        visible: segFilter,
+                                                        child: Expanded(
+                                                          child: Container(
+                                                            color: Colors.white,
+                                                            height: 40,
+                                                            child: StreamBuilder<
+                                                                    ResponseOb>(
+                                                                initialData: hasSegmentData ==
+                                                                        false
+                                                                    ? ResponseOb(
+                                                                        msgState:
+                                                                            MsgState
+                                                                                .loading)
+                                                                    : null,
+                                                                stream: quotationBloc
+                                                                    .getSegmentListStream(),
+                                                                builder: (context,
+                                                                    AsyncSnapshot<
+                                                                            ResponseOb>
+                                                                        snapshot) {
+                                                                  ResponseOb?
+                                                                      responseOb =
+                                                                      snapshot
+                                                                          .data;
+                                                                  if (responseOb
+                                                                          ?.msgState ==
+                                                                      MsgState
+                                                                          .loading) {
+                                                                    return Center(
+                                                                      child: Image
+                                                                          .asset(
+                                                                        'assets/gifs/loading.gif',
+                                                                        width:
+                                                                            100,
+                                                                        height:
+                                                                            100,
+                                                                      ),
+                                                                    );
+                                                                  } else if (responseOb
+                                                                          ?.msgState ==
+                                                                      MsgState
+                                                                          .error) {
+                                                                    return const Center(
+                                                                      child: Text(
+                                                                          "Something went Wrong!"),
+                                                                    );
+                                                                  } else {
+                                                                    return DropdownSearch<
+                                                                        String>(
+                                                                      popupItemBuilder: (context,
+                                                                          item,
+                                                                          isSelected) {
+                                                                        return Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(8.0),
+                                                                          child:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text(item.toString().split(',')[1]),
+                                                                              const Divider(),
+                                                                            ],
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                      showSearchBox:
+                                                                          false,
+                                                                      showSelectedItems:
+                                                                          true,
+                                                                      showClearButton:
+                                                                          !hasNotSegmentFilter,
+                                                                      items: segmentList
+                                                                          .map((e) =>
+                                                                              '${e['id']},${e['name']}')
+                                                                          .toList(),
+                                                                      onChanged:
+                                                                          getSegmentFilterId,
+                                                                      selectedItem:
+                                                                          segmentFilterName,
+                                                                    );
+                                                                  }
+                                                                }),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  'Currency: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                                                const SizedBox(width: 10),
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Quotation: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
+                                                Expanded(
                                                   child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  color: Colors.white,
+                                                      color: Colors.white,
+                                                      height: 40,
+                                                      child: TextFormField(
+                                                          readOnly: true,
+                                                          autovalidateMode:
+                                                              AutovalidateMode
+                                                                  .onUserInteraction,
+                                                          validator: (value) {
+                                                            if (value == null ||
+                                                                value.isEmpty) {
+                                                              return 'Please select Quotation Date';
+                                                            }
+                                                            return null;
+                                                          },
+                                                          controller:
+                                                              dateOrderController,
+                                                          decoration:
+                                                              InputDecoration(
+                                                                  border:
+                                                                      const OutlineInputBorder(),
+                                                                  suffixIcon:
+                                                                      IconButton(
+                                                                    icon: const Icon(
+                                                                        Icons
+                                                                            .arrow_drop_down),
+                                                                    onPressed:
+                                                                        () async {
+                                                                      final DateTime? selected = await showDatePicker(
+                                                                          context:
+                                                                              context,
+                                                                          initialDate: DateTime
+                                                                              .now(),
+                                                                          firstDate: DateTime
+                                                                              .now(),
+                                                                          lastDate:
+                                                                              DateTime(2023));
+
+                                                                      if (selected !=
+                                                                          null) {
+                                                                        setState(
+                                                                            () {
+                                                                          dateOrder =
+                                                                              '${selected.toString().split(' ')[0]} ${DateTime.now().toString().split(' ')[1].split('.')[0]}';
+                                                                          dateOrderController.text =
+                                                                              '${selected.toString().split(' ')[0]} ${DateTime.now().toString().split(' ')[1].split('.')[0]}';
+                                                                          hasNotQuoDate =
+                                                                              false;
+                                                                          print(
+                                                                              dateOrder);
+                                                                        });
+                                                                      }
+                                                                    },
+                                                                  )))),
                                                 ),
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: const [
-                                                      Text('MMK',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 18))
-                                                    ]),
-                                              )),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Zone: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Customer: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
+                                                Expanded(
                                                   child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  color: Colors.white,
+                                                    color: Colors.white,
+                                                    height: 40,
+                                                    child: StreamBuilder<
+                                                            ResponseOb>(
+                                                        initialData:
+                                                            hasCustomerData ==
+                                                                    false
+                                                                ? ResponseOb(
+                                                                    msgState:
+                                                                        MsgState
+                                                                            .loading)
+                                                                : null,
+                                                        stream: quotationBloc
+                                                            .getCustomerStream(),
+                                                        builder: (context,
+                                                            AsyncSnapshot<
+                                                                    ResponseOb>
+                                                                snapshot) {
+                                                          ResponseOb?
+                                                              responseOb =
+                                                              snapshot.data;
+                                                          if (responseOb
+                                                                  ?.msgState ==
+                                                              MsgState
+                                                                  .loading) {
+                                                            return Center(
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/gifs/loading.gif',
+                                                                width: 100,
+                                                                height: 100,
+                                                              ),
+                                                            );
+                                                          } else if (responseOb
+                                                                  ?.msgState ==
+                                                              MsgState.error) {
+                                                            return const Center(
+                                                              child: Text(
+                                                                  "Something went Wrong!"),
+                                                            );
+                                                          } else {
+                                                            return DropdownSearch<
+                                                                String>(
+                                                              popupItemBuilder:
+                                                                  (context,
+                                                                      item,
+                                                                      isSelected) {
+                                                                return Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          8.0),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(item
+                                                                          .toString()
+                                                                          .split(
+                                                                              ',')[1]),
+                                                                      const Divider(),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              },
+                                                              autoValidateMode:
+                                                                  AutovalidateMode
+                                                                      .onUserInteraction,
+                                                              validator:
+                                                                  (value) {
+                                                                if (value ==
+                                                                        null ||
+                                                                    value
+                                                                        .isEmpty) {
+                                                                  return 'Please select Customer Name';
+                                                                }
+                                                                return null;
+                                                              },
+                                                              showSearchBox:
+                                                                  true,
+                                                              showSelectedItems:
+                                                                  true,
+                                                              showClearButton:
+                                                                  !hasNotCustomer,
+                                                              items:
+                                                                  customerList
+                                                                      .map((e) {
+                                                                return e['code'] !=
+                                                                        false
+                                                                    ? '${e['id']},${e['code']} ${e['name']}'
+                                                                    : '${e['id']},${e['name']}';
+                                                              }).toList(),
+                                                              onChanged:
+                                                                  getCustomerId,
+                                                              selectedItem:
+                                                                  customerName,
+                                                            );
+                                                          }
+                                                        }),
+                                                  ),
                                                 ),
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(zoneListName,
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 18))
-                                                    ]),
-                                              )),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  'Exchange Rate: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                                                const SizedBox(width: 10),
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Payment Terms: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
+                                                Expanded(
                                                   child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  color: Colors.white,
+                                                    color: Colors.white,
+                                                    height: 40,
+                                                    child: StreamBuilder<
+                                                            ResponseOb>(
+                                                        initialData:
+                                                            hasPaymentTermsData ==
+                                                                    false
+                                                                ? ResponseOb(
+                                                                    msgState:
+                                                                        MsgState
+                                                                            .loading)
+                                                                : null,
+                                                        stream: quotationBloc
+                                                            .getPaymentTermsStream(),
+                                                        builder: (context,
+                                                            AsyncSnapshot<
+                                                                    ResponseOb>
+                                                                snapshot) {
+                                                          ResponseOb?
+                                                              responseOb =
+                                                              snapshot.data;
+                                                          if (responseOb
+                                                                  ?.msgState ==
+                                                              MsgState
+                                                                  .loading) {
+                                                            return Center(
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/gifs/loading.gif',
+                                                                width: 100,
+                                                                height: 100,
+                                                              ),
+                                                            );
+                                                          } else if (responseOb
+                                                                  ?.msgState ==
+                                                              MsgState.error) {
+                                                            return const Center(
+                                                              child: Text(
+                                                                  "Something went Wrong!"),
+                                                            );
+                                                          } else {
+                                                            return DropdownSearch<
+                                                                String>(
+                                                              popupItemBuilder:
+                                                                  (context,
+                                                                      item,
+                                                                      isSelected) {
+                                                                return Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          8.0),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(item
+                                                                          .toString()
+                                                                          .split(
+                                                                              ',')[1]),
+                                                                      const Divider(),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              },
+                                                              showSearchBox:
+                                                                  true,
+                                                              showSelectedItems:
+                                                                  true,
+                                                              showClearButton:
+                                                                  !hasNotPaymentTerms,
+                                                              items: paymentTermsList
+                                                                  .map((e) =>
+                                                                      '${e['id']},${e['name']}')
+                                                                  .toList(),
+                                                              onChanged:
+                                                                  getPaymentTermsId,
+                                                              selectedItem:
+                                                                  paymentTermsName,
+                                                            );
+                                                          }
+                                                        }),
+                                                  ),
                                                 ),
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: const [
-                                                      Text('1.0',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 18))
-                                                    ]),
-                                              )),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Segment: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Currency: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
-                                                  child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  color: Colors.white,
+                                                Expanded(
+                                                    child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: const [
+                                                        Text('MMK',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 18))
+                                                      ]),
+                                                )),
+                                                const SizedBox(
+                                                  width: 10,
                                                 ),
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(segmentListName,
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 18))
-                                                    ]),
-                                              )),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  'Pricelist: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Zone: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
-                                                  child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  color: Colors.white,
+                                                Expanded(
+                                                    child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(zoneListName,
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 18))
+                                                      ]),
+                                                )),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Exchange Rate: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: const [
-                                                      Text(
-                                                          'Publice Pricelist (MMK)',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 18))
-                                                    ]),
-                                              )),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Region: ',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                                                Expanded(
+                                                    child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: const [
+                                                        Text('1.0',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 18))
+                                                      ]),
+                                                )),
+                                                const SizedBox(width: 10),
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Segment: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
-                                                  child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  color: Colors.white,
+                                                Expanded(
+                                                    child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(segmentListName,
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 18))
+                                                      ]),
+                                                )),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Pricelist: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(regionListName,
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 18))
-                                                    ]),
-                                              )),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  'Warehouse',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black),
+                                                Expanded(
+                                                    child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: const [
+                                                        Text(
+                                                            'Publice Pricelist (MMK)',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 18))
+                                                      ]),
+                                                )),
+                                                const SizedBox(width: 10),
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Region: ',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
-                                              ),
-                                              StreamBuilder<ResponseOb>(
-                                                  initialData:
-                                                      stockwarehouseList
-                                                              .isNotEmpty
-                                                          ? null
-                                                          : ResponseOb(
-                                                              msgState: MsgState
-                                                                  .loading),
-                                                  stream: productBloc
-                                                      .getStockWarehouseStream(),
-                                                  builder: (context, snapshot) {
-                                                    ResponseOb? responseOb =
-                                                        snapshot.data;
-                                                    if (responseOb?.msgState ==
-                                                        MsgState.error) {
-                                                      return const Center(
-                                                          child: Text('Error'));
-                                                    } else if (responseOb
-                                                            ?.msgState ==
-                                                        MsgState.loading) {
-                                                      return Expanded(
-                                                        child: Container(
+                                                Expanded(
+                                                    child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(regionListName,
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 18))
+                                                      ]),
+                                                )),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const Expanded(
+                                                  child: Text(
+                                                    'Warehouse',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                                StreamBuilder<ResponseOb>(
+                                                    initialData:
+                                                        stockwarehouseList
+                                                                .isNotEmpty
+                                                            ? null
+                                                            : ResponseOb(
+                                                                msgState: MsgState
+                                                                    .loading),
+                                                    stream: productBloc
+                                                        .getStockWarehouseStream(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      ResponseOb? responseOb =
+                                                          snapshot.data;
+                                                      if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.error) {
+                                                        return const Center(
+                                                            child:
+                                                                Text('Error'));
+                                                      } else if (responseOb
+                                                              ?.msgState ==
+                                                          MsgState.loading) {
+                                                        return Expanded(
+                                                          child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            color: Colors.white,
+                                                            child: Center(
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/gifs/loading.gif',
+                                                                width: 100,
+                                                                height: 100,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        return Expanded(
+                                                            child: Container(
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(10),
-                                                          color: Colors.white,
-                                                          child: Center(
-                                                            child: Image.asset(
-                                                              'assets/gifs/loading.gif',
-                                                              width: 100,
-                                                              height: 100,
-                                                            ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .grey),
+                                                            color: Colors.white,
                                                           ),
-                                                        ),
-                                                      );
-                                                    } else {
-                                                      return Expanded(
-                                                          child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5),
-                                                          border: Border.all(
-                                                              color:
-                                                                  Colors.grey),
-                                                          color: Colors.white,
-                                                        ),
-                                                        child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                  '${stockwarehouseList.isNotEmpty ? stockwarehouseList[0]['name'] : ''}',
-                                                                  style: const TextStyle(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontSize:
-                                                                          18))
-                                                            ]),
-                                                      ));
-                                                    }
-                                                  }),
-                                              const Expanded(child: SizedBox()),
-                                              const Expanded(child: SizedBox()),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ]))),
-                              SliverPadding(
-                                padding: const EdgeInsets.all(8),
-                                sliver: SliverToBoxAdapter(
-                                    child: Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 10, bottom: 10),
-                                  height: 50,
-                                  width: 20,
-                                  color: Colors.white,
-                                  child: const Text(
-                                    "Order Line",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                )),
-                              ),
-                              SliverPadding(
+                                                          child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                    '${stockwarehouseList.isNotEmpty ? stockwarehouseList[0]['name'] : ''}',
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            18))
+                                                              ]),
+                                                        ));
+                                                      }
+                                                    }),
+                                                const Expanded(
+                                                    child: SizedBox()),
+                                                const Expanded(
+                                                    child: SizedBox()),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ]))),
+                                SliverPadding(
                                   padding: const EdgeInsets.all(8),
                                   sliver: SliverToBoxAdapter(
-                                    child: Container(
-                                      color: Colors.white,
-                                      padding: const EdgeInsets.only(
-                                          top: 5, bottom: 5, left: 8, right: 8),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: const [
-                                          SizedBox(
-                                              width: 130,
-                                              child: Text('Product',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 80,
-                                              child: Text('Quantity',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 80,
-                                              child: Text('Delivered',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 80,
-                                              child: Text('Invoiced',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 80,
-                                              child: Text('UoM',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 100,
-                                              child: Text('Unit Price',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 80,
-                                              child: Text('Sale Discount',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 100,
-                                              child: Text('Discount',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 80,
-                                              child: Text('Taxes',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          SizedBox(
-                                              width: 50,
-                                              child: Text('IsFOC',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          SizedBox(
-                                            width: 2,
-                                          ),
-                                          Expanded(
-                                              child: Text('Subtotal',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                        ],
-                                      ),
+                                      child: Container(
+                                    padding: const EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    height: 50,
+                                    width: 20,
+                                    color: Colors.white,
+                                    child: const Text(
+                                      "Order Line",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
                                     ),
                                   )),
-                              SliverPadding(
-                                padding: const EdgeInsets.only(left: 8),
-                                sliver: SliverToBoxAdapter(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TextButton(
-                                          style: TextButton.styleFrom(
-                                            // maximumSize: Size(40, 20),
-                                            backgroundColor:
-                                                AppColors.appBarColor,
-                                          ),
-                                          onPressed: customerId == 0
-                                              ? null
-                                              : () {
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder: (context) {
-                                                    return SaleOrderLineMultiCreatePage(
-                                                      newOrEditSOL: 0,
-                                                      newOrEdit:
-                                                          widget.newOrEdit,
-                                                      quotationId: widget
-                                                          .quotationList['id'],
-                                                      solId: 0,
-                                                      partnerId: customerId,
-                                                      zoneId: zoneListId,
-                                                      segmentId: segmentListId,
-                                                      regionId: regionListId,
-                                                      currencyId: 119,
-                                                    );
-                                                  })).then(
-                                                      (value) => setState(() {
-                                                            SystemChrome
-                                                                .setPreferredOrientations([
-                                                              DeviceOrientation
-                                                                  .landscapeLeft,
-                                                              DeviceOrientation
-                                                                  .landscapeRight
-                                                            ]);
-                                                            newPage = -1;
-                                                            //databaseHelper
-                                                            //.deleteAllSaleOrderLineUpdate();
-                                                            databaseHelper
-                                                                .deleteAllSaleOrderLineMultiSelect();
-                                                          }));
-                                                },
-                                          child: const Text(
-                                            "Add an Order",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          )),
-                                    ],
+                                ),
+                                SliverPadding(
+                                    padding: const EdgeInsets.all(8),
+                                    sliver: SliverToBoxAdapter(
+                                      child: Container(
+                                        color: Colors.white,
+                                        padding: const EdgeInsets.only(
+                                            top: 5,
+                                            bottom: 5,
+                                            left: 8,
+                                            right: 8),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: const [
+                                            SizedBox(
+                                                width: 130,
+                                                child: Text('Product',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 80,
+                                                child: Text('Quantity',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 80,
+                                                child: Text('Delivered',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 80,
+                                                child: Text('Invoiced',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 80,
+                                                child: Text('UoM',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 100,
+                                                child: Text('Unit Price',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 80,
+                                                child: Text('Sale Discount',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 100,
+                                                child: Text('Discount',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 80,
+                                                child: Text('Taxes',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            SizedBox(
+                                                width: 50,
+                                                child: Text('IsFOC',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            Expanded(
+                                                child: Text('Subtotal',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))),
+                                          ],
+                                        ),
+                                      ),
+                                    )),
+                                SliverPadding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  sliver: SliverToBoxAdapter(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        TextButton(
+                                            style: TextButton.styleFrom(
+                                              // maximumSize: Size(40, 20),
+                                              backgroundColor:
+                                                  AppColors.appBarColor,
+                                            ),
+                                            onPressed: customerId == 0
+                                                ? null
+                                                : () {
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder: (context) {
+                                                      return SaleOrderLineMultiCreatePage(
+                                                        newOrEditSOL: 0,
+                                                        newOrEdit:
+                                                            widget.newOrEdit,
+                                                        quotationId: widget
+                                                                .quotationList[
+                                                            'id'],
+                                                        solId: 0,
+                                                        partnerId: customerId,
+                                                        zoneId: zoneListId,
+                                                        segmentId:
+                                                            segmentListId,
+                                                        regionId: regionListId,
+                                                        currencyId: 119,
+                                                      );
+                                                    })).then(
+                                                        (value) => setState(() {
+                                                              SystemChrome
+                                                                  .setPreferredOrientations([
+                                                                DeviceOrientation
+                                                                    .landscapeLeft,
+                                                                DeviceOrientation
+                                                                    .landscapeRight
+                                                              ]);
+                                                              newPage = -1;
+                                                              //databaseHelper
+                                                              //.deleteAllSaleOrderLineUpdate();
+                                                              databaseHelper
+                                                                  .deleteAllSaleOrderLineMultiSelect();
+                                                            }));
+                                                  },
+                                            child: const Text(
+                                              "Add an Order",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height: 30,
+                                const SliverToBoxAdapter(
+                                  child: SizedBox(
+                                    height: 30,
+                                  ),
                                 ),
-                              ),
-                              SliverPadding(
-                                  padding: const EdgeInsets.all(8),
-                                  sliver: saleOrderLineWidget),
-                              const SliverToBoxAdapter(
-                                child: SizedBox(height: 20),
-                              ),
-                            ],
+                                SliverPadding(
+                                    padding: const EdgeInsets.all(8),
+                                    sliver: saleOrderLineWidget),
+                                const SliverToBoxAdapter(
+                                  child: SizedBox(height: 20),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }),
+          ),
+          isCreateQuo == true
+              ? StreamBuilder<ResponseOb>(
+                  initialData: ResponseOb(msgState: MsgState.loading),
+                  stream: quotationCreateBloc.getCreateNewStream(),
+                  builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                    ResponseOb? responseOb = snapshot.data;
+                    if (responseOb?.msgState == MsgState.loading) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                );
-              }),
-        ),
-        isCreateQuo == true
-            ? StreamBuilder<ResponseOb>(
-                initialData: ResponseOb(msgState: MsgState.loading),
-                stream: quotationCreateBloc.getCreateNewStream(),
-                builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                  ResponseOb? responseOb = snapshot.data;
-                  if (responseOb?.msgState == MsgState.loading) {
+                      );
+                    }
+                    return Container(
+                      color: Colors.black.withOpacity(0.5),
+                    );
+                  })
+              : Container(),
+          isCreateSOL == true
+              ? StreamBuilder<ResponseOb>(
+                  initialData: ResponseOb(msgState: MsgState.loading),
+                  stream: saleorderlineBloc.createproductlineListStream(),
+                  builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                    ResponseOb? responseOb = snapshot.data;
+                    if (responseOb?.msgState == MsgState.loading) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      );
+                    }
                     return Container(
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
@@ -2429,19 +2511,26 @@ class _QuotationCreateState extends State<QuotationCreate> {
                         ),
                       ),
                     );
-                  }
-                  return Container(
-                    color: Colors.black.withOpacity(0.5),
-                  );
-                })
-            : Container(),
-        isCreateSOL == true
-            ? StreamBuilder<ResponseOb>(
-                initialData: ResponseOb(msgState: MsgState.loading),
-                stream: saleorderlineBloc.createproductlineListStream(),
-                builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                  ResponseOb? responseOb = snapshot.data;
-                  if (responseOb?.msgState == MsgState.loading) {
+                  })
+              : Container(),
+          isUpdateQuo == true
+              ? StreamBuilder<ResponseOb>(
+                  initialData: ResponseOb(msgState: MsgState.loading),
+                  stream: quotationEditBloc.getQuotationEditStream(),
+                  builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                    ResponseOb? responseOb = snapshot.data;
+                    if (responseOb?.msgState == MsgState.loading) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      );
+                    }
                     return Container(
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
@@ -2452,26 +2541,26 @@ class _QuotationCreateState extends State<QuotationCreate> {
                         ),
                       ),
                     );
-                  }
-                  return Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/gifs/loading.gif',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                  );
-                })
-            : Container(),
-        isUpdateQuo == true
-            ? StreamBuilder<ResponseOb>(
-                initialData: ResponseOb(msgState: MsgState.loading),
-                stream: quotationEditBloc.getQuotationEditStream(),
-                builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                  ResponseOb? responseOb = snapshot.data;
-                  if (responseOb?.msgState == MsgState.loading) {
+                  })
+              : Container(),
+          isUpdateSOL == true
+              ? StreamBuilder<ResponseOb>(
+                  initialData: ResponseOb(msgState: MsgState.loading),
+                  stream: saleorderlineBloc.updateproductlineListStream(),
+                  builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                    ResponseOb? responseOb = snapshot.data;
+                    if (responseOb?.msgState == MsgState.loading) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      );
+                    }
                     return Container(
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
@@ -2482,26 +2571,26 @@ class _QuotationCreateState extends State<QuotationCreate> {
                         ),
                       ),
                     );
-                  }
-                  return Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/gifs/loading.gif',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                  );
-                })
-            : Container(),
-        isUpdateSOL == true
-            ? StreamBuilder<ResponseOb>(
-                initialData: ResponseOb(msgState: MsgState.loading),
-                stream: saleorderlineBloc.updateproductlineListStream(),
-                builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                  ResponseOb? responseOb = snapshot.data;
-                  if (responseOb?.msgState == MsgState.loading) {
+                  })
+              : Container(),
+          isDeleteSOL == true
+              ? StreamBuilder<ResponseOb>(
+                  initialData: ResponseOb(msgState: MsgState.loading),
+                  stream: quotationDeleteBloc.deleteSaleOrderLineStream(),
+                  builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                    ResponseOb? responseOb = snapshot.data;
+                    if (responseOb?.msgState == MsgState.loading) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      );
+                    }
                     return Container(
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
@@ -2512,26 +2601,26 @@ class _QuotationCreateState extends State<QuotationCreate> {
                         ),
                       ),
                     );
-                  }
-                  return Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/gifs/loading.gif',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                  );
-                })
-            : Container(),
-        isDeleteSOL == true
-            ? StreamBuilder<ResponseOb>(
-                initialData: ResponseOb(msgState: MsgState.loading),
-                stream: quotationDeleteBloc.deleteSaleOrderLineStream(),
-                builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                  ResponseOb? responseOb = snapshot.data;
-                  if (responseOb?.msgState == MsgState.loading) {
+                  })
+              : Container(),
+          isUpdateQuoOrderLine == true
+              ? StreamBuilder<ResponseOb>(
+                  initialData: ResponseOb(msgState: MsgState.loading),
+                  stream: quotationEditBloc.getUpdateQuotationOrderLineStream(),
+                  builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                    ResponseOb? responseOb = snapshot.data;
+                    if (responseOb?.msgState == MsgState.loading) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      );
+                    }
                     return Container(
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
@@ -2542,50 +2631,10 @@ class _QuotationCreateState extends State<QuotationCreate> {
                         ),
                       ),
                     );
-                  }
-                  return Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/gifs/loading.gif',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                  );
-                })
-            : Container(),
-        isUpdateQuoOrderLine == true
-            ? StreamBuilder<ResponseOb>(
-                initialData: ResponseOb(msgState: MsgState.loading),
-                stream: quotationEditBloc.getUpdateQuotationOrderLineStream(),
-                builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-                  ResponseOb? responseOb = snapshot.data;
-                  if (responseOb?.msgState == MsgState.loading) {
-                    return Container(
-                      color: Colors.black.withOpacity(0.5),
-                      child: Center(
-                        child: Image.asset(
-                          'assets/gifs/loading.gif',
-                          width: 100,
-                          height: 100,
-                        ),
-                      ),
-                    );
-                  }
-                  return Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/gifs/loading.gif',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                  );
-                })
-            : Container(),
-      ],
+                  })
+              : Container(),
+        ],
+      ),
     );
   }
 }

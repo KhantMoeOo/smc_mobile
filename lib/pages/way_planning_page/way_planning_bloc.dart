@@ -50,7 +50,7 @@ class WayPlanningBloc {
               'leader_id'
             ],
             order: 'trip_id asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('Way Planning Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];
@@ -102,7 +102,7 @@ class WayPlanningBloc {
             ],
             ['id', 'name', 'leader_id'],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Trip result');
           print('Trip Config Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];

@@ -44,7 +44,7 @@ class MaterialProductLineBloc {
               'product_uom_id',
             ],
             order: 'product_id asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('MaterialProductLineListResult:' +
               res.getResult()['records'].toString());
@@ -100,7 +100,7 @@ class MaterialProductLineBloc {
           'qty': qty,
           'product_uom_id': uomId,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('MaterialProductLine Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

@@ -20,7 +20,7 @@ class SaleOrderLineOb {
   String? promotionDiscount = '';
   String taxId = '[]';
   String taxName;
-  int? isFOC;
+  int? isFOC = 0;
   String subTotal;
 
   SaleOrderLineOb({

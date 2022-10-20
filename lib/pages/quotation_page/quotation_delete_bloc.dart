@@ -31,7 +31,7 @@ class DeleteQuoBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.unlink('sale.order', [ids]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('quodelete result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -72,7 +72,7 @@ class DeleteQuoBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.unlink('sale.order.line', [ids]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('SaleOrderLinedelete result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

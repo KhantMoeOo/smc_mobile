@@ -399,12 +399,14 @@ class _LoginMBState extends State<LoginMB> {
                                         onPressed: () {
                                           // loginBloc.quotationLogin('admin',
                                           //     'Pr0fess!0n@l', 'smc_db_test');
-                                          loginBloc.quotationLogin(
-                                              'admin', 'admin', 'smc_uat_test');
                                           // loginBloc.quotationLogin(
-                                          //     _emailcontroller.text,
-                                          //     _passwordcontroller.text,
-                                          //     dbName);
+                                          //     'Sai Nay Lin',
+                                          //     '123',
+                                          //     'smc_sale_test');
+                                          loginBloc.quotationLogin(
+                                              _emailcontroller.text,
+                                              _passwordcontroller.text,
+                                              dbName);
                                         },
                                         child: const Text(
                                           'Log in',

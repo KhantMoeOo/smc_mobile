@@ -66,7 +66,7 @@ class QuotationEditBloc {
           'segment_id': segmentId,
           'region_id': regionId
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -106,9 +106,9 @@ class QuotationEditBloc {
       Sharef.getOdooClientInstance().then((value) async {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
-        OdooResponse res =
-            await odoo.write('sale.order', [ids], {'state': state,'invoice_status': 'to invoice'});
-        if (res.getResult() != null) {
+        OdooResponse res = await odoo.write('sale.order', [ids],
+            {'state': state, 'invoice_status': 'to invoice'});
+        if (!res.hasError()) {
           print('result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -149,9 +149,12 @@ class QuotationEditBloc {
       Sharef.getOdooClientInstance().then((value) async {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
-        OdooResponse res =
-            await odoo.write('sale.order', [ids], {'picking_ids': [pickingIds]});
-        if (res.getResult() != null) {
+        OdooResponse res = await odoo.write('sale.order', [
+          ids
+        ], {
+          'picking_ids': [pickingIds]
+        });
+        if (!res.hasError()) {
           print('result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -194,7 +197,7 @@ class QuotationEditBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.write('sale.order', [ids], {'order_line': orderline});
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

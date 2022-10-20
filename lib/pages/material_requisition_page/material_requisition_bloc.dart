@@ -58,7 +58,7 @@ class MaterialRequisitionBloc {
               'desc',
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('MaterialRequisitionResult:' +
               res.getResult()['records'].toString());
@@ -178,7 +178,7 @@ class MaterialRequisitionBloc {
             ],
             ['id', 'name', 'location_id'],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('StockLocationResult:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];

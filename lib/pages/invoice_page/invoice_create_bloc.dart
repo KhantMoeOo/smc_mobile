@@ -51,7 +51,7 @@ class InvoiceCreateBloc {
           'currency_id': currencyId,
           'exchange_rate': exchangeRate == '' ? null : exchangeRate
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Invoice Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -89,8 +89,8 @@ class InvoiceCreateBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
-            await odoo.callKW('sale.order', 'create_invoices', [id]);
-        if (res.getResult() != null) {
+            await odoo.callKW('sale.order', 'mobile_create_invoice', [id]);
+        if (!res.hasError()) {
           print('invoiceCreateMethod Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

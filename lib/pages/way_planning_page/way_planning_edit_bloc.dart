@@ -53,7 +53,7 @@ class WayPlanningEditBloc {
           'to_date': toDate,
           'leader_id': leaderId
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Way Plannin edit result: ${res.getResult()}');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -102,7 +102,7 @@ class WayPlanningEditBloc {
           'job_id': jobId,
           'mr_responsible': mrResponsible
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('HrEmployeeLine edit result: ${res.getResult()}');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -151,7 +151,7 @@ class WayPlanningEditBloc {
           'location_id': locationId,
           'remark': remark
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('TripPlanSchedule edit result: ${res.getResult()}');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -205,7 +205,7 @@ class WayPlanningEditBloc {
           'invoice_status': invoiceStatus,
           'remark': remark
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('TripPlanDelivery edit result: ${res.getResult()}');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

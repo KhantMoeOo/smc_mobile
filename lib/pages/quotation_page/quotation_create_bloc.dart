@@ -51,7 +51,7 @@ class QuotationCreateBloc {
           'zone_filter_id': zoneFilter,
           'seg_filter_id': segFilter,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Createresult');
           print('Quo Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;

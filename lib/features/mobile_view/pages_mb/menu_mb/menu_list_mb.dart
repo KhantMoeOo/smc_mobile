@@ -16,6 +16,7 @@ import '../../../pages/material_isssues/material_issues_list.dart';
 import '../../../pages/material_requisition/material_requisition_list.dart';
 import '../material_issues_mb/material_issues_list_mb.dart';
 import '../material_requisition_mb/material_requisition_list_mb.dart';
+import '../profile_mb/profile_mb.dart';
 import '../quotation_mb/quotation_list_mb.dart';
 import '../way_plan_mb/way_plan_list_mb.dart';
 
@@ -629,35 +630,46 @@ class _MenuListMBState extends State<MenuListMB> {
                                                               )
                                                             ],
                                                           )),
-                                                      Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                          ),
-                                                          child: Column(
-                                                            children: [
-                                                              Image.asset(
-                                                                'assets/imgs/person_icon.png',
-                                                                height: 80,
-                                                                color: AppColors
-                                                                    .appBarColor,
-                                                              ),
-                                                              const Text(
-                                                                "Profile",
-                                                                style: TextStyle(
-                                                                    fontWeight: FontWeight.bold,
-                                                                    // fontSize:
-                                                                    //     20,
-                                                                    color: AppColors.appBarColor),
-                                                              )
-                                                            ],
-                                                          )),
+                                                      InkWell(
+                                                        onTap: () {
+                                                          Navigator.of(context)
+                                                              .pushAndRemoveUntil(
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) {
+                                                            return ProfileMB();
+                                                          }), (route) => false);
+                                                        },
+                                                        child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.asset(
+                                                                  'assets/imgs/person_icon.png',
+                                                                  height: 80,
+                                                                  color: AppColors
+                                                                      .appBarColor,
+                                                                ),
+                                                                const Text(
+                                                                  "Profile",
+                                                                  style: TextStyle(
+                                                                      fontWeight: FontWeight.bold,
+                                                                      // fontSize:
+                                                                      //     20,
+                                                                      color: AppColors.appBarColor),
+                                                                )
+                                                              ],
+                                                            )),
+                                                      ),
                                                       Container(
                                                         padding:
                                                             const EdgeInsets

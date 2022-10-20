@@ -10,8 +10,7 @@ class SaleTeamBloc {
   StreamController<ResponseOb> saleteamListStreamController =
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getSaleTeamListStream() =>
-      saleteamListStreamController
-          .stream; // sale team List Stream Controller
+      saleteamListStreamController.stream; // sale team List Stream Controller
 
   StreamController<ResponseOb> hrdepartmentListStreamController =
       StreamController<ResponseOb>.broadcast();
@@ -49,9 +48,9 @@ class SaleTeamBloc {
               'mr_responsible'
             ],
             order: 'emp_name asc');
-        if (res.getResult() != null) {
-          print(
-              'Hr Employee line Result:' + res.getResult()['records'].toString());
+        if (!res.hasError()) {
+          print('Hr Employee line Result:' +
+              res.getResult()['records'].toString());
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = data;
@@ -111,7 +110,7 @@ class SaleTeamBloc {
               // 'leader_id'
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Hr Departmentresult');
           print(
               'Hr department Result:' + res.getResult()['records'].toString());
@@ -174,7 +173,7 @@ class SaleTeamBloc {
               // 'leader_id'
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Hr Job result');
           print('Hr Job Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];

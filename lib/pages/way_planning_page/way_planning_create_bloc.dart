@@ -50,7 +50,7 @@ class TripPlanCreateBloc {
           'to_date': toDate,
           'leader_id': leaderId
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Trip Plan Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -95,7 +95,7 @@ class TripPlanCreateBloc {
           'job_id': jobId,
           'mr_responsible': mrResponsible
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Hr Employee Line Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -140,7 +140,7 @@ class TripPlanCreateBloc {
           'location_id': locationId,
           'remark': remark
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Trip Plan Schedule Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -190,7 +190,7 @@ class TripPlanCreateBloc {
           'invoice_status': invoiceStatus,
           'remark': remark
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('TripPlanDelivery Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

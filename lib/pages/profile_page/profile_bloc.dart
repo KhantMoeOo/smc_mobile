@@ -70,7 +70,7 @@ class ProfileBloc {
               'age',
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Get Profile result: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -195,7 +195,7 @@ class ProfileBloc {
             ],
             ['id', 'name', 'zone_id'],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Get ResUsers result: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

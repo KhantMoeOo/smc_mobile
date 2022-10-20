@@ -72,7 +72,7 @@ class InvoiceBloc {
               'authorized_transaction_ids'
             ],
             order: 'id desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('InvoiceResult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -129,7 +129,7 @@ class InvoiceBloc {
               'inbound_payment_method_ids',
             ],
             order: 'id desc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('AccountJournalResult: ${res.getResult()['records']}');
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;

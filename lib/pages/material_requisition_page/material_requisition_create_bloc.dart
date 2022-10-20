@@ -58,7 +58,7 @@ class MaterialRequisitionCreateBloc {
           'scheduled_date': scheduledDate,
           'desc': description,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('MaterialRequisition Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -99,7 +99,7 @@ class MaterialRequisitionCreateBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.write('material.requisition', [ids], {'state': state});
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -142,7 +142,7 @@ class MaterialRequisitionCreateBloc {
   //       odoo.setSessionId(value['session_id']);
   //       OdooResponse res =
   //           await odoo.callKW('material.requisition', 'action_confirm', [ids]);
-  //       if (res.getResult() != null) {
+  //       if (!res.hasError()) {
   //         print('callActionConfirmresult');
   //         // data = res.getResult()['records'];
   //         responseOb.msgState = MsgState.data;

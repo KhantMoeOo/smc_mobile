@@ -54,7 +54,7 @@ class ProductBloc {
               'categ_id'
             ],
             order: 'name asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           print('ProductResult:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];

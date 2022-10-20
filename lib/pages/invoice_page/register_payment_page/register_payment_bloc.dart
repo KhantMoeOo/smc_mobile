@@ -51,7 +51,7 @@ class RegisterPaymentBloc {
           'journal_id': journalId,
           'payment_method_id': paymentmethodId,
         });
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('RegisterPayment Create Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

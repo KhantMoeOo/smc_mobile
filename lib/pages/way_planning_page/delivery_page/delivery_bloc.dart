@@ -7,18 +7,16 @@ import '../../../obs/response_ob.dart';
 import '../../../services/odoo.dart';
 import '../../../utils/app_const.dart';
 
-class DeliveryBloc{
+class DeliveryBloc {
   StreamController<ResponseOb> deliveryListStreamController =
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getDeliveryListStream() =>
-      deliveryListStreamController
-          .stream; // Delivery List Stream Controller
+      deliveryListStreamController.stream; // Delivery List Stream Controller
 
   StreamController<ResponseOb> crmTeamListStreamController =
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getCRMTeamListStream() =>
-      crmTeamListStreamController
-          .stream; // CRM Team List Stream Controller
+      crmTeamListStreamController.stream; // CRM Team List Stream Controller
 
   StreamController<ResponseOb> accountmoveListStreamController =
       StreamController<ResponseOb>.broadcast();
@@ -29,8 +27,7 @@ class DeliveryBloc{
   StreamController<ResponseOb> orderListStreamController =
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getOrderListStream() =>
-      orderListStreamController
-          .stream; // Order List Stream Controller
+      orderListStreamController.stream; // Order List Stream Controller
 
   late Odoo odoo;
 
@@ -46,32 +43,33 @@ class DeliveryBloc{
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
-            'trip.plan.delivery',
-            [],
-            [
-              'id',
-              'trip_id',
-              'team_id',
-              'assign_person',
-              'zone_id',
-              'invoice_id',
-              'order_id',
-              'state',
-              'invoice_status',
-              'remark'
-            ],
-            // order: 'emp_name asc'
-            );
-        if (res.getResult() != null) {
-          print(
-              'Trip Plan Delivery Result:' + res.getResult()['records'].toString());
+          'trip.plan.delivery',
+          [],
+          [
+            'id',
+            'trip_id',
+            'team_id',
+            'assign_person',
+            'zone_id',
+            'invoice_id',
+            'order_id',
+            'state',
+            'invoice_status',
+            'remark'
+          ],
+          // order: 'emp_name asc'
+        );
+        if (!res.hasError()) {
+          print('Trip Plan Delivery Result:' +
+              res.getResult()['records'].toString());
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = data;
           deliveryListStreamController.sink.add(responseOb);
         } else {
           data = null;
-          print('Get Trip Plan Delivery Error:' + res.getErrorMessage().toString());
+          print('Get Trip Plan Delivery Error:' +
+              res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           deliveryListStreamController.sink.add(responseOb);
@@ -105,18 +103,13 @@ class DeliveryBloc{
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
-            'crm.team',
-            [],
-            [
-              'id',
-              'name',
-              'zone_id'
-            ],
-            // order: 'emp_name asc'
-            );
-        if (res.getResult() != null) {
-          print(
-              'CRM Team Result:' + res.getResult()['records'].toString());
+          'crm.team',
+          [],
+          ['id', 'name', 'zone_id'],
+          // order: 'emp_name asc'
+        );
+        if (!res.hasError()) {
+          print('CRM Team Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = data;
@@ -157,19 +150,15 @@ class DeliveryBloc{
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
-            'account.move',
-            [['type', '=', 'out_invoice']],
-            [
-              'id',
-              'name',
-              'invoice_origin',
-              'type'
-            ],
-            // order: 'emp_name asc'
-            );
-        if (res.getResult() != null) {
-          print(
-              'Account move Result:' + res.getResult()['records'].toString());
+          'account.move',
+          [
+            ['type', '=', 'out_invoice']
+          ],
+          ['id', 'name', 'invoice_origin', 'type'],
+          // order: 'emp_name asc'
+        );
+        if (!res.hasError()) {
+          print('Account move Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = data;
@@ -210,19 +199,13 @@ class DeliveryBloc{
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
-            'sale.order',
-            [],
-            [
-              'id',
-              'name',
-              'state',
-              'invoice_status'
-            ],
-            // order: 'emp_name asc'
-            );
-        if (res.getResult() != null) {
-          print(
-              'Order Result:' + res.getResult()['records'].toString());
+          'sale.order',
+          [],
+          ['id', 'name', 'state', 'invoice_status'],
+          // order: 'emp_name asc'
+        );
+        if (!res.hasError()) {
+          print('Order Result:' + res.getResult()['records'].toString());
           data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = data;
@@ -251,7 +234,7 @@ class DeliveryBloc{
     }
   } // Get Order List Data
 
-  dispose(){
+  dispose() {
     deliveryListStreamController.close();
     crmTeamListStreamController.close();
     accountmoveListStreamController.close();

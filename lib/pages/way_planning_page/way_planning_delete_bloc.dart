@@ -43,7 +43,7 @@ class DeleteWayPlanBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.unlink('trip.plan', [ids]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('Way Plan delete result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -83,7 +83,7 @@ class DeleteWayPlanBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.unlink('hr.employee.line', [ids]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('HrEmployeeLine delete result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
@@ -124,15 +124,15 @@ class DeleteWayPlanBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.unlink('trip.plan.schedule', [ids]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('TripPlanSchedule delete result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
           tripplanscheduleDeleteStreamController.sink.add(responseOb);
         } else {
-          print(
-              'DeleteTripPlanScheduleError:' + res.getErrorMessage().toString());
+          print('DeleteTripPlanScheduleError:' +
+              res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           tripplanscheduleDeleteStreamController.sink.add(responseOb);
@@ -165,15 +165,15 @@ class DeleteWayPlanBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.unlink('trip.plan.delivery', [ids]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('TripPlanDelivery delete result');
           // data = res.getResult()['records'];
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
           tripplandeliveryDeleteStreamController.sink.add(responseOb);
         } else {
-          print(
-              'DeleteTripPlanDeliveryError:' + res.getErrorMessage().toString());
+          print('DeleteTripPlanDeliveryError:' +
+              res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           tripplandeliveryDeleteStreamController.sink.add(responseOb);

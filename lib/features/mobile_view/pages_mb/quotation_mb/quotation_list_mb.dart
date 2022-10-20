@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:smc_mobile/features/mobile_view/pages_mb/quotation_mb/quotation_create_mb.dart';
 import '../../../../dbs/database_helper.dart';
 import '../../../../dbs/sharef.dart';
 import '../../../../obs/response_ob.dart';
@@ -13,6 +12,7 @@ import '../../../../pages/quotation_page/quotation_create_page.dart';
 import '../../../../utils/app_const.dart';
 import '../../../../widgets/quotation_widgets/quotation_card_widget.dart';
 import '../menu_mb/menu_list_mb.dart';
+import 'quotation_create_mb.dart';
 
 class QuotationListMB extends StatefulWidget {
   const QuotationListMB({Key? key}) : super(key: key);

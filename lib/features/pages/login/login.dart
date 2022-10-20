@@ -292,12 +292,12 @@ class _LoginState extends State<Login> {
                                 onPressed: () {
                                   // loginBloc.quotationLogin('admin',
                                   //     'Pr0fess!0n@l', 'smc_db_test');
-                                  loginBloc.quotationLogin(
-                                      'admin', 'admin', 'smc_uat_test');
                                   // loginBloc.quotationLogin(
-                                  //     _emailcontroller.text,
-                                  //     _passwordcontroller.text,
-                                  //     dbName);
+                                  //     'admin', 'admin', 'smc_uat_test');
+                                  loginBloc.quotationLogin(
+                                      _emailcontroller.text,
+                                      _passwordcontroller.text,
+                                      dbName);
                                 },
                                 child: const Text(
                                   'Log in',

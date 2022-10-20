@@ -962,7 +962,7 @@ class _InvoiceDetailMBState extends State<InvoiceDetailMB>
                             Visibility(
                               visible: invoiceList[0]
                                               ['invoice_payment_state'] ==
-                                          'paid' ||
+                                          'paid' &&
                                       typeList.contains(invoiceList[0]['type'])
                                   ? true
                                   : false,

@@ -33,7 +33,7 @@ class InvoiceEditBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.write('account.move', [ids], {'state': state});
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('result');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
@@ -73,7 +73,7 @@ class InvoiceEditBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.callKW('account.move', 'action_post', [ids]);
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('callactionpostresult');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();

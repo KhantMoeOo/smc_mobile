@@ -232,12 +232,15 @@ class _SaleOrderLineMultiCreatePageState
               ? product['product_code']
               : '${product['product_code']} ${product['name']}',
           quantity: '0',
-          qtyDelivered: product['qty_delivered'].toString(),
-          qtyInvoiced: product['qty_invoiced'].toString(),
+          qtyDelivered: '0.0',
+          qtyInvoiced: '0.0',
+          saleDiscount: '0.0',
+          discountId: 0,
+          discountName: '',
           uomName: '',
           uomId: 0,
           unitPrice: '0',
-          taxId: product['tax_ids'].toString(),
+          taxId: '[]',
           taxName: '',
           subTotal: '');
       await databaseHelper.insertOrderLineMultiSelect(saleorderlineOb);

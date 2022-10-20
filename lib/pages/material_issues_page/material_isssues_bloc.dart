@@ -57,7 +57,7 @@ class MaterialIssuesBloc {
               'multi_mr_id',
             ],
             order: 'id asc');
-        if (res.getResult() != null) {
+        if (!res.hasError()) {
           print('PurchaseRequisitionResult:' +
               res.getResult()['records'].toString());
           data = res.getResult()['records'];
