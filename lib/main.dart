@@ -1,15 +1,16 @@
 // @dart = 2.9
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'features/splash_screen/splash_screen.dart';
 import 'pages/login_page/login_page.dart';
 import 'pages/splash_screen_page/splash_screen_page.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
-      .then((value) => runApp(MyApp()));
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
+  //     .then((value) => runApp(MyApp()));
   runApp(const MyApp());
 }
 
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
           //primarySwatch: Color(0xFFf31a22),
           // primaryColor: Color(0xFFf31a22),
           ),
-      home: const SplashScreenPage(),
+      home: const SplashScreen(),
     );
   }
 }

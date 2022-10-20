@@ -43,6 +43,9 @@ class _QuotationListState extends State<QuotationList> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+
     deleteAllDatabase();
     quotationBloc.getQuotationData(
         name: ['name', 'ilike', ''], state: ['id', 'ilike', '']);

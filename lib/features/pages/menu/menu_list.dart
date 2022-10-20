@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:smc_mobile/pages/sale_pricelist_page/sale_pricelist_page.dart';
-import 'package:smc_mobile/pages/sale_pricelist_page/sale_pricelist_type_page.dart';
-import 'package:smc_mobile/pages/way_planning_page/way_planning_page.dart';
 import '../../../dbs/sharef.dart';
 import '../../../obs/response_ob.dart';
 import '../../../pages/logout_page/logout_page.dart';
@@ -12,6 +9,8 @@ import '../../../pages/material_issues_page/material_isssues_bloc.dart';
 import '../../../pages/material_requisition_page/material_requisition_bloc.dart';
 import '../../../pages/product_page/product_bloc.dart';
 import '../../../pages/profile_page/profile_bloc.dart';
+import '../../../pages/sale_pricelist_page/sale_pricelist_type_page.dart';
+import '../../../pages/way_planning_page/way_planning_page.dart';
 import '../../../utils/app_const.dart';
 import '../material_isssues/material_issues_list.dart';
 import '../material_requisition/material_requisition_list.dart';

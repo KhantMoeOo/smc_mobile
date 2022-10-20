@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import '../../features/mobile_view/pages_mb/quotation_mb/quotation_detail_mb.dart';
 import '../../pages/quotation_page/quotation_bloc.dart';
 import '../../pages/quotation_page/quotation_detail_page.dart';
 import '../../utils/app_const.dart';
@@ -69,7 +70,7 @@ class _QuotationCardWidgetState extends State<QuotationCardWidget> {
             color: AppColors.appBarColor,
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return QuotationRecordDetailPage(
+                return QuotationDetailMB(
                     quotationId: widget.quotationId,
                     name: widget.name,
                     userid: widget.userid,

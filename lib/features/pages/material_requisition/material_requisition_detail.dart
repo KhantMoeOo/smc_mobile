@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smc_mobile/features/pages/material_requisition/material_requisition_list.dart';
-
 import '../../../dbs/database_helper.dart';
 import '../../../obs/product_line_ob.dart';
 import '../../../obs/response_ob.dart';
@@ -10,6 +8,7 @@ import '../../../pages/material_requisition_page/material_requisition_create_blo
 import '../../../pages/material_requisition_page/purchase_requisition_bloc.dart';
 import '../../../pages/quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
 import '../../../utils/app_const.dart';
+import 'material_requisition_list.dart';
 
 class MaterialRequisitionDetail extends StatefulWidget {
   Map<String, dynamic> mrList;
@@ -437,9 +436,9 @@ class _MaterialRequisitionDetailState extends State<MaterialRequisitionDetail> {
                                   saleOrderLineWidget = SliverToBoxAdapter(
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -1087,8 +1086,8 @@ class _MaterialRequisitionDetailState extends State<MaterialRequisitionDetail> {
                                       child: Center(
                                         child: Image.asset(
                                           'assets/gifs/loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -1101,8 +1100,8 @@ class _MaterialRequisitionDetailState extends State<MaterialRequisitionDetail> {
                                     child: Center(
                                       child: Image.asset(
                                         'assets/gifs/loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -1124,8 +1123,8 @@ class _MaterialRequisitionDetailState extends State<MaterialRequisitionDetail> {
                                       child: Center(
                                         child: Image.asset(
                                           'assets/gifs/loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -1143,8 +1142,8 @@ class _MaterialRequisitionDetailState extends State<MaterialRequisitionDetail> {
                                     child: Center(
                                       child: Image.asset(
                                         'assets/gifs/loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -1166,8 +1165,8 @@ class _MaterialRequisitionDetailState extends State<MaterialRequisitionDetail> {
                                       child: Center(
                                         child: Image.asset(
                                           'assets/gifs/loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -1185,8 +1184,8 @@ class _MaterialRequisitionDetailState extends State<MaterialRequisitionDetail> {
                                     child: Center(
                                       child: Image.asset(
                                         'assets/gifs/loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );

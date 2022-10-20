@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../dbs/sharef.dart';
 import '../../../obs/response_ob.dart';
@@ -36,6 +37,8 @@ class _LoginState extends State<Login> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     Sharef.clearSessionId();
     loginBloc.getLoginStream().listen((ResponseOb responseOb) {
       if (responseOb.msgState == MsgState.data) {
@@ -177,9 +180,9 @@ class _LoginState extends State<Login> {
                             } else {
                               return Center(
                                 child: Image.asset(
-                                  'assets/gifs/three_circle_loading.gif',
-                                  width: 150,
-                                  height: 150,
+                                  'assets/gifs/loading.gif',
+                                  width: 100,
+                                  height: 100,
                                 ),
                               );
                             }
@@ -273,8 +276,8 @@ class _LoginState extends State<Login> {
                               child: Center(
                                 child: Image.asset(
                                   'assets/gifs/loading.gif',
-                                  width: 150,
-                                  height: 150,
+                                  width: 100,
+                                  height: 100,
                                 ),
                               ),
                             );

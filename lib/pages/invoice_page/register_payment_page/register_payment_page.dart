@@ -265,9 +265,9 @@ class _RegisterPaymentPageState extends State<RegisterPaymentPage> {
                             if (responseOb?.msgState == MsgState.loading) {
                               return Center(
                                 child: Image.asset(
-                                  'assets/gifs/three_circle_loading.gif',
-                                  width: 150,
-                                  height: 150,
+                                  'assets/gifs/loading.gif',
+                                  width: 100,
+                                  height: 100,
                                 ),
                               );
                             } else if (responseOb?.msgState == MsgState.error) {
@@ -437,9 +437,9 @@ class _RegisterPaymentPageState extends State<RegisterPaymentPage> {
                                       MsgState.loading) {
                                     return Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
@@ -613,9 +613,9 @@ class _RegisterPaymentPageState extends State<RegisterPaymentPage> {
                         color: Colors.black.withOpacity(0.5),
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -624,9 +624,9 @@ class _RegisterPaymentPageState extends State<RegisterPaymentPage> {
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
                         child: Image.asset(
-                          'assets/gifs/three_circle_loading.gif',
-                          width: 150,
-                          height: 150,
+                          'assets/gifs/loading.gif',
+                          width: 100,
+                          height: 100,
                         ),
                       ),
                     );
@@ -644,9 +644,9 @@ class _RegisterPaymentPageState extends State<RegisterPaymentPage> {
                         color: Colors.black.withOpacity(0.5),
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -655,9 +655,9 @@ class _RegisterPaymentPageState extends State<RegisterPaymentPage> {
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
                         child: Image.asset(
-                          'assets/gifs/three_circle_loading.gif',
-                          width: 150,
-                          height: 150,
+                          'assets/gifs/loading.gif',
+                          width: 100,
+                          height: 100,
                         ),
                       ),
                     );

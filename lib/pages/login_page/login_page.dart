@@ -251,9 +251,9 @@ class _LoginPageState extends State<LoginPage> {
                                     } else {
                                       return Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       );
                                     }
@@ -373,9 +373,9 @@ class _LoginPageState extends State<LoginPage> {
                                       height: 50,
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -400,12 +400,12 @@ class _LoginPageState extends State<LoginPage> {
                                         onPressed: () {
                                           // loginBloc.quotationLogin('admin',
                                           //     'Pr0fess!0n@l', 'smc_db_test');
-                                          loginBloc.quotationLogin('admin',
-                                              'Pr0fess!0n@l', 'smc_uat');
                                           // loginBloc.quotationLogin(
-                                          //     _emailcontroller.text,
-                                          //     _passwordcontroller.text,
-                                          //     dbName);
+                                          //     'admin', 'admin', 'smc_uat_test');
+                                          loginBloc.quotationLogin(
+                                              _emailcontroller.text,
+                                              _passwordcontroller.text,
+                                              dbName);
                                         },
                                         child: const Text(
                                           'Log in',

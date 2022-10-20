@@ -717,9 +717,9 @@ class _MultiMaterialProductLinePageState
                 color: Colors.white,
                 child: Center(
                   child: Image.asset(
-                    'assets/gifs/three_circle_loading.gif',
-                    width: 150,
-                    height: 150,
+                    'assets/gifs/loading.gif',
+                    width: 100,
+                    height: 100,
                   ),
                 ),
               );
@@ -775,7 +775,7 @@ class _MultiMaterialProductLinePageState
                                   return e.isSelect != 1
                                       ? Container()
                                       : Container(
-                                          //width: 150,
+                                          //width: 100,
                                           //padding: const EdgeInsets.all(8),
                                           decoration: BoxDecoration(
                                               color: Colors.grey,
@@ -823,9 +823,9 @@ class _MultiMaterialProductLinePageState
                           return Container(
                             child: Center(
                               child: Image.asset(
-                                'assets/gifs/three_circle_loading.gif',
-                                width: 150,
-                                height: 150,
+                                'assets/gifs/loading.gif',
+                                width: 100,
+                                height: 100,
                               ),
                             ),
                           );
@@ -860,7 +860,7 @@ class _MultiMaterialProductLinePageState
                             )),
                         Container(
                             padding: const EdgeInsets.all(8),
-                            width: 150,
+                            width: 100,
                             child: const Text(
                               'UOM',
                               style: TextStyle(
@@ -1102,11 +1102,11 @@ class _MultiMaterialProductLinePageState
                                                                   return Center(
                                                                     child: Image
                                                                         .asset(
-                                                                      'assets/gifs/three_circle_loading.gif',
+                                                                      'assets/gifs/loading.gif',
                                                                       width:
-                                                                          150,
+                                                                          100,
                                                                       height:
-                                                                          150,
+                                                                          100,
                                                                     ),
                                                                   );
                                                                 } else if (responseOb
@@ -1318,7 +1318,7 @@ class _MultiMaterialProductLinePageState
                                                           .quantity),
                                                 ),
                                                 Container(
-                                                  width: 150,
+                                                  width: 100,
                                                   child: Text(
                                                       productlineDBList![i]
                                                           .uomName),

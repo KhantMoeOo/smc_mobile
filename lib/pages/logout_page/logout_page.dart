@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/mobile_view/pages_mb/login_mb/login_mb.dart';
 import '../../features/pages/login/login.dart';
 import '../../obs/response_ob.dart';
 import '../login_page/login_page.dart';
@@ -20,8 +21,11 @@ class _LogoutPageState extends State<LogoutPage> {
     // TODO: implement initState
     super.initState();
     logoutBloc.smcLogout();
-    logoutBloc.getLogoutStream().listen((ResponseOb responseOb) {
-      if (responseOb.msgState == MsgState.data) {
+    logoutBloc.getLogoutStream().listen(getLogoutListen);
+  }
+
+  void getLogoutListen(ResponseOb responseOb){
+    if (responseOb.msgState == MsgState.data) {
         final snackbar = SnackBar(
             elevation: 0.0,
             shape:
@@ -34,7 +38,7 @@ class _LogoutPageState extends State<LogoutPage> {
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return const Login();
+          return MediaQuery.of(context).size.width > 400.0? const Login(): const LoginMB();
         }), (route) => false);
       } else if (responseOb.msgState == MsgState.error) {
         final snackbar = SnackBar(
@@ -48,7 +52,6 @@ class _LogoutPageState extends State<LogoutPage> {
                 textAlign: TextAlign.center));
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
-    });
   }
 
   @override
@@ -61,9 +64,9 @@ class _LogoutPageState extends State<LogoutPage> {
           ResponseOb? responseOb = snapshot.data;
           return Center(
             child: Image.asset(
-              'assets/gifs/three_circle_loading.gif',
-              width: 150,
-              height: 150,
+              'assets/gifs/loading.gif',
+              width: 100,
+              height: 100,
             ),
           );
         },

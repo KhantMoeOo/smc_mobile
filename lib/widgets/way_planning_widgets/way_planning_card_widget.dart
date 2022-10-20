@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import '../../features/mobile_view/pages_mb/way_plan_mb/way_plan_detail_mb.dart';
 import '../../pages/way_planning_page/way_planning_bloc.dart';
 import '../../pages/way_planning_page/way_planning_detail_page.dart';
 import '../../utils/app_const.dart';
@@ -47,7 +48,7 @@ class _WayPlanningCardWidgetState extends State<WayPlanningCardWidget> {
             color: AppColors.appBarColor,
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return WayPlanningDetailPage(
+                return WayPlanningDetailMB(
                   wayplanid: widget.wayplanid,
                   tripId: widget.tripId,
                   name: widget.name,

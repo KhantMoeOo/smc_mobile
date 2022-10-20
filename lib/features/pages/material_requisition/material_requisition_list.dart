@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:smc_mobile/pages/material_requisition_page/material_requisition_create_page.dart';
 
 import '../../../dbs/database_helper.dart';
 import '../../../dbs/sharef.dart';
 import '../../../obs/response_ob.dart';
 import '../../../pages/material_requisition_page/material_requisition_bloc.dart';
+import '../../../pages/material_requisition_page/material_requisition_create_page.dart';
 import '../../../pages/profile_page/profile_bloc.dart';
 import '../../../utils/app_const.dart';
 import '../menu/menu_list.dart';
@@ -173,7 +173,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                             width: 2,
                           ),
                           SizedBox(
-                              width: 150,
+                              width: 100,
                               child: Text('Request Person',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold))),
@@ -181,7 +181,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                             width: 2,
                           ),
                           SizedBox(
-                              width: 150,
+                              width: 100,
                               child: Text('Department',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold))),
@@ -189,7 +189,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                             width: 2,
                           ),
                           SizedBox(
-                              width: 150,
+                              width: 100,
                               child: Text('Order Date',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold))),
@@ -197,7 +197,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                             width: 2,
                           ),
                           SizedBox(
-                              width: 150,
+                              width: 100,
                               child: Text('Scheduled Date',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold))),
@@ -261,7 +261,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                                         width: 2,
                                       ),
                                       SizedBox(
-                                        width: 150,
+                                        width: 100,
                                         child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -279,7 +279,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                                         width: 2,
                                       ),
                                       SizedBox(
-                                        width: 150,
+                                        width: 100,
                                         child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -297,7 +297,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                                         width: 2,
                                       ),
                                       SizedBox(
-                                        width: 150,
+                                        width: 100,
                                         child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -315,7 +315,7 @@ class _MaterialRequisitionListState extends State<MaterialRequisitionList> {
                                         width: 2,
                                       ),
                                       SizedBox(
-                                        width: 150,
+                                        width: 100,
                                         child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,

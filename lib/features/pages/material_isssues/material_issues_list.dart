@@ -373,7 +373,7 @@ class _MaterialIssuesListState extends State<MaterialIssuesList> {
                                                               width: 2,
                                                             ),
                                                             SizedBox(
-                                                                width: 150,
+                                                                width: 100,
                                                                 child: Text(
                                                                     'From',
                                                                     style: TextStyle(
@@ -383,7 +383,7 @@ class _MaterialIssuesListState extends State<MaterialIssuesList> {
                                                               width: 2,
                                                             ),
                                                             SizedBox(
-                                                                width: 150,
+                                                                width: 100,
                                                                 child: Text(
                                                                     'To',
                                                                     style: TextStyle(
@@ -403,7 +403,7 @@ class _MaterialIssuesListState extends State<MaterialIssuesList> {
                                                               width: 2,
                                                             ),
                                                             SizedBox(
-                                                                width: 150,
+                                                                width: 100,
                                                                 child: Text(
                                                                     'Scheduled Date',
                                                                     style: TextStyle(
@@ -488,7 +488,7 @@ class _MaterialIssuesListState extends State<MaterialIssuesList> {
                                                                         ),
                                                                         SizedBox(
                                                                           width:
-                                                                              150,
+                                                                              100,
                                                                           child: Column(
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               mainAxisAlignment: MainAxisAlignment.start,
@@ -502,7 +502,7 @@ class _MaterialIssuesListState extends State<MaterialIssuesList> {
                                                                         ),
                                                                         SizedBox(
                                                                           width:
-                                                                              150,
+                                                                              100,
                                                                           child: Column(
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               mainAxisAlignment: MainAxisAlignment.start,
@@ -530,7 +530,7 @@ class _MaterialIssuesListState extends State<MaterialIssuesList> {
                                                                         ),
                                                                         SizedBox(
                                                                           width:
-                                                                              150,
+                                                                              100,
                                                                           child: Column(
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               mainAxisAlignment: MainAxisAlignment.start,

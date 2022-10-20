@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:smc_mobile/features/pages/material_requisition/material_requisition_list.dart';
 import '../../dbs/database_helper.dart';
 import '../../dbs/sharef.dart';
+import '../../features/pages/material_requisition/material_requisition_list.dart';
 import '../../obs/product_line_ob.dart';
 import '../../obs/response_ob.dart';
 import '../../utils/app_const.dart';
@@ -735,9 +735,9 @@ class _MaterialRequisitionCreatePageState
                           productlineWidget = SliverToBoxAdapter(
                             child: Center(
                               child: Image.asset(
-                                'assets/gifs/three_circle_loading.gif',
-                                width: 150,
-                                height: 150,
+                                'assets/gifs/loading.gif',
+                                width: 100,
+                                height: 100,
                               ),
                             ),
                           );
@@ -907,9 +907,9 @@ class _MaterialRequisitionCreatePageState
                                                           color: Colors.white,
                                                           child: Center(
                                                             child: Image.asset(
-                                                              'assets/gifs/three_circle_loading.gif',
-                                                              width: 150,
-                                                              height: 150,
+                                                              'assets/gifs/loading.gif',
+                                                              width: 100,
+                                                              height: 100,
                                                             ),
                                                           ),
                                                         ));
@@ -1086,9 +1086,9 @@ class _MaterialRequisitionCreatePageState
                                                           color: Colors.white,
                                                           child: Center(
                                                             child: Image.asset(
-                                                              'assets/gifs/three_circle_loading.gif',
-                                                              width: 150,
-                                                              height: 150,
+                                                              'assets/gifs/loading.gif',
+                                                              width: 100,
+                                                              height: 100,
                                                             ),
                                                           ),
                                                         ));
@@ -1176,9 +1176,9 @@ class _MaterialRequisitionCreatePageState
                                                           MsgState.loading) {
                                                         return Center(
                                                           child: Image.asset(
-                                                            'assets/gifs/three_circle_loading.gif',
-                                                            width: 150,
-                                                            height: 150,
+                                                            'assets/gifs/loading.gif',
+                                                            width: 100,
+                                                            height: 100,
                                                           ),
                                                         );
                                                       } else if (responseOb
@@ -1250,9 +1250,9 @@ class _MaterialRequisitionCreatePageState
                                             //             MsgState.loading) {
                                             //           return Center(
                                             //             child: Image.asset(
-                                            //               'assets/gifs/three_circle_loading.gif',
-                                            //               width: 150,
-                                            //               height: 150,
+                                            //               'assets/gifs/loading.gif',
+                                            //               width: 100,
+                                            //               height: 100,
                                             //             ),
                                             //           );
                                             //         } else if (responseOb
@@ -1543,9 +1543,9 @@ class _MaterialRequisitionCreatePageState
                                                         MsgState.loading) {
                                                       return Center(
                                                         child: Image.asset(
-                                                          'assets/gifs/three_circle_loading.gif',
-                                                          width: 150,
-                                                          height: 150,
+                                                          'assets/gifs/loading.gif',
+                                                          width: 100,
+                                                          height: 100,
                                                         ),
                                                       );
                                                     } else if (responseOb
@@ -1745,9 +1745,9 @@ class _MaterialRequisitionCreatePageState
                             color: Colors.black.withOpacity(0.5),
                             child: Center(
                               child: Image.asset(
-                                'assets/gifs/three_circle_loading.gif',
-                                width: 150,
-                                height: 150,
+                                'assets/gifs/loading.gif',
+                                width: 100,
+                                height: 100,
                               ),
                             ),
                           );
@@ -1769,9 +1769,9 @@ class _MaterialRequisitionCreatePageState
                             color: Colors.black.withOpacity(0.5),
                             child: Center(
                               child: Image.asset(
-                                'assets/gifs/three_circle_loading.gif',
-                                width: 150,
-                                height: 150,
+                                'assets/gifs/loading.gif',
+                                width: 100,
+                                height: 100,
                               ),
                             ),
                           );

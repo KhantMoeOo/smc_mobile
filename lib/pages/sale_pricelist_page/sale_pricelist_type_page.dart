@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import '../../features/mobile_view/pages_mb/menu_mb/menu_list_mb.dart';
 import '../../features/pages/menu/menu_list.dart';
 import '../../utils/app_const.dart';
 import '../../widgets/drawer_widget.dart';
@@ -50,7 +51,7 @@ class _SalePricelistTypePageState extends State<SalePricelistTypePage> {
                 onPressed: () {
                   Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
-                    return MenuList();
+                    return MediaQuery.of(context).size.width > 400.0 ? MenuList(): MenuListMB();
                   }));
                 },
                 icon: const Icon(Icons.menu),

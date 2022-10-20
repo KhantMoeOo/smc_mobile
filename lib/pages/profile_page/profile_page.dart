@@ -85,8 +85,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             children: [
                               // Center(
                               //   child: Container(
-                              //     width: 150,
-                              //     height: 150,
+                              //     width: 100,
+                              //     height: 100,
                               //     decoration: BoxDecoration(
                               //         shape: BoxShape.circle,
                               //         image: DecorationImage(
@@ -97,8 +97,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               // ),
                               Center(
                                   child: SizedBox(
-                                height: 150,
-                                width: 150,
+                                height: 100,
+                                width: 100,
                                 child: CircleAvatar(
                                   backgroundImage: MemoryImage(base64Decode(
                                       profileList[i]['image_128'])),
@@ -439,9 +439,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Colors.white,
                 child: Center(
                   child: Image.asset(
-                    'assets/gifs/three_circle_loading.gif',
-                    width: 150,
-                    height: 150,
+                    'assets/gifs/loading.gif',
+                    width: 100,
+                    height: 100,
                   ),
                 ));
           }

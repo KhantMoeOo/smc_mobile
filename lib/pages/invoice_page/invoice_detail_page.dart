@@ -200,9 +200,9 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                     color: Colors.white,
                     child: Center(
                       child: Image.asset(
-                        'assets/gifs/three_circle_loading.gif',
-                        width: 150,
-                        height: 150,
+                        'assets/gifs/loading.gif',
+                        width: 100,
+                        height: 100,
                       ),
                     ));
               } else if (responseOb?.msgState == MsgState.error) {
@@ -705,7 +705,7 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                               child: Align(
                                 alignment: Alignment.topRight,
                                 child: Container(
-                                  // width: 150,
+                                  // width: 100,
                                   // height: 60,
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
@@ -1071,9 +1071,9 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                     color: Colors.white,
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ));
                               } else if (responseOb?.msgState ==

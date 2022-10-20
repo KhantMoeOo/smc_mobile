@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:smc_mobile/pages/delivery_page/delivery_create_bloc.dart';
-import 'package:smc_mobile/pages/quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
-
 import '../../../dbs/database_helper.dart';
 import '../../../dbs/sharef.dart';
 import '../../../obs/response_ob.dart';
 import '../../../obs/stock_move_ob.dart';
 import '../../../pages/delivery_page/delivery_bloc.dart';
+import '../../../pages/delivery_page/delivery_create_bloc.dart';
 import '../../../pages/material_issues_page/material_isssues_bloc.dart';
+import '../../../pages/quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
 import '../../../utils/app_const.dart';
 import 'material_issues_list.dart';
 
@@ -197,7 +196,7 @@ class _MaterialIssuesDetailState extends State<MaterialIssuesDetail> {
                                           child: Row(
                                             children: [
                                               SizedBox(
-                                                width: 150,
+                                                width: 100,
                                                 child: Column(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
@@ -941,7 +940,7 @@ class _MaterialIssuesDetailState extends State<MaterialIssuesDetail> {
                                                               .spaceBetween,
                                                       children: const [
                                                         SizedBox(
-                                                            width: 150,
+                                                            width: 100,
                                                             child: Text(
                                                                 'Product Code',
                                                                 style: TextStyle(

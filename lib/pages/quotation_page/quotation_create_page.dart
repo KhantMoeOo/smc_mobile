@@ -1833,9 +1833,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                       saleOrderLineWidget = SliverToBoxAdapter(
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -2002,9 +2002,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                       MsgState.loading) {
                                                     return Center(
                                                       child: Image.asset(
-                                                        'assets/gifs/three_circle_loading.gif',
-                                                        width: 150,
-                                                        height: 150,
+                                                        'assets/gifs/loading.gif',
+                                                        width: 100,
+                                                        height: 100,
                                                       ),
                                                     );
                                                   } else if (responseOb
@@ -2040,8 +2040,8 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                       },
                                                       showSearchBox: false,
                                                       showSelectedItems: true,
-                                                      showClearButton:
-                                                          !hasNotSegmentFilter,
+                                                      // showClearButton:
+                                                      //     !hasNotSegmentFilter,
                                                       items: segmentList
                                                           .map((e) =>
                                                               '${e['id']},${e['name']}')
@@ -2086,9 +2086,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                               MsgState.loading) {
                                             return Center(
                                               child: Image.asset(
-                                                'assets/gifs/three_circle_loading.gif',
-                                                width: 150,
-                                                height: 150,
+                                                'assets/gifs/loading.gif',
+                                                width: 100,
+                                                height: 100,
                                               ),
                                             );
                                           } else if (responseOb?.msgState ==
@@ -2463,9 +2463,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                               MsgState.loading) {
                                             return Center(
                                               child: Image.asset(
-                                                'assets/gifs/three_circle_loading.gif',
-                                                width: 150,
-                                                height: 150,
+                                                'assets/gifs/loading.gif',
+                                                width: 100,
+                                                height: 100,
                                               ),
                                             );
                                           } else if (responseOb?.msgState ==
@@ -2883,9 +2883,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                                                   color: Colors.white,
                                                   child: Center(
                                                     child: Image.asset(
-                                                      'assets/gifs/three_circle_loading.gif',
-                                                      width: 150,
-                                                      height: 150,
+                                                      'assets/gifs/loading.gif',
+                                                      width: 100,
+                                                      height: 100,
                                                     ),
                                                   ),
                                                 ),
@@ -3044,9 +3044,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                           color: Colors.black.withOpacity(0.5),
                           child: Center(
                             child: Image.asset(
-                              'assets/gifs/three_circle_loading.gif',
-                              width: 150,
-                              height: 150,
+                              'assets/gifs/loading.gif',
+                              width: 100,
+                              height: 100,
                             ),
                           ),
                         );
@@ -3067,9 +3067,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                           color: Colors.black.withOpacity(0.5),
                           child: Center(
                             child: Image.asset(
-                              'assets/gifs/three_circle_loading.gif',
-                              width: 150,
-                              height: 150,
+                              'assets/gifs/loading.gif',
+                              width: 100,
+                              height: 100,
                             ),
                           ),
                         );
@@ -3078,9 +3078,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                         color: Colors.black.withOpacity(0.5),
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -3097,9 +3097,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                           color: Colors.black.withOpacity(0.5),
                           child: Center(
                             child: Image.asset(
-                              'assets/gifs/three_circle_loading.gif',
-                              width: 150,
-                              height: 150,
+                              'assets/gifs/loading.gif',
+                              width: 100,
+                              height: 100,
                             ),
                           ),
                         );
@@ -3108,9 +3108,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                         color: Colors.black.withOpacity(0.5),
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -3127,9 +3127,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                           color: Colors.black.withOpacity(0.5),
                           child: Center(
                             child: Image.asset(
-                              'assets/gifs/three_circle_loading.gif',
-                              width: 150,
-                              height: 150,
+                              'assets/gifs/loading.gif',
+                              width: 100,
+                              height: 100,
                             ),
                           ),
                         );
@@ -3138,9 +3138,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                         color: Colors.black.withOpacity(0.5),
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -3157,9 +3157,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                           color: Colors.black.withOpacity(0.5),
                           child: Center(
                             child: Image.asset(
-                              'assets/gifs/three_circle_loading.gif',
-                              width: 150,
-                              height: 150,
+                              'assets/gifs/loading.gif',
+                              width: 100,
+                              height: 100,
                             ),
                           ),
                         );
@@ -3168,9 +3168,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                         color: Colors.black.withOpacity(0.5),
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -3188,9 +3188,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                           color: Colors.black.withOpacity(0.5),
                           child: Center(
                             child: Image.asset(
-                              'assets/gifs/three_circle_loading.gif',
-                              width: 150,
-                              height: 150,
+                              'assets/gifs/loading.gif',
+                              width: 100,
+                              height: 100,
                             ),
                           ),
                         );
@@ -3199,9 +3199,9 @@ class _QuotationNewPageState extends State<QuotationNewPage> {
                         color: Colors.black.withOpacity(0.5),
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );

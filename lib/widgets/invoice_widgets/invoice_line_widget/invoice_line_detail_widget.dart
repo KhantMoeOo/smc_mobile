@@ -415,9 +415,9 @@ class InvoiceLineDetailWidgetState extends State<InvoiceLineDetailWidget> {
             invoicelineWidget = SliverToBoxAdapter(
               child: Center(
                 child: Image.asset(
-                  'assets/gifs/three_circle_loading.gif',
-                  width: 150,
-                  height: 150,
+                  'assets/gifs/loading.gif',
+                  width: 100,
+                  height: 100,
                 ),
               ),
             );
@@ -788,7 +788,7 @@ class InvoiceLineDetailWidgetState extends State<InvoiceLineDetailWidget> {
                 ),
               ),
               const SliverToBoxAdapter(
-                child: SizedBox(height: 150),
+                child: SizedBox(height: 100),
               ),
             ],
           );

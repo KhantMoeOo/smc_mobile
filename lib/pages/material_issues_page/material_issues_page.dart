@@ -181,9 +181,9 @@ class _MaterialIssuesPageState extends State<MaterialIssuesPage> {
             color: Colors.white,
             child: Center(
               child: Image.asset(
-                'assets/gifs/three_circle_loading.gif',
-                width: 150,
-                height: 150,
+                'assets/gifs/loading.gif',
+                width: 100,
+                height: 100,
               ),
             ),
           );
@@ -206,9 +206,9 @@ class _MaterialIssuesPageState extends State<MaterialIssuesPage> {
                     color: Colors.white,
                     child: Center(
                       child: Image.asset(
-                        'assets/gifs/three_circle_loading.gif',
-                        width: 150,
-                        height: 150,
+                        'assets/gifs/loading.gif',
+                        width: 100,
+                        height: 100,
                       ),
                     ),
                   );
@@ -230,9 +230,9 @@ class _MaterialIssuesPageState extends State<MaterialIssuesPage> {
                             color: Colors.white,
                             child: Center(
                               child: Image.asset(
-                                'assets/gifs/three_circle_loading.gif',
-                                width: 150,
-                                height: 150,
+                                'assets/gifs/loading.gif',
+                                width: 100,
+                                height: 100,
                               ),
                             ),
                           );
@@ -253,9 +253,9 @@ class _MaterialIssuesPageState extends State<MaterialIssuesPage> {
                                     color: Colors.white,
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -280,9 +280,9 @@ class _MaterialIssuesPageState extends State<MaterialIssuesPage> {
                                             color: Colors.white,
                                             child: Center(
                                               child: Image.asset(
-                                                'assets/gifs/three_circle_loading.gif',
-                                                width: 150,
-                                                height: 150,
+                                                'assets/gifs/loading.gif',
+                                                width: 100,
+                                                height: 100,
                                               ),
                                             ),
                                           );

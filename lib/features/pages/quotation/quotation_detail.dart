@@ -506,12 +506,12 @@ class _QuotationDetailState extends State<QuotationDetail> {
     return WillPopScope(
       onWillPop: () async {
         await databaseHelper.deleteAllSaleOrderLineUpdate();
-          await databaseHelper.deleteAllTripPlanDeliveryUpdate();
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) {
-            return QuotationList();
-          }), (route) => false);
-          return true;
+        await databaseHelper.deleteAllTripPlanDeliveryUpdate();
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) {
+          return QuotationList();
+        }), (route) => false);
+        return true;
       },
       child: SafeArea(
           child: StreamBuilder<ResponseOb>(
@@ -1120,9 +1120,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                   saleOrderLineWidget = SliverToBoxAdapter(
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2163,7 +2163,7 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                                 ),
                                               ),
                                               const SliverToBoxAdapter(
-                                                child: SizedBox(height: 150),
+                                                child: SizedBox(height: 100),
                                               ),
                                             ],
                                           ),
@@ -2190,9 +2190,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                         color: Colors.white,
                                         child: Center(
                                           child: Image.asset(
-                                            'assets/gifs/three_circle_loading.gif',
-                                            width: 150,
-                                            height: 150,
+                                            'assets/gifs/loading.gif',
+                                            width: 100,
+                                            height: 100,
                                           ),
                                         ));
                                   }
@@ -2218,9 +2218,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                         color: Colors.white,
                                         child: Center(
                                           child: Image.asset(
-                                            'assets/gifs/three_circle_loading.gif',
-                                            width: 150,
-                                            height: 150,
+                                            'assets/gifs/loading.gif',
+                                            width: 100,
+                                            height: 100,
                                           ),
                                         ));
                                   } else if (responseOb?.msgState ==
@@ -2247,9 +2247,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2259,9 +2259,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2282,9 +2282,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2294,9 +2294,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2317,9 +2317,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2341,9 +2341,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2364,9 +2364,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2376,9 +2376,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2399,9 +2399,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2411,9 +2411,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2433,9 +2433,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2445,9 +2445,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2468,9 +2468,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2480,9 +2480,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2503,9 +2503,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2515,9 +2515,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2538,9 +2538,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2559,9 +2559,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
                                       child: Image.asset(
-                                        'assets/gifs/three_circle_loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );
@@ -2582,9 +2582,9 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                       color: Colors.black.withOpacity(0.5),
                                       child: Center(
                                         child: Image.asset(
-                                          'assets/gifs/three_circle_loading.gif',
-                                          width: 150,
-                                          height: 150,
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
                                         ),
                                       ),
                                     );
@@ -2595,8 +2595,8 @@ class _QuotationDetailState extends State<QuotationDetail> {
                                     child: Center(
                                       child: Image.asset(
                                         'assets/gifs/loading.gif',
-                                        width: 150,
-                                        height: 150,
+                                        width: 100,
+                                        height: 100,
                                       ),
                                     ),
                                   );

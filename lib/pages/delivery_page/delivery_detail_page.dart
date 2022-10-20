@@ -437,9 +437,9 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
                             stockmoveWidget = SliverToBoxAdapter(
                               child: Center(
                                 child: Image.asset(
-                                  'assets/gifs/three_circle_loading.gif',
-                                  width: 150,
-                                  height: 150,
+                                  'assets/gifs/loading.gif',
+                                  width: 100,
+                                  height: 100,
                                 ),
                               ),
                             );
@@ -846,7 +846,7 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
                                 child: Align(
                                   alignment: Alignment.topRight,
                                   child: Container(
-                                    // width: 150,
+                                    // width: 100,
                                     // height: 60,
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
@@ -1257,9 +1257,9 @@ class _DeliveryDetailPageState extends State<DeliveryDetailPage> {
                     color: Colors.white,
                     child: Center(
                       child: Image.asset(
-                        'assets/gifs/three_circle_loading.gif',
-                        width: 150,
-                        height: 150,
+                        'assets/gifs/loading.gif',
+                        width: 100,
+                        height: 100,
                       ),
                     ),
                   );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../dbs/sharef.dart';
 import '../../features/pages/login/login.dart';
 import '../../features/pages/quotation/quotation_list.dart';
@@ -16,6 +17,12 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   @override
   void initState() {
     // TODO: implement initState
+
+    //  SystemChrome.setPreferredOrientations(
+    //         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
+    //     :
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     super.initState();
     checkLogin();
   }
@@ -26,7 +33,9 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
       if (userInfo == true) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return const QuotationList();
+          return MediaQuery.of(context).size.width > 400.0
+              ? const QuotationList()
+              : const QuotationListPage();
         }), (route) => false);
       } else {
         // Navigator.of(context).pushAndRemoveUntil(
@@ -35,7 +44,9 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
         // }), (route) => false);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return const Login();
+          return MediaQuery.of(context).size.width > 400.0
+              ? const Login()
+              : const LoginPage();
         }), (route) => false);
       }
     });

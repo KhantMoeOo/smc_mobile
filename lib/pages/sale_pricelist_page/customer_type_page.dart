@@ -127,9 +127,9 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                   color: Colors.white,
                   child: Center(
                     child: Image.asset(
-                      'assets/gifs/three_circle_loading.gif',
-                      width: 150,
-                      height: 150,
+                      'assets/gifs/loading.gif',
+                      width: 100,
+                      height: 100,
                     ),
                   ),
                 );
@@ -152,9 +152,9 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                         color: Colors.white,
                         child: Center(
                           child: Image.asset(
-                            'assets/gifs/three_circle_loading.gif',
-                            width: 150,
-                            height: 150,
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       );
@@ -280,7 +280,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                             Container(
                                                 padding:
                                                     const EdgeInsets.all(8),
-                                                width: 150,
+                                                width: 100,
                                                 child: const Text(
                                                   'Product',
                                                   style: TextStyle(
@@ -352,7 +352,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                                                   padding:
                                                                       const EdgeInsets
                                                                           .all(8),
-                                                                  width: 150,
+                                                                  width: 100,
                                                                   child: Text(
                                                                     '${salepricelistproductlineList[i]['product_id'][1]} ${salepricelistproductlineList[i]['code']}',
                                                                     style:
