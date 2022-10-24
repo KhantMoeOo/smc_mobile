@@ -63,14 +63,14 @@ class _ProfileMBState extends State<ProfileMB> {
                 appBar: AppBar(
                   backgroundColor: AppColors.appBarColor,
                   leading: IconButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return const MenuListMB();
-                    }));
-                  },
-                  icon: const Icon(Icons.menu),
-                ),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return const MenuListMB();
+                      }));
+                    },
+                    icon: const Icon(Icons.menu),
+                  ),
                   title: const Text("My Profile"),
                 ),
                 body: Padding(
@@ -103,15 +103,26 @@ class _ProfileMBState extends State<ProfileMB> {
                               //                 profileList[i]['image_128'])))),
                               //   ),
                               // ),
-                              Center(
-                                  child: SizedBox(
-                                height: 100,
-                                width: 100,
-                                child: CircleAvatar(
-                                  backgroundImage: MemoryImage(base64Decode(
-                                      profileList[i]['image_128'])),
-                                ),
-                              )),
+                              profileList[i]['image_128'] == false
+                                  ? Container(
+                                      width: 100,
+                                      height: 100,
+                                      decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  'assets/imgs/person_icon.png'))),
+                                    )
+                                  : Center(
+                                      child: SizedBox(
+                                      height: 100,
+                                      width: 100,
+                                      child: CircleAvatar(
+                                        backgroundImage: MemoryImage(
+                                            base64Decode(
+                                                profileList[i]['image_128'])),
+                                      ),
+                                    )),
                               const SizedBox(height: 50),
                               Row(
                                 children: [

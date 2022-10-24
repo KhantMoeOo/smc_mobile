@@ -12,11 +12,17 @@ class QuotationCreateBloc {
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getCreateNewStream() => createNewStreamController.stream;
 
+  StreamController<ResponseOb> callDiscountandPromotionController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getCallDiscountandPromotionStream() =>
+      callDiscountandPromotionController.stream;
+
   late Odoo odoo;
 
   quotationCreate(
       {warehouseId,
       customerId,
+      partnerId,
       currencyId,
       exchangeRate,
       dateOrder,
@@ -40,6 +46,7 @@ class QuotationCreateBloc {
           'warehouse_id': warehouseId,
           'partner_id': customerId,
           'currency_id': currencyId,
+          'partner_id': partnerId,
           'exchange_rate': exchangeRate,
           'date_order': dateOrder,
           'pricelist_id': priceListId,
@@ -81,7 +88,48 @@ class QuotationCreateBloc {
     }
   }
 
+  getDiscountandPromo({id}) async {
+    print('Get Call Promo and Disocunt');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    callDiscountandPromotionController.sink.add(responseOb);
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res = await odoo
+            .callKW('sale.order', 'constrains_customer_credit_limit', [id]);
+        if (!res.hasError()) {
+          print('Get Call Promo and Disocunt Result: ${res.getResult()}');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          callDiscountandPromotionController.sink.add(responseOb);
+        } else {
+          print('Get Call Promo and Disocunt Error:' +
+              res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          callDiscountandPromotionController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        callDiscountandPromotionController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        callDiscountandPromotionController.sink.add(responseOb);
+      }
+    }
+  } // Get Call Promo and Disocunt
+
   dispose() {
     createNewStreamController.close();
+    callDiscountandPromotionController.close();
   }
 }

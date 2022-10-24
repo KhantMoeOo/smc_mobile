@@ -179,7 +179,7 @@ class ProfileBloc {
     String userId = '';
     print('EntergetResUsersData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
-    resusersStreamController.sink.add(responseOb);
+    //resusersStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
     try {

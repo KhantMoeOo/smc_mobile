@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:provider/provider.dart';
+import 'package:smc_mobile/features/mobile_view/pages_mb/error_mb/no_internet_connection_mb.dart';
 import '../../../../dbs/database_helper.dart';
 import '../../../../dbs/sharef.dart';
 import '../../../../obs/response_ob.dart';
@@ -39,6 +42,7 @@ class _QuotationListMBState extends State<QuotationListMB> {
 
   late double screenHeight;
   late double screenWidth;
+  late var listener;
 
   @override
   void initState() {
@@ -48,9 +52,27 @@ class _QuotationListMBState extends State<QuotationListMB> {
     // screenWidth = MediaQuery.of(context).size.width;
 
     deleteAllDatabase();
+    // listener = InternetConnectionChecker().onStatusChange.listen((status) {
+    //   print('listen');
+    //   switch (status) {
+    //     case InternetConnectionStatus.connected:
+    //       print('Data connection is 1 available.');
+    //       quotationBloc.getQuotationData(
+    //           name: ['name', 'ilike', ''], state: ['id', 'ilike', '']);
+    //       break;
+    //     case InternetConnectionStatus.disconnected:
+    //       print('You are disconnected from the internet.');
+    //       Navigator.of(context).pushAndRemoveUntil(
+    //           MaterialPageRoute(builder: (context) {
+    //         return NoInternetConnectionMB();
+    //       }), (route) => false);
+    //       break;
+    //   }
+    // });
     quotationBloc.getQuotationData(
-        name: ['name', 'ilike', ''], state: ['id', 'ilike', '']);
+              name: ['name', 'ilike', ''], state: ['id', 'ilike', '']);
     quotationBloc.getQuotationStream().listen(getQuotationListListen);
+
     // scrollController.addListener(scrollListener);
   }
 
@@ -123,7 +145,7 @@ class _QuotationListMBState extends State<QuotationListMB> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    quotationBloc.dipose();
+    listener.cancel();
     scrollController.dispose();
     searchController.dispose();
   }

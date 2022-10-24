@@ -188,6 +188,8 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
   bool hasNotFilter = true;
   String filterName = '';
 
+  bool isCallPromoDiscount = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -248,48 +250,18 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
         .waitingproductlineListStream()
         .listen(getproductlineListListen);
 
-    saleorderlineBloc
-        .getproductlineListStream()
-        .listen(getSaleOrderLineWithIDListen);
+    // saleorderlineBloc
+    //     .getproductlineListStream()
+    //     .listen(getSaleOrderLineWithIDListen);
 
-    quotationEditBloc
-        .getUpdateQuotationOrderLineStream()
-        .listen(getQuotationOrderLineUpdateListen);
+    quotationCreateBloc
+        .getCallDiscountandPromotionStream()
+        .listen(getCallDiscountandPromoListen);
     // quotationBloc.getQuotationWithIdStream().listen(getQuotationListListen);
     // quotationEditBloc.getQuotationEditStream().listen(getQuotationEditListen);
   }
 
-  // void getQuotationEditListen(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     isQuotationEdit = true;
-  //     final snackbar = SnackBar(
-  //         elevation: 0.0,
-  //         shape:
-  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-  //         behavior: SnackBarBehavior.floating,
-  //         duration: const Duration(seconds: 1),
-  //         backgroundColor: Colors.green,
-  //         content:
-  //             const Text('Create Successfully!', textAlign: TextAlign.center));
-  //     Navigator.of(context).pushAndRemoveUntil(
-  //         MaterialPageRoute(builder: (context) {
-  //       return QuotationListPage();
-  //     }), (route) => false);
-  //     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  //   } else if (responseOb.msgState == MsgState.error) {
-  //     print('Error Update Quotation');
-  //   }
-  // } // Get Quotation Edit List Listen
-
-  // @override
-  // void didChangeDependencies() {
-  //   // TODO: implement didChangeDependencies
-  //   super.didChangeDependencies();
-  //   print('DIDchange');
-  //   // quotationBloc.getCustomerList();
-  //   // quotationBloc.getCustomerStream().listen(getCustomerList);
-  // }
-  void getQuotationOrderLineUpdateListen(ResponseOb responseOb) {
+  void getCallDiscountandPromoListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       final snackbar = SnackBar(
           elevation: 0.0,
@@ -339,8 +311,8 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
           isUpdateQuoOrderLine = true;
           print('QuotationID: $quotationId');
         });
-        quotationEditBloc.updateQuotationOrderLineData(
-            ids: quotationId, orderline: saleorderlineIdList);
+        // quotationEditBloc.updateQuotationOrderLineData(
+        //     ids: quotationId, orderline: saleorderlineIdList);
       }
     }
   }
@@ -348,7 +320,8 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
   void getproductlineListListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       print('QuotationID: $quotationId');
-      saleorderlineBloc.getSaleOrderLineData(quotationId);
+      // saleorderlineBloc.getSaleOrderLineData(quotationId);
+      quotationCreateBloc.getDiscountandPromo(id: quotationId);
       if (widget.newOrEdit == 1) {
         final snackbar = SnackBar(
             elevation: 0.0,
@@ -2182,132 +2155,9 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                         controller: currencyController
                                           ..text = 'MMK',
                                       )),
-                                  // Container(
-                                  //   color: Colors.white,
-                                  //   height: 40,
-                                  //   child: StreamBuilder<ResponseOb>(
-                                  //       initialData: hasCurrencyData == false
-                                  //           ? ResponseOb(
-                                  //               msgState: MsgState.loading)
-                                  //           : null,
-                                  //       stream:
-                                  //           quotationBloc.getCurrencyStream(),
-                                  //       builder: (context,
-                                  //           AsyncSnapshot<ResponseOb>
-                                  //               snapshot) {
-                                  //         ResponseOb? responseOb =
-                                  //             snapshot.data;
-                                  //         if (responseOb?.msgState ==
-                                  //             MsgState.loading) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 CircularProgressIndicator(),
-                                  //           );
-                                  //         } else if (responseOb?.msgState ==
-                                  //             MsgState.error) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 Text("Something went Wrong!"),
-                                  //           );
-                                  //         } else {
-                                  //           return DropdownSearch<String>(
-                                  //             // enabled: false,
-                                  //             popupItemBuilder:
-                                  //                 (context, item, isSelected) {
-                                  //               return Padding(
-                                  //                 padding:
-                                  //                     const EdgeInsets.all(8.0),
-                                  //                 child: Column(
-                                  //                   crossAxisAlignment:
-                                  //                       CrossAxisAlignment
-                                  //                           .start,
-                                  //                   children: [
-                                  //                     Text(item
-                                  //                         .toString()
-                                  //                         .split(',')[1]),
-                                  //                     const Divider(),
-                                  //                   ],
-                                  //                 ),
-                                  //               );
-                                  //             },
-                                  //             showSearchBox: true,
-                                  //             showSelectedItems: true,
-                                  //             showClearButton: !hasNotCurrency,
-                                  //             items: currencyList
-                                  //                 .map((e) =>
-                                  //                     '${e['id']},${e['name']}')
-                                  //                 .toList(),
-                                  //             onChanged: getCurrencyId,
-                                  //             selectedItem: currencyName,
-                                  //           );
-                                  //         }
-                                  //       }),
-                                  // ),
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  // const Text(
-                                  //   "Exchange Rate:",
-                                  //   style: TextStyle(
-                                  //       fontWeight: FontWeight.bold,
-                                  //       fontSize: 20),
-                                  // ),
-                                  // Container(
-                                  //   color: Colors.white,
-                                  //   height: 40,
-                                  //   child: TextField(
-                                  //     keyboardType:
-                                  //         const TextInputType.numberWithOptions(
-                                  //             decimal: true),
-                                  //     inputFormatters: <TextInputFormatter>[
-                                  //       FilteringTextInputFormatter.allow(
-                                  //           RegExp(r'^(\d+)?\.?\d{0,2}'))
-                                  //     ],
-                                  //     controller: exhchangeRateController,
-                                  //     decoration: const InputDecoration(
-                                  //         border: OutlineInputBorder()),
-                                  //   ),
-                                  // ),
-                                  // const SizedBox(
-                                  //   height: 10,
-                                  // ),
-                                  // const Text(
-                                  //   "Expiration:",
-                                  //   style: TextStyle(
-                                  //       fontWeight: FontWeight.bold,
-                                  //       fontSize: 20),
-                                  // ),
-                                  // Container(
-                                  //   color: Colors.white,
-                                  //   height: 40,
-                                  //   child: TextField(
-                                  //     readOnly: true,
-                                  //     controller: validityDateController,
-                                  //     decoration: InputDecoration(
-                                  //         border: const OutlineInputBorder(),
-                                  //         suffixIcon: IconButton(
-                                  //             onPressed: () async {
-                                  //               final DateTime? selected =
-                                  //                   await showDatePicker(
-                                  //                       context: context,
-                                  //                       initialDate:
-                                  //                           DateTime.now(),
-                                  //                       firstDate:
-                                  //                           DateTime.now(),
-                                  //                       lastDate:
-                                  //                           DateTime(2023));
-
-                                  //               if (selected != null) {
-                                  //                 validityDate =
-                                  //                     '${selected.toString().split(' ')[0]} ${DateTime.now().toString().split(' ')[1].split('.')[0]}';
-                                  //                 validityDateController.text =
-                                  //                     '${selected.toString().split(' ')[0]} ${DateTime.now().toString().split(' ')[1].split('.')[0]}';
-                                  //               }
-                                  //             },
-                                  //             icon: const Icon(
-                                  //                 Icons.arrow_drop_down))),
-                                  //   ),
-                                  // ),
                                   const SizedBox(
                                     height: 10,
                                   ),
@@ -2387,75 +2237,6 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                         controller: pricelistController
                                           ..text = 'Publice Pricelist (MMK)',
                                       )),
-                                  // Container(
-                                  //   color: Colors.white,
-                                  //   height: 40,
-                                  //   child: StreamBuilder<ResponseOb>(
-                                  //       initialData: hasPricelistData == false
-                                  //           ? ResponseOb(
-                                  //               msgState: MsgState.loading)
-                                  //           : null,
-                                  //       stream:
-                                  //           quotationBloc.getPricelistStream(),
-                                  //       builder: (context,
-                                  //           AsyncSnapshot<ResponseOb>
-                                  //               snapshot) {
-                                  //         ResponseOb? responseOb =
-                                  //             snapshot.data;
-                                  //         if (responseOb?.msgState ==
-                                  //             MsgState.loading) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 CircularProgressIndicator(),
-                                  //           );
-                                  //         } else if (responseOb?.msgState ==
-                                  //             MsgState.error) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 Text("Something went Wrong!"),
-                                  //           );
-                                  //         } else {
-                                  //           return DropdownSearch<String>(
-                                  //             popupItemBuilder:
-                                  //                 (context, item, isSelected) {
-                                  //               return Padding(
-                                  //                 padding:
-                                  //                     const EdgeInsets.all(8.0),
-                                  //                 child: Column(
-                                  //                   crossAxisAlignment:
-                                  //                       CrossAxisAlignment
-                                  //                           .start,
-                                  //                   children: [
-                                  //                     Text(item
-                                  //                         .toString()
-                                  //                         .split(',')[1]),
-                                  //                     const Divider(),
-                                  //                   ],
-                                  //                 ),
-                                  //               );
-                                  //             },
-                                  //             showSearchBox: true,
-                                  //             showSelectedItems: true,
-                                  //             showClearButton: !hasNotPriceList,
-                                  //             autoValidateMode: AutovalidateMode
-                                  //                 .onUserInteraction,
-                                  //             validator: (value) {
-                                  //               if (value == null ||
-                                  //                   value.isEmpty) {
-                                  //                 return 'Please select Pricelist Name';
-                                  //               }
-                                  //               return null;
-                                  //             },
-                                  //             items: pricelistList
-                                  //                 .map((e) =>
-                                  //                     '${e['id']},${e['name']} (${e['currency_id'][1]})')
-                                  //                 .toList(),
-                                  //             onChanged: getPricelistId,
-                                  //             selectedItem: pricelistName,
-                                  //           );
-                                  //         }
-                                  //       }),
-                                  // ),
                                   const SizedBox(
                                     height: 10,
                                   ),
@@ -2589,126 +2370,6 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  // Container(
-                                  //   color: Colors.white,
-                                  //   height: 40,
-                                  //   child: StreamBuilder<ResponseOb>(
-                                  //       initialData: hasZoneData == false
-                                  //           ? ResponseOb(
-                                  //               msgState: MsgState.loading)
-                                  //           : null,
-                                  //       stream:
-                                  //           quotationBloc.getZoneListStream(),
-                                  //       builder: (context,
-                                  //           AsyncSnapshot<ResponseOb>
-                                  //               snapshot) {
-                                  //         ResponseOb? responseOb =
-                                  //             snapshot.data;
-                                  //         if (responseOb?.msgState ==
-                                  //             MsgState.loading) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 CircularProgressIndicator(),
-                                  //           );
-                                  //         } else if (responseOb?.msgState ==
-                                  //             MsgState.error) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 Text("Something went Wrong!"),
-                                  //           );
-                                  //         } else {
-                                  //           return DropdownSearch<String>(
-                                  //             popupItemBuilder:
-                                  //                 (context, item, isSelected) {
-                                  //               return Padding(
-                                  //                 padding:
-                                  //                     const EdgeInsets.all(8.0),
-                                  //                 child: Column(
-                                  //                   crossAxisAlignment:
-                                  //                       CrossAxisAlignment
-                                  //                           .start,
-                                  //                   children: [
-                                  //                     Text(item
-                                  //                         .toString()
-                                  //                         .split(',')[1]),
-                                  //                     const Divider(),
-                                  //                   ],
-                                  //                 ),
-                                  //               );
-                                  //             },
-                                  //             showSearchBox: true,
-                                  //             showSelectedItems: true,
-                                  //             showClearButton: !hasNotZone,
-                                  //             items: zoneList
-                                  //                 .map((e) =>
-                                  //                     '${e['id']},${e['name']}')
-                                  //                 .toList(),
-                                  //             onChanged: getZoneListId,
-                                  //             selectedItem: zoneListName,
-                                  //           );
-                                  //         }
-                                  //       }),
-                                  // ),
-                                  // Container(
-                                  //   color: Colors.white,
-                                  //   height: 40,
-                                  //   child: StreamBuilder<ResponseOb>(
-                                  //       initialData: hasSegmentData == false
-                                  //           ? ResponseOb(
-                                  //               msgState: MsgState.loading)
-                                  //           : null,
-                                  //       stream: quotationBloc
-                                  //           .getSegmentListStream(),
-                                  //       builder: (context,
-                                  //           AsyncSnapshot<ResponseOb>
-                                  //               snapshot) {
-                                  //         ResponseOb? responseOb =
-                                  //             snapshot.data;
-                                  //         if (responseOb?.msgState ==
-                                  //             MsgState.loading) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 CircularProgressIndicator(),
-                                  //           );
-                                  //         } else if (responseOb?.msgState ==
-                                  //             MsgState.error) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 Text("Something went Wrong!"),
-                                  //           );
-                                  //         } else {
-                                  //           return DropdownSearch<String>(
-                                  //             popupItemBuilder:
-                                  //                 (context, item, isSelected) {
-                                  //               return Padding(
-                                  //                 padding:
-                                  //                     const EdgeInsets.all(8.0),
-                                  //                 child: Column(
-                                  //                   crossAxisAlignment:
-                                  //                       CrossAxisAlignment
-                                  //                           .start,
-                                  //                   children: [
-                                  //                     Text(item
-                                  //                         .toString()
-                                  //                         .split(',')[1]),
-                                  //                     const Divider(),
-                                  //                   ],
-                                  //                 ),
-                                  //               );
-                                  //             },
-                                  //             showSearchBox: true,
-                                  //             showSelectedItems: true,
-                                  //             showClearButton: !hasNotSegment,
-                                  //             items: segmentList
-                                  //                 .map((e) =>
-                                  //                     '${e['id']},${e['name']}')
-                                  //                 .toList(),
-                                  //             onChanged: getSegmentListId,
-                                  //             selectedItem: segmentListName,
-                                  //           );
-                                  //         }
-                                  //       }),
-                                  // ),
                                   Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -2758,66 +2419,6 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  // Container(
-                                  //   color: Colors.white,
-                                  //   height: 40,
-                                  //   child: StreamBuilder<ResponseOb>(
-                                  //       initialData: hasRegionData == false
-                                  //           ? ResponseOb(
-                                  //               msgState: MsgState.loading)
-                                  //           : null,
-                                  //       stream:
-                                  //           quotationBloc.getRegionListStream(),
-                                  //       builder: (context,
-                                  //           AsyncSnapshot<ResponseOb>
-                                  //               snapshot) {
-                                  //         ResponseOb? responseOb =
-                                  //             snapshot.data;
-                                  //         if (responseOb?.msgState ==
-                                  //             MsgState.loading) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 CircularProgressIndicator(),
-                                  //           );
-                                  //         } else if (responseOb?.msgState ==
-                                  //             MsgState.error) {
-                                  //           return const Center(
-                                  //             child:
-                                  //                 Text("Something went Wrong!"),
-                                  //           );
-                                  //         } else {
-                                  //           return DropdownSearch<String>(
-                                  //             popupItemBuilder:
-                                  //                 (context, item, isSelected) {
-                                  //               return Padding(
-                                  //                 padding:
-                                  //                     const EdgeInsets.all(8.0),
-                                  //                 child: Column(
-                                  //                   crossAxisAlignment:
-                                  //                       CrossAxisAlignment
-                                  //                           .start,
-                                  //                   children: [
-                                  //                     Text(item
-                                  //                         .toString()
-                                  //                         .split(',')[1]),
-                                  //                     const Divider(),
-                                  //                   ],
-                                  //                 ),
-                                  //               );
-                                  //             },
-                                  //             showSearchBox: true,
-                                  //             showSelectedItems: true,
-                                  //             showClearButton: !hasNotRegion,
-                                  //             items: regionList
-                                  //                 .map((e) =>
-                                  //                     '${e['id']},${e['name']}')
-                                  //                 .toList(),
-                                  //             onChanged: getRegionListId,
-                                  //             selectedItem: regionListName,
-                                  //           );
-                                  //         }
-                                  //       }),
-                                  // ),
                                   Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -2992,24 +2593,6 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                             onPressed: customerId == 0
                                                 ? null
                                                 : () {
-                                                    // Navigator.of(context).push(
-                                                    //     MaterialPageRoute(
-                                                    //         builder: (context) {
-                                                    //   return OrderLineCreatePage(
-                                                    //     newOrEditSOL: 0,
-                                                    //     newOrEdit: widget.newOrEdit,
-                                                    //     quotationId:
-                                                    //         widget.quotationId,
-                                                    //     solId: 0,
-                                                    //     partnerId: customerId,
-                                                    //     zoneId: zoneListId,
-                                                    //     segmentId: segmentListId,
-                                                    //     regionId: regionListId,
-                                                    //     currencyId: currencyId,
-                                                    //   );
-                                                    // })).then((value) => setState(() {
-                                                    //       newPage = -1;
-                                                    //     }));
                                                     Navigator.of(context).push(
                                                         MaterialPageRoute(
                                                             builder: (context) {
@@ -3205,11 +2788,11 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                       );
                     })
                 : Container(),
-            isUpdateQuoOrderLine == true
+            isCallPromoDiscount == true
                 ? StreamBuilder<ResponseOb>(
                     initialData: ResponseOb(msgState: MsgState.loading),
                     stream:
-                        quotationEditBloc.getUpdateQuotationOrderLineStream(),
+                        quotationCreateBloc.getCallDiscountandPromotionStream(),
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.loading) {

@@ -179,6 +179,7 @@ class _SaleOrderLineMultiSelectionMBState
         .listen(getSalePricelistProductLineListen);
 
     saleorderlineBloc.getSalePricelistData(['id', 'ilike', '']);
+    saleorderlineBloc.getUnitPriceListStream().listen(getUnitPriceListen);
     saleorderlineBloc
         .getSalePricelistListStream()
         .listen(getSalePricelistListen);
@@ -219,6 +220,16 @@ class _SaleOrderLineMultiSelectionMBState
       print("No SalePricelistProductline Data");
     }
   } // listen SalePricelistProductline
+
+  void getUnitPriceListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      unitPriceController.text = responseOb.data.toString();
+      subTotalController.text = (double.parse(quantityController.text) *
+              double.parse(unitPriceController.text))
+          .toString();
+      print('UnitPirce: ${unitPriceController.text}');
+    }
+  }
 
   Future<void> insertProductIntoSOLDB() async {
     for (var product in productproductList) {
@@ -319,9 +330,9 @@ class _SaleOrderLineMultiSelectionMBState
                 print("uomFactor: $uomFactor");
               }
             }
-            Future.delayed(Duration(seconds: 2), () {
-              calculateUnitPrice();
-            });
+            // Future.delayed(Duration(seconds: 2), () {
+            //   calculateUnitPrice();
+            // });
           }
         }
         for (var getuomList in uomList) {
@@ -567,57 +578,66 @@ class _SaleOrderLineMultiSelectionMBState
             print(
                 'productUOM Category: [$productUOMCategoryId, $productUOMCategoryName]');
             print("uomFactor: $uomFactor");
-            if (prioritySort.isNotEmpty) {
-              print('Priority Sort List: ${prioritySort}');
-              prioritySort.sort(
-                  (a, b) => (b['priority_new']).compareTo(a['priority_new']));
-              print('Sorted Priority: ${prioritySort.toList()}');
-              for (var uom in uomList) {
-                if (uom['id'] == prioritySort[0]['uom_id'][0]) {
-                  prioritySortUOMCategoryId = uom['category_id'][0];
-                  prioritySortUOMCategoryName = uom['category_id'][1];
-                  print(
-                      'prioritySortUOMCategoryId: $prioritySortUOMCategoryId');
-                  print(
-                      'prioritySortUOMCategoryName: $prioritySortUOMCategoryName');
-                }
-              }
-              if (prioritySortUOMCategoryId == productUOMCategoryId) {
-                if (prioritySort[0]['uom_id'] != null &&
-                    prioritySort[0]['uom_id'][0] != uomId) {
-                  print('Does not same uomIds');
-                  totalFactor = (1.0 * uomFactor);
-                  totalFactor = (totalFactor / productUOMFactor);
-                  unitPriceController.text =
-                      (prioritySort[0]['price'] * totalFactor).toString();
-                  subTotalController.text =
-                      (double.parse(quantityController.text) *
-                              double.parse(unitPriceController.text))
-                          .toString();
-                  print('subtotal: ${subTotalController.text}');
-                  print('unit Price: ${unitPriceController.text}');
-                } else {
-                  unitPriceController.text =
-                      prioritySort[0]['price'].toString();
-                  print('Unit Price: ${prioritySort[0]['price']}');
-                  subTotalController.text =
-                      (double.parse(quantityController.text) *
-                              double.parse(unitPriceController.text))
-                          .toString();
-                  print('unit Price: ${unitPriceController.text}');
-                  print('subtotal: ${subTotalController.text}');
-                }
-              }
-            } else {
-              unitPriceController.text = '1.0';
-              subTotalController.text = (double.parse(quantityController.text) *
-                      double.parse(unitPriceController.text))
-                  .toString();
-              print('subtotal: ${subTotalController.text}');
-            }
+            // if (prioritySort.isNotEmpty) {
+            //   print('Priority Sort List: ${prioritySort}');
+            //   prioritySort.sort(
+            //       (a, b) => (b['priority_new']).compareTo(a['priority_new']));
+            //   print('Sorted Priority: ${prioritySort.toList()}');
+            //   for (var uom in uomList) {
+            //     if (uom['id'] == prioritySort[0]['uom_id'][0]) {
+            //       prioritySortUOMCategoryId = uom['category_id'][0];
+            //       prioritySortUOMCategoryName = uom['category_id'][1];
+            //       print(
+            //           'prioritySortUOMCategoryId: $prioritySortUOMCategoryId');
+            //       print(
+            //           'prioritySortUOMCategoryName: $prioritySortUOMCategoryName');
+            //     }
+            //   }
+            //   if (prioritySortUOMCategoryId == productUOMCategoryId) {
+            //     if (prioritySort[0]['uom_id'] != null &&
+            //         prioritySort[0]['uom_id'][0] != uomId) {
+            //       print('Does not same uomIds');
+            //       totalFactor = (1.0 * uomFactor);
+            //       totalFactor = (totalFactor / productUOMFactor);
+            //       unitPriceController.text =
+            //           (prioritySort[0]['price'] * totalFactor).toString();
+            //       subTotalController.text =
+            //           (double.parse(quantityController.text) *
+            //                   double.parse(unitPriceController.text))
+            //               .toString();
+            //       print('subtotal: ${subTotalController.text}');
+            //       print('unit Price: ${unitPriceController.text}');
+            //     } else {
+            //       unitPriceController.text =
+            //           prioritySort[0]['price'].toString();
+            //       print('Unit Price: ${prioritySort[0]['price']}');
+            //       subTotalController.text =
+            //           (double.parse(quantityController.text) *
+            //                   double.parse(unitPriceController.text))
+            //               .toString();
+            //       print('unit Price: ${unitPriceController.text}');
+            //       print('subtotal: ${subTotalController.text}');
+            //     }
+            //   }
+            // } else {
+            //   unitPriceController.text = '1.0';
+            //   subTotalController.text = (double.parse(quantityController.text) *
+            //           double.parse(unitPriceController.text))
+            //       .toString();
+            //   print('subtotal: ${subTotalController.text}');
+            // }
           }
         }
       });
+      saleorderlineBloc.getUnitPrice(
+          id: 766,
+          productId: productproductId,
+          currencyId: 119,
+          productuom: uomId,
+          zoneId: widget.zoneId,
+          regionId: false,
+          segmentId: widget.segmentId,
+          partnerId: widget.partnerId);
     } else {
       hasNotUOM = true;
     }
@@ -944,6 +964,15 @@ class _SaleOrderLineMultiSelectionMBState
                                                 'ProductCodeName : ${saleorderlineDBList![i].productCodeName}');
                                             print(
                                                 'SOL id: ${saleorderlineDBList![i].id}');
+                                            saleorderlineBloc.getUnitPrice(
+                                                id: 766,
+                                                productId: productproductId,
+                                                currencyId: 119,
+                                                productuom: uomId,
+                                                zoneId: widget.zoneId,
+                                                regionId: false,
+                                                segmentId: widget.segmentId,
+                                                partnerId: widget.partnerId);
                                             showDialog(
                                                 context: context,
                                                 builder: (context) {
@@ -1238,69 +1267,59 @@ class _SaleOrderLineMultiSelectionMBState
                                                           ),
                                                           SizedBox(
                                                             height: 40,
-                                                            child:
-                                                                TextFormField(
-                                                              readOnly: true,
-                                                              focusNode:
-                                                                  unitpriceFocus,
-                                                              onChanged:
-                                                                  (value) {
-                                                                if (value ==
-                                                                    '') {
-                                                                  setState(() {
-                                                                    hasUnitPrice =
-                                                                        false;
-                                                                  });
-                                                                } else {
-                                                                  setState(() {
-                                                                    hasUnitPrice =
-                                                                        true;
-                                                                  });
-                                                                }
-                                                              },
-                                                              autovalidateMode:
-                                                                  AutovalidateMode
-                                                                      .onUserInteraction,
-                                                              validator:
-                                                                  (value) {
-                                                                if (value ==
-                                                                        null ||
-                                                                    value
-                                                                        .isEmpty) {
-                                                                  return 'Please enter Unit Price';
-                                                                }
-                                                                return null;
-                                                              },
-                                                              keyboardType:
-                                                                  const TextInputType
-                                                                          .numberWithOptions(
-                                                                      decimal:
-                                                                          true),
-                                                              inputFormatters: <
-                                                                  TextInputFormatter>[
-                                                                FilteringTextInputFormatter
-                                                                    .allow(RegExp(
-                                                                        r'^(\d+)?\.?\d{0,2}'))
-                                                              ],
-                                                              onFieldSubmitted:
-                                                                  (value) {
-                                                                subTotalController
-                                                                    .text = (double.parse(quantityController
-                                                                            .text) *
-                                                                        double.parse(
-                                                                            value))
-                                                                    .toString();
-                                                                print(
-                                                                    'subtotal: ${subTotalController.text}');
-                                                              },
-                                                              controller:
-                                                                  unitPriceController,
-                                                              decoration:
-                                                                  const InputDecoration(
-                                                                      border:
-                                                                          OutlineInputBorder()),
-                                                            ),
-                                                          ), // Unit Price from Order Line
+                                                            child: StreamBuilder<
+                                                                    ResponseOb>(
+                                                                initialData: hasUOMData ==
+                                                                        true
+                                                                    ? null
+                                                                    : ResponseOb(
+                                                                        msgState:
+                                                                            MsgState
+                                                                                .loading),
+                                                                stream: saleorderlineBloc
+                                                                    .getUnitPriceListStream(),
+                                                                builder: (context,
+                                                                    AsyncSnapshot<
+                                                                            ResponseOb>
+                                                                        snapshot) {
+                                                                  ResponseOb?
+                                                                      responseOb =
+                                                                      snapshot
+                                                                          .data;
+                                                                  if (responseOb
+                                                                          ?.msgState ==
+                                                                      MsgState
+                                                                          .loading) {
+                                                                    return Center(
+                                                                      child: Image
+                                                                          .asset(
+                                                                        'assets/gifs/loading.gif',
+                                                                        width:
+                                                                            100,
+                                                                        height:
+                                                                            100,
+                                                                      ),
+                                                                    );
+                                                                  } else if (responseOb
+                                                                          ?.msgState ==
+                                                                      MsgState
+                                                                          .error) {
+                                                                    return const Center(
+                                                                      child: Text(
+                                                                          "Something went Wrong!"),
+                                                                    );
+                                                                  } else {
+                                                                    return TextField(
+                                                                        decoration:
+                                                                            InputDecoration(
+                                                                          border:
+                                                                              OutlineInputBorder(),
+                                                                        ),
+                                                                        controller:
+                                                                            unitPriceController);
+                                                                  }
+                                                                }),
+                                                          ), // UOM Many2one from Order Line
                                                           const SizedBox(
                                                               height: 10),
                                                           const Text(

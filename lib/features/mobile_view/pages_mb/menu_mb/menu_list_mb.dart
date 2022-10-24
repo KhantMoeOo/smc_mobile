@@ -201,9 +201,16 @@ class _MenuListMBState extends State<MenuListMB> {
             ),
           );
         } else if (responseOb?.msgState == MsgState.error) {
-          return const Center(
-            child: Text('Get User Error'),
-          );
+          if (responseOb?.errState == ErrState.noConnection) {
+            print('no internet connection');
+            return const Center(
+              child: Text('No Internet connection'),
+            );
+          } else {
+            return const Center(
+              child: Text('Get User Error'),
+            );
+          }
         } else {
           return StreamBuilder<ResponseOb>(
               initialData: hasMRData == true
@@ -224,9 +231,15 @@ class _MenuListMBState extends State<MenuListMB> {
                     ),
                   );
                 } else if (responseOb?.msgState == MsgState.error) {
-                  return const Center(
-                    child: Text('Get User Error'),
-                  );
+                  if (responseOb?.errState == ErrState.noConnection) {
+                    return const Center(
+                      child: Text('No Internet connection'),
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Get User Error'),
+                    );
+                  }
                 } else {
                   return StreamBuilder<ResponseOb>(
                       initialData: hasPRData == true
@@ -248,9 +261,15 @@ class _MenuListMBState extends State<MenuListMB> {
                             ),
                           );
                         } else if (responseOb?.msgState == MsgState.error) {
-                          return const Center(
-                            child: Text('Get User Error'),
-                          );
+                          if (responseOb?.errState == ErrState.noConnection) {
+                            return const Center(
+                              child: Text('No Internet connection'),
+                            );
+                          } else {
+                            return const Center(
+                              child: Text('Get User Error'),
+                            );
+                          }
                         } else {
                           return StreamBuilder<ResponseOb>(
                               initialData: hasStockWarehouseData == true
@@ -310,6 +329,7 @@ class _MenuListMBState extends State<MenuListMB> {
                                                   appBar: AppBar(
                                                     backgroundColor:
                                                         AppColors.appBarColor,
+                                                    title: const Text('Menus'),
                                                     leading: IconButton(
                                                       onPressed: () {
                                                         Navigator.of(context)

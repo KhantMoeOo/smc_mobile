@@ -88,6 +88,11 @@ class SaleOrderLineBloc {
   Stream<ResponseOb> getAccountTaxeslistListStream() =>
       accounttaxeslistStreamController.stream; // AccountTaxes Stream Controller
 
+  StreamController<ResponseOb> getUnitPriceStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getUnitPriceListStream() =>
+      getUnitPriceStreamController.stream; // getUnitPriceStreamController
+
   late Odoo odoo;
 
   getSaleOrderLineData(orderId) {
@@ -937,6 +942,62 @@ class SaleOrderLineBloc {
     }
   } // Get AccountTaxes Data
 
+  getUnitPrice(
+      {id,
+      productId,
+      currencyId,
+      zoneId,
+      segmentId,
+      regionId,
+      partnerId,
+      productuom}) async {
+    print('Get Unit Pirce');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    getUnitPriceStreamController.sink.add(responseOb);
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res = await odoo.callKW(
+            'sale.order.line', 'define_product_price_with_args', [
+          id,
+          productId,
+          currencyId,
+          zoneId,
+          segmentId,
+          regionId,
+          partnerId,
+          productuom
+        ]);
+        if (!res.hasError()) {
+          print('Get Unit Price Result: ${res.getResult()}');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          getUnitPriceStreamController.sink.add(responseOb);
+        } else {
+          print('Get Unit Price Error:' + res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          getUnitPriceStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        getUnitPriceStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        getUnitPriceStreamController.sink.add(responseOb);
+      }
+    }
+  } // Get Unit Price
+
   dispose() {
     saleOrderLineStreamController.close();
     saleOrderLineCreateStreamController.close();
@@ -952,5 +1013,6 @@ class SaleOrderLineBloc {
     salediscountlistStreamController.close();
     accounttaxeslistStreamController.close();
     salepricelistproductlinebyregionStreamController.close();
+    getUnitPriceStreamController.close();
   }
 }

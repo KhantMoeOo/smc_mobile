@@ -403,6 +403,9 @@ class _LoginMBState extends State<LoginMB> {
                                           //     'Sai Nay Lin',
                                           //     '123',
                                           //     'smc_sale_test');
+                                          print('db: $dbName');
+                                          print('email: ${_emailcontroller.text}');
+                                          print('pwd: ${_passwordcontroller.text}');
                                           loginBloc.quotationLogin(
                                               _emailcontroller.text,
                                               _passwordcontroller.text,
