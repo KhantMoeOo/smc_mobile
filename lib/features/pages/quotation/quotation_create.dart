@@ -1078,7 +1078,7 @@ class _QuotationCreateState extends State<QuotationCreate> {
         });
         await quotationCreateBloc.quotationCreate(
             warehouseId: stockwarehouseList[0]['id'],
-            customerId: customerId,
+            partnerId: customerId,
             currencyId: 119,
             exchangeRate: '1',
             dateOrder: dateOrderController.text,
