@@ -22,6 +22,7 @@ class QuotationCreateBloc {
   quotationCreate(
       {warehouseId,
       partnerId,
+      customerId,
       currencyId,
       exchangeRate,
       dateOrder,
@@ -64,7 +65,7 @@ class QuotationCreateBloc {
           createNewStreamController.sink.add(responseOb);
         } else {
           print('Create error');
-          print('GetCreateError:' + res.getErrorMessage().toString());
+          print('GetCreateError:' + res.getError().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           createNewStreamController.sink.add(responseOb);

@@ -66,12 +66,6 @@ class QuotationBloc {
     quotationStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    // name != ''? ['name', 'ilike', name] :
-    //           userId != ''? ['user_id', 'ilike', userId] :
-    //           partnerId != ''? ['partner_id', 'ilike', partnerId]:
-    //           productId != ''? ['order_line.product_id', 'like', productId]:
-    //           productName != ''? ['order_line.product_name', '=', productName]:
-
     try {
       print('Try');
       Sharef.getOdooClientInstance().then((value) async {
@@ -130,7 +124,7 @@ class QuotationBloc {
         } else {
           print('Quotation error');
           data = null;
-          print('GetquoError:' + res.getErrorMessage().toString());
+          print('GetquoError:' + res.getError().toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           quotationStreamController.sink.add(responseOb);

@@ -597,6 +597,31 @@ class _QuotationRecordDetailPageState extends State<QuotationRecordDetailPage> {
       });
       stockpickingBloc
           .getStockPickingData(['sale_id', '=', widget.quotationId]);
+    } else if (responseOb.msgState == MsgState.error) {
+      if (responseOb.errState == ErrState.unKnownErr) {
+        setState(() {
+          updateStatus = false;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  title: const Text('Something went wrong !'),
+                  content: Text('${responseOb.data}'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.cyan,
+                      ),
+                      child: const Text('Ok',
+                          style: TextStyle(color: Colors.white)),
+                    )
+                  ]);
+            });
+      }
     }
   }
 

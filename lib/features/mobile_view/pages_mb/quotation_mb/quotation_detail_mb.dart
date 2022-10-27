@@ -610,6 +610,31 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
       });
       stockpickingBloc
           .getStockPickingData(['sale_id', '=', widget.quotationId]);
+    } else if (responseOb.msgState == MsgState.error) {
+      if (responseOb.errState == ErrState.unKnownErr) {
+        setState(() {
+          updateStatus = false;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  title: const Text('Something went wrong !'),
+                  content: Text('${responseOb.data}'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.cyan,
+                      ),
+                      child: const Text('Ok',
+                          style: TextStyle(color: Colors.white)),
+                    )
+                  ]);
+            });
+      }
     }
   }
 
@@ -647,179 +672,6 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
       saleorderlineBloc.waitingSaleOrderLineData();
     }
   }
-
-  // void getCreateDeliveryListen(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     for (var customer in customerList) {
-  //       if (customer['id'] == quotationList[0]['partner_id'][0]) {
-  //         setState(() {
-  //           stockpickingId = responseOb.data;
-  //           isCreateDelivery = true;
-  //           print('isCreateDelivery: $isCreateDelivery');
-  //         });
-  //         setState(() {
-  //           isCreateDelivery = false;
-  //           isCreateStockMove = true;
-  //           for (var sol in productlineList) {
-  //             stockpickingcreateBloc.createStockMove(
-  //               pickingId: responseOb.data,
-  //               description: sol['product_id'][1],
-  //               productId: sol['product_id'][0],
-  //               qty: sol['product_uom_qty'],
-  //               productuom: sol['product_uom'][0],
-  //               locationId:
-  //                   stockpickingtypeList[0]['default_location_src_id'] == false
-  //                       ? customer['property_stock_supplier'][0]
-  //                       : stockpickingtypeList[0]['default_location_src_id'][0],
-  //               locationdestId:
-  //                   stockpickingtypeList[0]['default_location_dest_id'] == false
-  //                       ? customer['property_stock_customer'][0]
-  //                       : stockpickingtypeList[0]['default_location_dest_id']
-  //                           [0],
-  //               origin: quotationList[0]['name'],
-  //             );
-  //           }
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
-
-  // void getCreateStockMoveListen(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     setState(() {
-  //       isCreateStockMove = false;
-  //       isUpdateDeliveryStatus = true;
-  //       stockpickingcreateBloc.stockpickingUpdateStatus(
-  //           ids: stockpickingId, state: 'confirmed');
-  //     });
-  //   }
-  // }
-
-  // void getUpdateDeliveryStatus(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     setState(() {
-  //       isUpdateDeliveryStatus = false;
-  //       isUpdatePickingId = true;
-  //       quotationeditBloc.updateQuotationPickingIdsData(
-  //           ids: quotationList[0]['id'], pickingIds: stockpickingId);
-  //     });
-  //   }
-  // }
-
-  // void getUpdateQuotationPickingIdsListen(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     setState(() {
-  //       isUpdatePickingId = false;
-  //     });
-  //     quotationBloc.getQuotationWithIdData(widget.quotationId);
-  //   }
-  // }
-
-  // createInvoice() async {
-  //   setState(() {
-  //     isCreateInvoice = true;
-  //   });
-  //   await invoicecreateBloc.invoiceCreate(
-  //       partnerId: quotationList[0]['partner_id'][0],
-  //       ref: '',
-  //       invoiceDate: '',
-  //       invoiceOrigin: quotationList[0]['name'],
-  //       type: 'out_invoice',
-  //       invoicePaymentTermId: quotationList[0]['payment_term_id'] == false
-  //           ? null
-  //           : quotationList[0]['payment_term_id'][0],
-  //       invoiceDueDate: '',
-  //       journalId: 0,
-  //       currencyId: quotationList[0]['currency_id'] == false
-  //           ? null
-  //           : quotationList[0]['currency_id'][0],
-  //       exchangeRate: quotationList[0]['exchange_rate']);
-  // }
-
-  // void createInvoiceListen(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     setState(() {
-  //       invoiceId = responseOb.data;
-  //       isCreateInvoiceLine = true;
-  //       for (var sol in productlineList) {
-  //         for (var product in productproductList) {
-  //           if (product['id'] == sol['product_id'][0]) {
-  //             print('Product Name: ${product['name']}');
-  //             for (var categ in productcategoryList) {
-  //               if (categ['id'] == product['categ_id'][0]) {
-  //                 print(
-  //                     'Product Category: ${categ['name']},${categ['property_account_income_categ_id']}');
-  //                 invoicelineBloc.createInvoiceLine(
-  //                     moveId: invoiceId,
-  //                     excludefrominvoicetab:
-  //                         sol['is_foc'] == false ? false : true,
-  //                     productId: sol['product_id'][0],
-  //                     balance: double.parse(sol['price_subtotal'].toString()),
-  //                     salelineids: [sol['id']],
-  //                     accountId:
-  //                         categ['property_account_income_categ_id'] == false
-  //                             ? false
-  //                             : categ['property_account_income_categ_id'][0],
-  //                     name: sol['product_id'][1],
-  //                     accountinternaltype: 'other',
-  //                     quantity: double.parse(sol['product_uom_qty'].toString()),
-  //                     productUoMId: sol['product_uom'][0],
-  //                     priceunit: sol['price_subtotal'],
-  //                     salediscount: sol['sale_discount'],
-  //                     taxIds: sol['tax_id'],
-  //                     //credit: double.parse(sol['price_subtotal'].toString()),
-  //                     //debit: double.parse(sol['price_subtotal'].toString()),
-  //                     pricesubtotal: sol['price_subtotal']);
-  //                 totalSOLsubtotal = totalSOLsubtotal + sol['price_subtotal'];
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //       // invoicelineBloc.createInvoiceLine(
-  //       //   moveId: invoiceId,
-  //       //   productId: 1568,
-  //       //   salelineids: [746],
-  //       //   name: '',
-  //       //   accountinternaltype: 'receivable',
-  //       //   quantity: 1.0,
-  //       //   salediscount: 0.0,
-  //       //   taxIds: [],
-  //       //   credit: 0.0,
-  //       //   accountId: customerList[0]['property_account_receivable_id'][0],
-  //       //   priceunit: totalSOLsubtotal,
-  //       //   excludefrominvoicetab: true,
-  //       //   debit: totalSOLsubtotal,
-  //       // );
-  //       print('invoiceId: $invoiceId');
-  //     });
-  //   } else if (responseOb.msgState == MsgState.error) {
-  //     print('Creating invoice Error');
-  //   }
-  // }
-
-  // void getInvoiceLineCreateListen(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     print('Product Line List Length: ${productlineList.length}');
-  //     SharefCount.setTotal((productlineList.length) + 1);
-  //     saleorderlineBloc.waitingSaleOrderLineData();
-  //   }
-  // }
-
-  // void getWaitingInvoiceLineCreate(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-  //       return InvoiceDetailPage(
-  //         invoiceId: invoiceId,
-  //         quotationId: quotationList[0]['id'],
-  //         neworeditInvoice: 1,
-  //         address: customerAddress,
-  //       );
-  //     }));
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 import 'package:odoo_api/odoo_user_response.dart';
@@ -206,15 +207,24 @@ class StockPickingCreateBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
-            await odoo.callKW('sale.order', 'action_confirm', [id]);
+            await odoo.callKW('sale.order', 'action_confir', [id]);
         if (!res.hasError()) {
           print('Call Action Confirm Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;
           responseOb.data = res.getResult();
           callActionConfirmStreamController.sink.add(responseOb);
         } else {
-          print('GetCall Action Confirm Error:' +
-              res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('GetCall Action Confirm Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'GetCall Action Confirm Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           callActionConfirmStreamController.sink.add(responseOb);

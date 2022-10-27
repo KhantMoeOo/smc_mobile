@@ -2539,8 +2539,8 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                                   child: Center(
                                                     child: Image.asset(
                                                       'assets/gifs/loading.gif',
-                                                      width: 100,
-                                                      height: 100,
+                                                      width: 30,
+                                                      height: 30,
                                                     ),
                                                   ),
                                                 ),
