@@ -31,6 +31,11 @@ class QuotationEditBloc {
       updateQuotationOrderLineStreamController
           .stream; //updateQuotationOrderLineStreamController
 
+  StreamController<ResponseOb> checkqtyavailableStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getCheckQtyAvailableStream() =>
+      checkqtyavailableStreamController.stream;
+
   late Odoo odoo;
 
   editQuotationData(
@@ -228,10 +233,50 @@ class QuotationEditBloc {
     }
   } // updateQuotationOrderline Data
 
+  checkQtyAvailable({id}) async {
+    print('checkQtyAvailable');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    checkqtyavailableStreamController.sink.add(responseOb);
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res =
+            await odoo.callKW('sale.order', 'check_available_stock', [id]);
+        if (!res.hasError()) {
+          print('checkQtyAvailable Result: ${res.getResult()}');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          checkqtyavailableStreamController.sink.add(responseOb);
+        } else {
+          print('checkQtyAvailable Error:' + res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          checkqtyavailableStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        checkqtyavailableStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        checkqtyavailableStreamController.sink.add(responseOb);
+      }
+    }
+  }
+
   dispose() {
     quotationEditStreamController.close();
     updateQuotationStatusStreamController.close();
     updateQuotationPickingIdsStreamController.close();
     updateQuotationOrderLineStreamController.close();
+    checkqtyavailableStreamController.close();
   }
 }

@@ -24,7 +24,7 @@ class CustomerBloc {
 
   late Odoo odoo;
 
-  getCustomerList({name}) async {
+  getCustomerList({name, zoneId}) async {
     print('EntergetCustomerData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     customerStreamController.sink.add(responseOb);
@@ -39,6 +39,7 @@ class CustomerBloc {
             'res.partner',
             [
               ['customer_rank', '>=', '1'],
+              ['zone_id.id', '=', zoneId],
               name
             ],
             [

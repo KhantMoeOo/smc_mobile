@@ -1869,9 +1869,13 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                             dropdownBuilder: (c, i) {
                                               // print(
                                               //     'i : ${i.toString().split(',')[1]}');
-                                              return Text(i!.contains(',')
-                                                  ? i.toString().split(',')[1]
-                                                  : i);
+                                              return Text(i == null
+                                                  ? ''
+                                                  : i.contains(',')
+                                                      ? i
+                                                          .toString()
+                                                          .split(',')[1]
+                                                      : i);
                                             },
                                             selectedItem:
                                                 filterName == 'segment'
@@ -2116,7 +2120,7 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                               },
                                               showSearchBox: true,
                                               showSelectedItems: true,
-                                              showClearButton: !hasNotCustomer,
+                                              // showClearButton: !hasNotCustomer,
                                               items: customerList.map((e) {
                                                 return e['code'] != false
                                                     ? '${e['id']},${e['code']} ${e['name']}'
@@ -2126,9 +2130,13 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                               dropdownBuilder: (c, i) {
                                                 // print(
                                                 //     'i : ${i.toString().split(',')[1]}');
-                                                return Text(i!.contains(',')
-                                                    ? i.toString().split(',')[1]
-                                                    : i);
+                                                return Text(i == null
+                                                    ? ''
+                                                    : i.contains(',')
+                                                        ? i
+                                                            .toString()
+                                                            .split(',')[1]
+                                                        : i);
                                               },
                                               selectedItem: customerName,
                                             );
@@ -2299,14 +2307,31 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                               },
                                               showSearchBox: true,
                                               showSelectedItems: true,
-                                              showClearButton:
-                                                  !hasNotPaymentTerms,
+                                              // showClearButton:
+                                              //     !hasNotPaymentTerms,
+                                              // clearButton: IconButton(
+                                              //   onPressed: () {
+                                              //     setState(() {
+                                              //       paymentTermsId = 0;
+                                              //       paymentTermsName = '';
+                                              //       print(
+                                              //           'paymentTermsId: $paymentTermsId');
+                                              //       print(
+                                              //           'paymentTermsName: $paymentTermsName');
+                                              //     });
+                                              //   },
+                                              //   icon: const Icon(Icons.clear),
+                                              // ),
                                               dropdownBuilder: (c, i) {
                                                 // print(
                                                 //     'i : ${i.toString().split(',')[1]}');
-                                                return Text(i!.contains(',')
-                                                    ? i.toString().split(',')[1]
-                                                    : i);
+                                                return Text(i == null
+                                                    ? ''
+                                                    : i.contains(',')
+                                                        ? i
+                                                            .toString()
+                                                            .split(',')[1]
+                                                        : i);
                                               },
                                               items: paymentTermsList
                                                   .map((e) =>

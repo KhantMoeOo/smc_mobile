@@ -129,7 +129,38 @@ class _MaterialRequisitionListMBState extends State<MaterialRequisitionListMB> {
                           icon: const Icon(Icons.menu),
                         ),
                         backgroundColor: AppColors.appBarColor,
-                        title: const Text('Material Requisition')),
+                        title: const Text('Material Requisition'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return MaterialRequisitionCreateMB(
+                                  name: '',
+                                  neworedit: 0,
+                                  userId: userList[0]['zone_id'][0],
+                                );
+                              })).then((value) {
+                                setState(() {
+                                  materialRequisitionBloc
+                                      .getMaterialRequisitionListData([
+                                    'zone_id.id',
+                                    '=',
+                                    userList[0]['zone_id'][0]
+                                  ], [
+                                    'id',
+                                    'ilike',
+                                    ''
+                                  ]);
+                                });
+                              });
+                            },
+                            child: const Text("Create",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                )),
+                          )
+                        ]),
                     body: Column(
                       children: [
                         Padding(
@@ -201,44 +232,6 @@ class _MaterialRequisitionListMBState extends State<MaterialRequisitionListMB> {
                                               BorderRadius.circular(10))),
                                 ),
                               ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.green,
-                                  ),
-                                  width: 60,
-                                  child: TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) {
-                                        return MaterialRequisitionCreateMB(
-                                          name: '',
-                                          neworedit: 0,
-                                          userId: userList[0]['zone_id'][0],
-                                        );
-                                      })).then((value) {
-                                        setState(() {
-                                          materialRequisitionBloc
-                                              .getMaterialRequisitionListData([
-                                            'zone_id.id',
-                                            '=',
-                                            userList[0]['zone_id'][0]
-                                          ], [
-                                            'id',
-                                            'ilike',
-                                            ''
-                                          ]);
-                                        });
-                                      });
-                                    },
-                                    child: const Text("Create",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                        )),
-                                  )),
                             ],
                           ),
                         ),

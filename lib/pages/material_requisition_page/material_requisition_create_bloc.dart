@@ -51,7 +51,7 @@ class MaterialRequisitionCreateBloc {
           'zone_id': zoneId,
           'request_person': requestPerson,
           'department_id': departmentId,
-          'location_id': locationId,
+          // 'location_id': locationId,
           //'invoice_id': invoiceId,
           'priority': priority,
           'order_date': orderdate,

@@ -14,10 +14,13 @@ import '../../../../pages/way_planning_page/way_planning_page.dart';
 import '../../../../utils/app_const.dart';
 import '../../../pages/material_isssues/material_issues_list.dart';
 import '../../../pages/material_requisition/material_requisition_list.dart';
+import '../customer_mb/customer_list_mb.dart';
 import '../material_issues_mb/material_issues_list_mb.dart';
 import '../material_requisition_mb/material_requisition_list_mb.dart';
+import '../product_mb/product_list_mb.dart';
 import '../profile_mb/profile_mb.dart';
 import '../quotation_mb/quotation_list_mb.dart';
+import '../sale_pricelist_mb/sale_pricelist_type_mb.dart';
 import '../way_plan_mb/way_plan_list_mb.dart';
 
 class MenuListMB extends StatefulWidget {
@@ -507,6 +510,9 @@ class _MenuListMBState extends State<MenuListMB> {
                                                                       .appBarColor,
                                                                 ),
                                                                 Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
                                                                   children: [
                                                                     const Text(
                                                                       "Material Issues",
@@ -559,7 +565,7 @@ class _MenuListMBState extends State<MenuListMB> {
                                                                   MaterialPageRoute(
                                                                       builder:
                                                                           (context) {
-                                                            return SalePricelistTypePage();
+                                                            return SalePricelistTypeMB();
                                                           }), (route) => false);
                                                         },
                                                         child: Container(
@@ -592,64 +598,86 @@ class _MenuListMBState extends State<MenuListMB> {
                                                               ],
                                                             )),
                                                       ),
-                                                      Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                          ),
-                                                          child: Column(
-                                                            children: [
-                                                              Image.asset(
-                                                                'assets/imgs/product_icon.png',
-                                                                height: 80,
-                                                                color: AppColors
-                                                                    .appBarColor,
-                                                              ),
-                                                              const Text(
-                                                                "Products",
-                                                                style: TextStyle(
-                                                                    fontWeight: FontWeight.bold,
-                                                                    // fontSize:
-                                                                    //     20,
-                                                                    color: AppColors.appBarColor),
-                                                              )
-                                                            ],
-                                                          )),
-                                                      Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                          ),
-                                                          child: Column(
-                                                            children: [
-                                                              Image.asset(
-                                                                'assets/imgs/customer_icon.jpg',
-                                                                height: 80,
-                                                                color: AppColors
-                                                                    .appBarColor,
-                                                              ),
-                                                              const Text(
-                                                                "Customers",
-                                                                style: TextStyle(
-                                                                    fontWeight: FontWeight.bold,
-                                                                    // fontSize:
-                                                                    //     20,
-                                                                    color: AppColors.appBarColor),
-                                                              )
-                                                            ],
-                                                          )),
+                                                      InkWell(
+                                                        onTap: () {
+                                                          Navigator.of(context)
+                                                              .pushAndRemoveUntil(
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) {
+                                                            return ProductListMB();
+                                                          }), (route) => false);
+                                                        },
+                                                        child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.asset(
+                                                                  'assets/imgs/product_icon.png',
+                                                                  height: 80,
+                                                                  color: AppColors
+                                                                      .appBarColor,
+                                                                ),
+                                                                const Text(
+                                                                  "Products",
+                                                                  style: TextStyle(
+                                                                      fontWeight: FontWeight.bold,
+                                                                      // fontSize:
+                                                                      //     20,
+                                                                      color: AppColors.appBarColor),
+                                                                )
+                                                              ],
+                                                            )),
+                                                      ),
+                                                      InkWell(
+                                                        onTap: () {
+                                                          Navigator.of(context)
+                                                              .pushAndRemoveUntil(
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) {
+                                                            return const CustomerListMB();
+                                                          }), (route) => false);
+                                                        },
+                                                        child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.asset(
+                                                                  'assets/imgs/customer_icon.jpg',
+                                                                  height: 80,
+                                                                  color: AppColors
+                                                                      .appBarColor,
+                                                                ),
+                                                                const Text(
+                                                                  "Customers",
+                                                                  style: TextStyle(
+                                                                      fontWeight: FontWeight.bold,
+                                                                      // fontSize:
+                                                                      //     20,
+                                                                      color: AppColors.appBarColor),
+                                                                )
+                                                              ],
+                                                            )),
+                                                      ),
                                                       InkWell(
                                                         onTap: () {
                                                           Navigator.of(context)

@@ -13,6 +13,7 @@ import '../../../../pages/material_requisition_page/material_requisition_create_
 import '../../../../pages/material_requisition_page/purchase_requisition_bloc.dart';
 import '../../../../pages/quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
 import '../../../../utils/app_const.dart';
+import 'material_requisition_list_mb.dart';
 
 class MaterialRequisitionDetailMB extends StatefulWidget {
   int id;
@@ -244,7 +245,10 @@ class _MaterialRequisitionDetailMBState
         } else {
           await databaseHelper.deleteAllMaterialProductLineUpdate();
           await SharefCount.clearCount();
-          Navigator.of(context).pop();
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) {
+            return MaterialRequisitionListMB();
+          }), (route) => false);
           return true;
         }
       },

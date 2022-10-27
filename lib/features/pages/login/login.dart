@@ -295,9 +295,9 @@ class _LoginState extends State<Login> {
                                   // loginBloc.quotationLogin(
                                   //     'admin', 'admin', 'smc_uat_test');
                                   loginBloc.quotationLogin(
-                                      _emailcontroller.text,
-                                      _passwordcontroller.text,
-                                      dbName);
+                                      email: _emailcontroller.text,
+                                      password: _passwordcontroller.text,
+                                      db: dbName);
                                 },
                                 child: const Text(
                                   'Log in',

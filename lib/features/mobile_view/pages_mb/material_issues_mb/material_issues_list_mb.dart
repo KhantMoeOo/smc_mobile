@@ -197,9 +197,7 @@ class _MaterialIssuesListMBState extends State<MaterialIssuesListMB> {
               initialData: hasMRData == true
                   ? null
                   : ResponseOb(msgState: MsgState.loading),
-              stream: hasMRData == true
-                  ? null
-                  : mrBloc.getMaterialRequisitionListStream(),
+              stream: mrBloc.getMaterialRequisitionListStream(),
               builder: (context, snapshot) {
                 ResponseOb? responseOb = snapshot.data;
                 if (responseOb?.msgState == MsgState.loading) {
@@ -347,6 +345,7 @@ class _MaterialIssuesListMBState extends State<MaterialIssuesListMB> {
                                                                           (value) {
                                                                     profileBloc
                                                                         .getResUsersData();
+
                                                                     setState(
                                                                         () {
                                                                       stockpickingupdateList

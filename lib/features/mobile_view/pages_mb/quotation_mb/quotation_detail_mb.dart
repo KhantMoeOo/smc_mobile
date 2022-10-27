@@ -99,6 +99,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
   List<SaleOrderLineOb>? materialproductlineDBList = [];
   List<dynamic> productlineList = [];
   List<dynamic> salediscountlist = [];
+  List<dynamic> salepromotionlist = [];
   List<dynamic> accounttaxsList = [];
   List<dynamic> customerList = [];
   List<dynamic> stockpickingtypeList = [];
@@ -107,11 +108,13 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
   List<dynamic> accountIdList = [];
   List<dynamic> userList = [];
   List<dynamic> stockmoveList = [];
+  bool checkqtyresult = false;
   int deleteornot = 0;
   int stockpickingId = 0;
   double totalSOLsubtotal = 0.0;
   String statusString = '';
-  String discountName = '';
+  List<dynamic> discountName = [];
+  List<dynamic> promotionName = [];
   String taxName = '';
   String customerAddress = '';
   List<dynamic> quotationList = [];
@@ -128,9 +131,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
   bool isCallStockMove = false;
   bool isUpdateQtyDone = false;
   bool isWaitingState = false;
-
-  // List<dynamic> tripplandeliveryList = [];
-  // List<TripPlanDeliveryOb>? tripplandeliveryDBList = [];
+  bool isCheckQty = false;
 
   Future<void> getproductlineListFromDB() async {
     print('Worked');
@@ -139,14 +140,26 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
         print('ORderId?????: ${element['order_id']}');
         print('Found: ${element['id']}');
         if (element['discount_ids'].isNotEmpty) {
+          discountName.clear();
           for (var sd in salediscountlist) {
-            if (sd['id'] == element['discount_ids'][0]) {
-              discountName = sd['name'];
+            if (element['discount_ids'].contains(sd['id'])) {
+              discountName.add(sd['name']);
               print('Discount Name: $discountName');
             }
           }
         } else {
-          discountName = '';
+          discountName = [];
+        }
+        if (element['promotion_ids'].isNotEmpty) {
+          promotionName.clear();
+          for (var sd in salepromotionlist) {
+            if (element['promotion_ids'].contains(sd['id'])) {
+              promotionName.add(sd['name']);
+              print('Promotion Name: $promotionName');
+            }
+          }
+        } else {
+          promotionName = [];
         }
         if (element['tax_id'].isNotEmpty) {
           for (var tax in accounttaxsList) {
@@ -188,11 +201,11 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
             discountId: element['discount_ids'].isEmpty
                 ? 0
                 : element['discount_ids'][0],
-            discountName: discountName,
+            discountName: discountName.toString(),
             promotionId: element['promotion_ids'].isEmpty
                 ? 0
                 : element['promotion_ids'][0],
-            promotionName: '',
+            promotionName: promotionName.toString(),
             saleDiscount: element['sale_discount'].toString(),
             promotionDiscount: element['promotion_discount'].toString(),
             taxId: element['tax_id'].toString(),
@@ -230,6 +243,10 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
         .listen(saleDiscountListen);
 
     saleorderlineBloc
+        .getSalePromotionlistListStream()
+        .listen(salePromotionListen);
+
+    saleorderlineBloc
         .getAccountTaxeslistListStream()
         .listen(getAccountTaxesListListen);
 
@@ -245,24 +262,6 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
     quotationeditBloc
         .getUpdateQuotationStatusStream()
         .listen(getQuotationStatusUpdateListen);
-    // invoicelineBloc
-    //     .getInvoiceLineCreateStream()
-    //     .listen(getInvoiceLineCreateListen);
-    // stockpickingcreateBloc
-    //     .getCreateStockPickingStream()
-    //     .listen(getCreateDeliveryListen);
-    // stockpickingcreateBloc
-    //     .getCreateStockMoveStream()
-    //     .listen(getCreateStockMoveListen);
-    // stockpickingcreateBloc
-    //     .getUpdateStockPickingStatusStream()
-    //     .listen(getUpdateDeliveryStatus);
-    // quotationeditBloc
-    //     .getUpdateQuotationPickingIdsStream()
-    //     .listen(getUpdateQuotationPickingIdsListen);
-    // saleorderlineBloc
-    //     .waitingproductlineListStream()
-    //     .listen(getWaitingInvoiceLineCreate);
     invoicecreateBloc
         .getCallCreateInvoiceMethodStream()
         .listen(getCallCreateInvoiceMethodListen);
@@ -277,13 +276,9 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
     saleorderlineBloc
         .waitingproductlineListStream()
         .listen(getproductlineListListen);
-    // invoicelineBloc.getInvoiceLineData();
-    // quotationdeleteBloc
-    //     .deleteSaleOrderLineStream()
-    //     .listen(saleorderlineDeleteListen);
-    // saleorderlineBloc
-    //     .waitingproductlineListStream()
-    //     .listen(waitingDeleteListen);
+    quotationeditBloc
+        .getCheckQtyAvailableStream()
+        .listen(checkQtyAvailableListen);
   }
 
   @override
@@ -319,27 +314,6 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
       print('No Stock Picking Type List');
     }
   } // Listen to get stock picking type
-
-  // void getStockPickingCreateListen(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     final snackbar = SnackBar(
-  //         elevation: 0.0,
-  //         shape:
-  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-  //         behavior: SnackBarBehavior.floating,
-  //         duration: const Duration(seconds: 1),
-  //         backgroundColor: Colors.green,
-  //         content:
-  //             const Text('Create Successfully!', textAlign: TextAlign.center));
-  //     Navigator.of(context).pushAndRemoveUntil(
-  //         MaterialPageRoute(builder: (context) {
-  //       return QuotationListPage();
-  //     }), (route) => false);
-  //     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  //   } else if (responseOb.msgState == MsgState.error) {
-  //     print('Create StockPicking Create Error');
-  //   }
-  // }
 
   void getQuotationStatusUpdateListen(ResponseOb responseOb) async {
     if (responseOb.msgState == MsgState.data) {
@@ -378,6 +352,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
       quotationList = responseOb.data;
       await saleorderlineBloc.getSaleOrderLineData(quotationList[0]['id']);
       await saleorderlineBloc.getSaleDiscountlistData();
+      await saleorderlineBloc.getSalePromotionlistData();
       await saleorderlineBloc.getAccountTaxeslistData();
       await saleorderlineBloc.getProductProductData();
       await saleorderlineBloc.getProductCategoryData();
@@ -418,9 +393,17 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
     if (responseOb.msgState == MsgState.data) {
       salediscountlist = responseOb.data;
     } else if (responseOb.msgState == MsgState.error) {
-      print('No Sale Dicount List');
+      print('No Sale Discount List');
     }
   } // listen to get Sale Discount List
+
+  void salePromotionListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      salepromotionlist = responseOb.data;
+    } else if (responseOb.msgState == MsgState.error) {
+      print('No Sale Promotion List');
+    }
+  } // listen to get Sale Promotion List
 
   void getAccountTaxesListListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
@@ -473,14 +456,50 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
     }
   } // Listen to get Customer List
 
-  // void getTripPlanDeliveryList(ResponseOb responseOb) {
-  //   if (responseOb.msgState == MsgState.data) {
-  //     tripplandeliveryList = responseOb.data;
-  //     getproductlineListFromDB();
-  //   } else if (responseOb.msgState == MsgState.error) {
-  //     print("NoproductlineList");
-  //   }
-  // } // listen to get Sale Order Line List
+  void checkQtyAvailableListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      setState(() {
+        isCheckQty = false;
+        checkqtyresult = responseOb.data;
+      });
+      if (checkqtyresult == true) {
+        setState(() {
+          updateStatus = true;
+        });
+        stockpickingcreateBloc.callActionConfirm(id: widget.quotationId);
+      } else {
+        showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (context) {
+                                                                  return AlertDialog(
+                                                                      title: const Text(
+                                                                          'Something went wrong !'),
+                                                                      content:
+                                                                          const Text(
+                                                                              'Not enough Remaining Stock.'),
+                                                                      actions: [
+                                                                        TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          style:
+                                                                              TextButton.styleFrom(
+                                                                            backgroundColor:
+                                                                                Colors.cyan,
+                                                                          ),
+                                                                          child: const Text(
+                                                                              'Ok',
+                                                                              style: TextStyle(color: Colors.white)),
+                                                                        )
+                                                                      ]);
+                                                                });
+        print('Not enough stock');
+      }
+    }
+  } // listen to checkQtyAvailable
 
   void waitingDeleteListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
@@ -1821,6 +1840,9 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                   18))
                                                             //     ])),
                                                             Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 const SizedBox(
                                                                   width: 200,
@@ -1836,63 +1858,49 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             .black),
                                                                   ),
                                                                 ),
-                                                                Expanded(
-                                                                    child: Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                      Container(
-                                                                        padding:
-                                                                            const EdgeInsets.all(3),
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          color:
-                                                                              Colors.black,
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(5),
-                                                                        ),
-                                                                        child:
-                                                                            Text(
-                                                                          materialproductlineDBList![i]
-                                                                              .discountName!,
-                                                                          style: TextStyle(
-                                                                              color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
-                                                                                  ? Colors.cyan
-                                                                                  : materialproductlineDBList![i].isFOC == 1
-                                                                                      ? Colors.amber
-                                                                                      : Colors.white,
-                                                                              fontSize: 18),
-                                                                        ),
-                                                                      )
-                                                                    ])),
+                                                                Visibility(
+                                                                  visible: materialproductlineDBList![i]
+                                                                              .discountName ==
+                                                                          '[]'
+                                                                      ? false
+                                                                      : true,
+                                                                  child:
+                                                                      Expanded(
+                                                                          child: Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                        Container(
+                                                                          padding:
+                                                                              const EdgeInsets.all(3),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(5),
+                                                                          ),
+                                                                          child:
+                                                                              Text(
+                                                                            materialproductlineDBList![i].discountName == '[]'
+                                                                                ? ''
+                                                                                : materialproductlineDBList![i].discountName!.substring(1, materialproductlineDBList![i].discountName!.length - 1),
+                                                                            style: TextStyle(
+                                                                                color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                                    ? Colors.cyan
+                                                                                    : materialproductlineDBList![i].isFOC == 1
+                                                                                        ? Colors.amber
+                                                                                        : Colors.white,
+                                                                                fontSize: 18),
+                                                                          ),
+                                                                        )
+                                                                      ])),
+                                                                ),
                                                               ],
                                                             ),
-                                                            // RichText(
-                                                            //     text: TextSpan(
-                                                            //         children: [
-                                                            //       const TextSpan(
-                                                            //         text:
-                                                            //             'Promotion: ',
-                                                            //         style: TextStyle(
-                                                            //             fontSize:
-                                                            //                 20,
-                                                            //             fontWeight:
-                                                            //                 FontWeight
-                                                            //                     .bold,
-                                                            //             color: Colors
-                                                            //                 .black),
-                                                            //       ),
-                                                            //       TextSpan(
-                                                            //           text: materialproductlineDBList![
-                                                            //                   i]
-                                                            //               .promotionName,
-                                                            //           style: TextStyle(
-                                                            //               color: quotationList[0]['state'] == 'sale'? Colors.cyan: Colors
-                                                            //                   .black,
-                                                            //               fontSize:
-                                                            //                   18))
-                                                            //     ])),
                                                             Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 const SizedBox(
                                                                   width: 200,
@@ -1908,51 +1916,49 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             .black),
                                                                   ),
                                                                 ),
-                                                                Expanded(
-                                                                    child: Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                      Text(
-                                                                        materialproductlineDBList![i]
-                                                                            .promotionName!,
-                                                                        style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
-                                                                                ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
-                                                                                    ? Colors.amber
-                                                                                    : Colors.black,
-                                                                            fontSize: 18),
-                                                                      )
-                                                                    ])),
+                                                                Visibility(
+                                                                  visible: materialproductlineDBList![i]
+                                                                              .promotionName ==
+                                                                          '[]'
+                                                                      ? false
+                                                                      : true,
+                                                                  child:
+                                                                      Expanded(
+                                                                          child: Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                        Container(
+                                                                          padding:
+                                                                              const EdgeInsets.all(3),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(5),
+                                                                          ),
+                                                                          child:
+                                                                              Text(
+                                                                            materialproductlineDBList![i].promotionName == '[]'
+                                                                                ? ''
+                                                                                : materialproductlineDBList![i].promotionName!.substring(1, materialproductlineDBList![i].promotionName!.length - 1),
+                                                                            style: TextStyle(
+                                                                                color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                                    ? Colors.cyan
+                                                                                    : materialproductlineDBList![i].isFOC == 1
+                                                                                        ? Colors.amber
+                                                                                        : Colors.white,
+                                                                                fontSize: 18),
+                                                                          ),
+                                                                        )
+                                                                      ])),
+                                                                ),
                                                               ],
                                                             ),
-                                                            // RichText(
-                                                            //     text: TextSpan(
-                                                            //         children: [
-                                                            //       const TextSpan(
-                                                            //         text:
-                                                            //             'Discount: ',
-                                                            //         style: TextStyle(
-                                                            //             fontSize:
-                                                            //                 20,
-                                                            //             fontWeight:
-                                                            //                 FontWeight
-                                                            //                     .bold,
-                                                            //             color: Colors
-                                                            //                 .black),
-                                                            //       ),
-                                                            //       TextSpan(
-                                                            //           text: materialproductlineDBList![
-                                                            //                   i]
-                                                            //               .saleDiscount,
-                                                            //           style: TextStyle(
-                                                            //               color: quotationList[0]['state'] == 'sale'? Colors.cyan: Colors
-                                                            //                   .black,
-                                                            //               fontSize:
-                                                            //                   18))
-                                                            //     ])),
                                                             Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 const SizedBox(
                                                                   width: 200,
@@ -1987,32 +1993,10 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                     ])),
                                                               ],
                                                             ),
-                                                            // RichText(
-                                                            //     text: TextSpan(
-                                                            //         children: [
-                                                            //       const TextSpan(
-                                                            //         text:
-                                                            //             'Promo Discount: ',
-                                                            //         style: TextStyle(
-                                                            //             fontSize:
-                                                            //                 20,
-                                                            //             fontWeight:
-                                                            //                 FontWeight
-                                                            //                     .bold,
-                                                            //             color: Colors
-                                                            //                 .black),
-                                                            //       ),
-                                                            //       TextSpan(
-                                                            //           text: materialproductlineDBList![
-                                                            //                   i]
-                                                            //               .promotionDiscount,
-                                                            //           style: TextStyle(
-                                                            //               color: quotationList[0]['state'] == 'sale'? Colors.cyan: Colors
-                                                            //                   .black,
-                                                            //               fontSize:
-                                                            //                   18))
-                                                            //     ])),
                                                             Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 const SizedBox(
                                                                   width: 200,
@@ -3831,10 +3815,11 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                       Navigator.of(context)
                                                           .pop();
                                                       setState(() {
-                                                        updateStatus = true;
+                                                        // updateStatus = true;
+                                                        isCheckQty = true;
                                                       });
-                                                      stockpickingcreateBloc
-                                                          .callActionConfirm(
+                                                      quotationeditBloc
+                                                          .checkQtyAvailable(
                                                               id: widget
                                                                   .quotationId);
                                                       // quotationeditBloc
@@ -4007,19 +3992,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
-                                      MsgState.data) {
-                                    // quotationBloc.getQuotationWithIdData(
-                                    //     widget.quotationId);
-                                    // // stockpickingcreateBloc
-                                    // //     .stockpickingUpdateStatus(
-                                    // //         state: 'confirmed');
-                                    // isUpdateDeliveryStatus = false;
-                                    // int pickingIds = responseOb!.data;
-                                    // print('PickingIds: $pickingIds');
-                                    // quotationEditBloc.updateQuotationPickingIdsData(
-                                    //     ids: quotationList[0]['id'],
-                                    //     pickingIds: pickingIds);
-                                  }
+                                      MsgState.data) {}
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
@@ -4256,6 +4229,41 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                     ResponseOb(msgState: MsgState.loading),
                                 stream: invoicelineBloc
                                     .getInvoiceLineCreateStream(),
+                                builder: (context,
+                                    AsyncSnapshot<ResponseOb> snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.5),
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.data) {}
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/gifs/loading.gif',
+                                        width: 100,
+                                        height: 100,
+                                      ),
+                                    ),
+                                  );
+                                })
+                            : Container(),
+                        isCheckQty == true
+                            ? StreamBuilder<ResponseOb>(
+                                initialData:
+                                    ResponseOb(msgState: MsgState.loading),
+                                stream: quotationeditBloc
+                                    .getCheckQtyAvailableStream(),
                                 builder: (context,
                                     AsyncSnapshot<ResponseOb> snapshot) {
                                   ResponseOb? responseOb = snapshot.data;

@@ -1554,100 +1554,111 @@ class _MaterialRequisitionCreateMBState
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            const Text(
-                                              "Location:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 40,
-                                              width: 20,
-                                              child: StreamBuilder<ResponseOb>(
-                                                  initialData:
-                                                      hasStockLocationData ==
-                                                              true
-                                                          ? null
-                                                          : ResponseOb(
-                                                              msgState: MsgState
-                                                                  .loading),
-                                                  stream: materialrequisitionBloc
-                                                      .getStockLocationListStream(),
-                                                  builder: (context,
-                                                      AsyncSnapshot<ResponseOb>
-                                                          snapshot) {
-                                                    ResponseOb? responseOb =
-                                                        snapshot.data;
-                                                    if (responseOb?.msgState ==
-                                                        MsgState.loading) {
-                                                      return Center(
-                                                        child: Image.asset(
-                                                          'assets/gifs/loading.gif',
-                                                          width: 100,
-                                                          height: 100,
-                                                        ),
-                                                      );
-                                                    } else if (responseOb
-                                                            ?.msgState ==
-                                                        MsgState.error) {
-                                                      return const Center(
-                                                        child: Text(
-                                                            "Something went Wrong!"),
-                                                      );
-                                                    } else {
-                                                      return DropdownSearch<
-                                                          String>(
-                                                        popupItemBuilder:
-                                                            (context, item,
-                                                                isSelected) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(item
-                                                                    .toString()
-                                                                    .split(
-                                                                        ',')[1]),
-                                                                const Divider(),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                        dropdownBuilder:
-                                                            (c, i) {
-                                                          // print(
-                                                          //     'i : ${i.toString().split(',')[1]}');
-                                                          return Text(i!
-                                                                  .contains(',')
-                                                              ? i
-                                                                  .toString()
-                                                                  .split(',')[1]
-                                                              : i);
-                                                        },
-                                                        showSearchBox: true,
-                                                        showSelectedItems:
-                                                            false,
-                                                        showClearButton:
-                                                            !hasNotStockLocation,
-                                                        items: stocklocationList
-                                                            .map((e) =>
-                                                                '${e['id']},${e['name']}')
-                                                            .toList(),
-                                                        onChanged:
-                                                            getStockLocationListId,
-                                                        selectedItem:
-                                                            stocklocationName,
-                                                      );
-                                                    }
-                                                  }),
-                                            ),
-                                            const SizedBox(height: 10),
+                                            // const Text(
+                                            //   "Location:",
+                                            //   style: TextStyle(
+                                            //       fontWeight: FontWeight.bold,
+                                            //       fontSize: 20),
+                                            // ),
+                                            // Container(
+                                            //   color: Colors.white,
+                                            //   height: 40,
+                                            //   width: 20,
+                                            //   child: StreamBuilder<ResponseOb>(
+                                            //       initialData:
+                                            //           hasStockLocationData ==
+                                            //                   true
+                                            //               ? null
+                                            //               : ResponseOb(
+                                            //                   msgState: MsgState
+                                            //                       .loading),
+                                            //       stream: materialrequisitionBloc
+                                            //           .getStockLocationListStream(),
+                                            //       builder: (context,
+                                            //           AsyncSnapshot<ResponseOb>
+                                            //               snapshot) {
+                                            //         ResponseOb? responseOb =
+                                            //             snapshot.data;
+                                            //         if (responseOb?.msgState ==
+                                            //             MsgState.loading) {
+                                            //           return Center(
+                                            //             child: Image.asset(
+                                            //               'assets/gifs/loading.gif',
+                                            //               width: 100,
+                                            //               height: 100,
+                                            //             ),
+                                            //           );
+                                            //         } else if (responseOb
+                                            //                 ?.msgState ==
+                                            //             MsgState.error) {
+                                            //           return const Center(
+                                            //             child: Text(
+                                            //                 "Something went Wrong!"),
+                                            //           );
+                                            //         } else {
+                                            //           return DropdownSearch<
+                                            //               String>(
+                                            //             clearButtonBuilder:
+                                            //                 (context) {
+                                            //               print(
+                                            //                   'locationId: $stocklocationId');
+                                            //               return Icon(
+                                            //                   Icons.clear);
+                                            //             },
+                                            //             // clearButton: IconButton(
+                                            //             //     onPressed: () {}),
+                                            //             popupItemBuilder:
+                                            //                 (context, item,
+                                            //                     isSelected) {
+                                            //               return Padding(
+                                            //                 padding:
+                                            //                     const EdgeInsets
+                                            //                         .all(8.0),
+                                            //                 child: Column(
+                                            //                   crossAxisAlignment:
+                                            //                       CrossAxisAlignment
+                                            //                           .start,
+                                            //                   children: [
+                                            //                     Text(item
+                                            //                         .toString()
+                                            //                         .split(
+                                            //                             ',')[1]),
+                                            //                     const Divider(),
+                                            //                   ],
+                                            //                 ),
+                                            //               );
+                                            //             },
+                                            //             dropdownBuilder:
+                                            //                 (c, i) {
+                                            //               // print(
+                                            //               //     'i : ${i.toString().split(',')[1]}');
+                                            //               return Text(i == null
+                                            //                   ? ''
+                                            //                   : i.contains(',')
+                                            //                       ? i
+                                            //                           .toString()
+                                            //                           .split(
+                                            //                               ',')[1]
+                                            //                       : i);
+                                            //             },
+                                            //             showSearchBox: true,
+                                            //             showSelectedItems:
+                                            //                 false,
+                                            //             showClearButton:
+                                            //                 !hasNotStockLocation,
+                                            //             items: stocklocationList
+                                            //                 .map((e) =>
+                                            //                     '${e['id']},${e['name']}')
+                                            //                 .toList(),
+                                            //             onChanged:
+                                            //                 getStockLocationListId,
+                                            //             selectedItem:
+                                            //                 stocklocationName,
+                                            //           );
+                                            //         }
+                                            //       }),
+                                            // ),
+                                            // const SizedBox(height: 10),
                                             Text(
                                               "Description*:",
                                               style: TextStyle(

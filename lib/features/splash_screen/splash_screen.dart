@@ -33,9 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (userInfo == true) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return MediaQuery.of(context).size.width > 400.0
-              ? const QuotationList()
-              : const QuotationListMB();
+          return const QuotationListMB();
         }), (route) => false);
       } else {
         // Navigator.of(context).pushAndRemoveUntil(
@@ -44,9 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // }), (route) => false);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) {
-          return MediaQuery.of(context).size.width > 400.0
-              ? const Login()
-              : const LoginMB();
+          return const LoginMB();
         }), (route) => false);
       }
     });

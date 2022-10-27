@@ -36,6 +36,8 @@ class _LoginMBState extends State<LoginMB> {
     // TODO: implement initState
     super.initState();
     Sharef.clearSessionId();
+    loginBloc.getDatabasesList();
+    loginBloc.getDBListStream().listen(getDBListListen);
     loginBloc.getLoginStream().listen((ResponseOb responseOb) {
       if (responseOb.msgState == MsgState.data) {
         final snackbar = SnackBar(
@@ -66,6 +68,12 @@ class _LoginMBState extends State<LoginMB> {
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
     });
+  }
+
+  void getDBListListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      dbList = responseOb.data;
+    }
   }
 
   @override
@@ -171,49 +179,30 @@ class _LoginMBState extends State<LoginMB> {
                             const SizedBox(
                               height: 10,
                             ),
-                            // Container(
-                            //   color: Colors.white,
-                            //   height: 50,
-                            //   child: TextFormField(
-                            //     onEditingComplete: (() => FocusScope.of(context)
-                            //         .requestFocus(emailFocus)),
-                            //     scrollPadding: const EdgeInsets.only(bottom: 40),
-                            //     focusNode: dbFocus,
-                            //     controller: _dbcontroller,
-                            //     autofocus: false,
-                            //     style: const TextStyle(
-                            //       fontSize: 18,
-                            //     ),
-                            //     decoration: InputDecoration(
-                            //         suffixIcon: Directionality(
-                            //           textDirection: TextDirection.rtl,
-                            //           child: TextButton.icon(
-                            //             onPressed: () {},
-                            //             label: const Text(
-                            //               'Select',
-                            //               style: TextStyle(color: Colors.black),
-                            //             ),
-                            //             icon: const Icon(Icons.table_rows),
-                            //           ),
-                            //         ),
-                            //         focusedBorder: OutlineInputBorder(
-                            //             borderSide: BorderSide(
-                            //               color: Theme.of(context).primaryColor,
-                            //             ),
-                            //             borderRadius: BorderRadius.circular(10)),
-                            //         focusColor: Theme.of(context).primaryColor,
-                            //         border: OutlineInputBorder()),
-                            //   ),
-                            // ), // Database Selector with Text Field
                             Container(
-                              color: Colors.white,
-                              height: 50,
-                              child: FutureBuilder<List<dynamic>>(
-                                  future: odoo.getDatabases(),
+                                color: Colors.white,
+                                height: 50,
+                                child: StreamBuilder<ResponseOb>(
+                                  initialData:
+                                      ResponseOb(msgState: MsgState.data),
+                                  stream: loginBloc.getDBListStream(),
                                   builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      dbList = snapshot.data!;
-                                      print('dblist: $dbList');
+                                    ResponseOb? responseOb = snapshot.data;
+                                    if (responseOb?.msgState ==
+                                        MsgState.loading) {
+                                      return Center(
+                                        child: Image.asset(
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                      );
+                                    } else if (responseOb?.msgState ==
+                                        MsgState.error) {
+                                      return const Center(
+                                        child: Text("Something went Wrong!"),
+                                      );
+                                    } else {
                                       return DropdownSearch<String>(
                                         dropDownButton: const Icon(
                                           Icons.table_rows,
@@ -247,17 +236,9 @@ class _LoginMBState extends State<LoginMB> {
                                         },
                                         selectedItem: dbName,
                                       );
-                                    } else {
-                                      return Center(
-                                        child: Image.asset(
-                                          'assets/gifs/loading.gif',
-                                          width: 100,
-                                          height: 100,
-                                        ),
-                                      );
                                     }
-                                  }),
-                            ),
+                                  },
+                                )),
                             const SizedBox(
                               height: 20,
                             ),
@@ -404,12 +385,15 @@ class _LoginMBState extends State<LoginMB> {
                                           //     '123',
                                           //     'smc_sale_test');
                                           print('db: $dbName');
-                                          print('email: ${_emailcontroller.text}');
-                                          print('pwd: ${_passwordcontroller.text}');
+                                          print(
+                                              'email: ${_emailcontroller.text}');
+                                          print(
+                                              'pwd: ${_passwordcontroller.text}');
                                           loginBloc.quotationLogin(
-                                              _emailcontroller.text,
-                                              _passwordcontroller.text,
-                                              dbName);
+                                              email: _emailcontroller.text,
+                                              password:
+                                                  _passwordcontroller.text,
+                                              db: dbName);
                                         },
                                         child: const Text(
                                           'Log in',

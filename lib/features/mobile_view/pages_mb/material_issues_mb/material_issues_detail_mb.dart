@@ -10,6 +10,7 @@ import '../../../../pages/delivery_page/delivery_create_bloc.dart';
 import '../../../../pages/material_issues_page/material_isssues_bloc.dart';
 import '../../../../pages/quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
 import '../../../../utils/app_const.dart';
+import 'material_issues_list_mb.dart';
 
 class MaterialIssuesDetailMB extends StatefulWidget {
   int id;
@@ -157,7 +158,10 @@ class _MaterialIssuesDetailMBState extends State<MaterialIssuesDetailMB> {
           return false;
         } else {
           await databaseHelper.deleteAllStockMoveUpdate();
-          Navigator.of(context).pop();
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) {
+            return MaterialIssuesListMB();
+          }), (route) => false);
           return true;
         }
       },

@@ -1141,11 +1141,12 @@ class _MaterialProductLineMultiSelectionMBState
                                                                         (c, i) {
                                                                       // print(
                                                                       //     'i : ${i.toString().split(',')[1]}');
-                                                                      return Text(i!.contains(
-                                                                              ',')
-                                                                          ? i.toString().split(
-                                                                              ',')[1]
-                                                                          : i);
+                                                                      return Text(i ==
+                                                                              null
+                                                                          ? ''
+                                                                          : i.contains(',')
+                                                                              ? i.toString().split(',')[1]
+                                                                              : i);
                                                                     },
                                                                     popupItemBuilder:
                                                                         (context,

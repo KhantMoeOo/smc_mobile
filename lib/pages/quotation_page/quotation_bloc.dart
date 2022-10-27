@@ -60,7 +60,7 @@ class QuotationBloc {
 
   late Odoo odoo;
 
-  getQuotationData({name, state}) async {
+  getQuotationData({name, state, zoneId}) async {
     print('EntergetQuotationData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     quotationStreamController.sink.add(responseOb);
@@ -82,6 +82,7 @@ class QuotationBloc {
             [
               name,
               state,
+              ['zone_id.id','=',zoneId]
             ],
             [
               'id',

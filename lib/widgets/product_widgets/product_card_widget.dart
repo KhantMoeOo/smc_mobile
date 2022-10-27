@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import '../../features/mobile_view/pages_mb/product_mb/product_detail_mb.dart';
 import '../../pages/product_page/product_detail_page.dart';
 import '../../utils/app_const.dart';
 
@@ -57,7 +58,7 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
               onTap: () {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
-                  return ProductDetailPage(productId: widget.productid);
+                  return ProductDetailMB(productId: widget.productid);
                 }));
               },
               iconWidget: Column(

@@ -37,6 +37,8 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: implement initState
     super.initState();
     Sharef.clearSessionId();
+    loginBloc.getDatabasesList();
+    loginBloc.getDBListStream().listen(getDBListListen);
     loginBloc.getLoginStream().listen((ResponseOb responseOb) {
       if (responseOb.msgState == MsgState.data) {
         final snackbar = SnackBar(
@@ -67,6 +69,12 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
     });
+  }
+
+  void getDBListListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      dbList = responseOb.data;
+    }
   }
 
   @override
@@ -207,14 +215,29 @@ class _LoginPageState extends State<LoginPage> {
                             //   ),
                             // ), // Database Selector with Text Field
                             Container(
-                              color: Colors.white,
-                              height: 50,
-                              child: FutureBuilder<List<dynamic>>(
-                                  future: odoo.getDatabases(),
+                                color: Colors.white,
+                                height: 50,
+                                child: StreamBuilder<ResponseOb>(
+                                  initialData:
+                                      ResponseOb(msgState: MsgState.data),
+                                  stream: loginBloc.getDBListStream(),
                                   builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      dbList = snapshot.data!;
-                                      print('dblist: $dbList');
+                                    ResponseOb? responseOb = snapshot.data;
+                                    if (responseOb?.msgState ==
+                                        MsgState.loading) {
+                                      return Center(
+                                        child: Image.asset(
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                      );
+                                    } else if (responseOb?.msgState ==
+                                        MsgState.error) {
+                                      return const Center(
+                                        child: Text("Something went Wrong!"),
+                                      );
+                                    } else {
                                       return DropdownSearch<String>(
                                         dropDownButton: const Icon(
                                           Icons.table_rows,
@@ -248,17 +271,9 @@ class _LoginPageState extends State<LoginPage> {
                                         },
                                         selectedItem: dbName,
                                       );
-                                    } else {
-                                      return Center(
-                                        child: Image.asset(
-                                          'assets/gifs/loading.gif',
-                                          width: 100,
-                                          height: 100,
-                                        ),
-                                      );
                                     }
-                                  }),
-                            ),
+                                  },
+                                )),
                             const SizedBox(
                               height: 20,
                             ),
@@ -403,9 +418,10 @@ class _LoginPageState extends State<LoginPage> {
                                           // loginBloc.quotationLogin(
                                           //     'admin', 'admin', 'smc_uat_test');
                                           loginBloc.quotationLogin(
-                                              _emailcontroller.text,
-                                              _passwordcontroller.text,
-                                              dbName);
+                                              email: _emailcontroller.text,
+                                              password:
+                                                  _passwordcontroller.text,
+                                              db: dbName);
                                         },
                                         child: const Text(
                                           'Log in',

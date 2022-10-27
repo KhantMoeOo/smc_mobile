@@ -83,6 +83,12 @@ class SaleOrderLineBloc {
   Stream<ResponseOb> getSaleDiscountlistListStream() =>
       salediscountlistStreamController.stream; // SaleDiscount Stream Controller
 
+  StreamController<ResponseOb> salepromotionlistStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> getSalePromotionlistListStream() =>
+      salepromotionlistStreamController
+          .stream; // SalePromotion Stream Controller
+
   StreamController<ResponseOb> accounttaxeslistStreamController =
       StreamController<ResponseOb>.broadcast();
   Stream<ResponseOb> getAccountTaxeslistListStream() =>
@@ -894,6 +900,55 @@ class SaleOrderLineBloc {
     }
   } // Get SaleDiscount Data
 
+  getSalePromotionlistData() async {
+    print('EntergetSalePromotionlistData');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    salepromotionlistStreamController.sink.add(responseOb);
+    List<dynamic>? data;
+
+    try {
+      print('Try');
+      Sharef.getOdooClientInstance().then((value) async {
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res = await odoo.searchRead(
+            'sale.discount',
+            [
+              ['sale_type', '=', 'promotion']
+            ],
+            ['id', 'name', 'sale_type'],
+            order: 'priority desc');
+        if (!res.hasError()) {
+          print('getSalePromotionlistresult: ${res.getResult()['records']}');
+          data = res.getResult()['records'];
+          responseOb.msgState = MsgState.data;
+          responseOb.data = data;
+          salepromotionlistStreamController.sink.add(responseOb);
+        } else {
+          data = null;
+          print(
+              'getSalePromotionlistError:' + res.getErrorMessage().toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          salepromotionlistStreamController.sink.add(responseOb);
+        }
+      });
+    } catch (e) {
+      print('catch');
+      if (e.toString().contains("SocketException")) {
+        responseOb.data = "Internet Connection Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.noConnection;
+        salepromotionlistStreamController.sink.add(responseOb);
+      } else {
+        responseOb.data = "Unknown Error";
+        responseOb.msgState = MsgState.error;
+        responseOb.errState = ErrState.unKnownErr;
+        salepromotionlistStreamController.sink.add(responseOb);
+      }
+    }
+  } // Get SalePromotion Data
+
   getAccountTaxeslistData() async {
     print('EntergetAccountTaxestlistData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
@@ -1011,6 +1066,7 @@ class SaleOrderLineBloc {
     salepricelistproductlinewithfilterStreamController.close();
     salepricelistStreamController.close();
     salediscountlistStreamController.close();
+    salepromotionlistStreamController.close();
     accounttaxeslistStreamController.close();
     salepricelistproductlinebyregionStreamController.close();
     getUnitPriceStreamController.close();
