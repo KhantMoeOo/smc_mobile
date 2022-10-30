@@ -207,7 +207,7 @@ class StockPickingCreateBloc {
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
-            await odoo.callKW('sale.order', 'action_confir', [id]);
+            await odoo.callKW('sale.order', 'action_confirm', [id]);
         if (!res.hasError()) {
           print('Call Action Confirm Result: ${res.getResult()}');
           responseOb.msgState = MsgState.data;

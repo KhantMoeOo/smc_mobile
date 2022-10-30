@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 const BASEURL = "http://192.168.100.17:8074";
 
-//const BASEURL = "http://192.168.1.23:8074";
+//const BASEURL = "http://192.168.1.19:8074";
 
 //const BASEURL = "http://94.74.117.238";
 

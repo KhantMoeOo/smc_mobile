@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 import '../../dbs/sharef.dart';
@@ -182,9 +183,9 @@ class ProfileBloc {
     //resusersStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
+    Sharef.getOdooClientInstance().then((value) async {
+      try {
+        print('try get User Data');
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         userId = value['uid'];
@@ -202,27 +203,35 @@ class ProfileBloc {
           responseOb.data = data;
           resusersStreamController.sink.add(responseOb);
         } else {
-          data = null;
-          print('GetResUsersError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get User Data Error: ${map['message']}');
+              }
+            },
+          );
+          print('Get User Data Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           resusersStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
-      print('ResUsers catch');
-      if (e.toString().contains("SocketException")) {
-        responseOb.data = "Internet Connection Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.noConnection;
-        resusersStreamController.sink.add(responseOb);
-      } else {
-        responseOb.data = "Unknown Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.unKnownErr;
-        resusersStreamController.sink.add(responseOb);
+      } catch (e) {
+        print('ResUsers catch');
+        if (e.toString().contains("SocketException")) {
+          responseOb.data = "Internet Connection Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.noConnection;
+          resusersStreamController.sink.add(responseOb);
+        } else {
+          responseOb.data = "Unknown Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          resusersStreamController.sink.add(responseOb);
+        }
       }
-    }
+    });
   } // get ResUsers
 
   dispose() {

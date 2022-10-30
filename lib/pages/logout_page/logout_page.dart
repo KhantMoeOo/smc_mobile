@@ -24,34 +24,34 @@ class _LogoutPageState extends State<LogoutPage> {
     logoutBloc.getLogoutStream().listen(getLogoutListen);
   }
 
-  void getLogoutListen(ResponseOb responseOb){
+  void getLogoutListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
-        final snackbar = SnackBar(
-            elevation: 0.0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 1),
-            backgroundColor: Colors.green,
-            content: const Text('Logout Successfully!',
-                textAlign: TextAlign.center));
-        ScaffoldMessenger.of(context).showSnackBar(snackbar);
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (BuildContext context) {
-          return MediaQuery.of(context).size.width > 400.0? const Login(): const LoginMB();
-        }), (route) => false);
-      } else if (responseOb.msgState == MsgState.error) {
-        final snackbar = SnackBar(
-            elevation: 0.0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 1),
-            backgroundColor: Colors.red,
-            content: const Text('Something went wrong!',
-                textAlign: TextAlign.center));
-        ScaffoldMessenger.of(context).showSnackBar(snackbar);
-      }
+      final snackbar = SnackBar(
+          elevation: 0.0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.green,
+          content:
+              const Text('Logout Successfully!', textAlign: TextAlign.center));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (BuildContext context) {
+        return const LoginMB();
+      }), (route) => false);
+    } else if (responseOb.msgState == MsgState.error) {
+      final snackbar = SnackBar(
+          elevation: 0.0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.red,
+          content:
+              const Text('Something went wrong!', textAlign: TextAlign.center));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
   }
 
   @override

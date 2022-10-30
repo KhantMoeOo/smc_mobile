@@ -13,11 +13,8 @@ enum MsgState {
 
 enum ErrState {
   unKnownErr,
-  notFoundErr,
   severErr,
   noConnection,
-  other,
-  userErr,
 }
 
 enum PageState {

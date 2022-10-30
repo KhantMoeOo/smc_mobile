@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 import '../../dbs/sharef.dart';
@@ -66,17 +67,18 @@ class QuotationBloc {
     quotationStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
+    Sharef.getOdooClientInstance().then((value) async {
+      
+      try {
+        print('try get Quotation Data');
         odoo = Odoo(BASEURL);
-        odoo.setSessionId(value['session_id']);
+      odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'sale.order',
             [
               name,
               state,
-              ['zone_id.id','=',zoneId]
+              ['zone_id.id', '=', zoneId]
             ],
             [
               'id',
@@ -122,28 +124,35 @@ class QuotationBloc {
               ? quotationStreamController.sink.add(responseOb)
               : null;
         } else {
-          print('Quotation error');
-          data = null;
-          print('GetquoError:' + res.getError().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Quotation List Error: ${map['message']}');
+              }
+            },
+          );
+          print('Get Quotation List Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           quotationStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
-      print('Quotation catch: $e');
-      if (e.toString().contains("SocketException")) {
-        responseOb.data = "Internet Connection Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.noConnection;
-        quotationStreamController.sink.add(responseOb);
-      } else {
-        responseOb.data = "Unknown Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.unKnownErr;
-        quotationStreamController.sink.add(responseOb);
+      } catch (e) {
+        print('Quotation catch: $e');
+        if (e.toString().contains("SocketException")) {
+          responseOb.data = "Internet Connection Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.noConnection;
+          quotationStreamController.sink.add(responseOb);
+        } else {
+          responseOb.data = "Unknown Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          quotationStreamController.sink.add(responseOb);
+        }
       }
-    }
+    });
   } // get Quotation List
 
   getQuotationWithIdData(id) async {
@@ -152,11 +161,10 @@ class QuotationBloc {
     quotationWithIdStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
-        odoo.setSessionId(value['session_id']);
+    Sharef.getOdooClientInstance().then((value) async {
+      odoo = Odoo(BASEURL);
+      odoo.setSessionId(value['session_id']);
+      try {
         OdooResponse res = await odoo.searchRead(
             'sale.order',
             [
@@ -207,28 +215,36 @@ class QuotationBloc {
               ? quotationWithIdStreamController.sink.add(responseOb)
               : null;
         } else {
-          print('getQuotationWithIdData error');
-          data = null;
-          print('GetquoError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Quotation With Id Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get Quotation With Id Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           quotationWithIdStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
-      print('getQuotationWithIdData catch: $e');
-      if (e.toString().contains("SocketException")) {
-        responseOb.data = "Internet Connection Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.noConnection;
-        quotationWithIdStreamController.sink.add(responseOb);
-      } else {
-        responseOb.data = "Unknown Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.unKnownErr;
-        quotationWithIdStreamController.sink.add(responseOb);
+      } catch (e) {
+        print('getQuotationWithIdData catch: $e');
+        if (e.toString().contains("SocketException")) {
+          responseOb.data = "Internet Connection Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.noConnection;
+          quotationWithIdStreamController.sink.add(responseOb);
+        } else {
+          responseOb.data = "Unknown Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          quotationWithIdStreamController.sink.add(responseOb);
+        }
       }
-    }
+    });
   } // getQuotationWithIdData List
 
   getCustomerList(name, zoneId) async {

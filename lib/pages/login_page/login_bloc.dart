@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:odoo_api/odoo_api_connector.dart';
 import 'package:odoo_api/odoo_user_response.dart';
 
@@ -25,15 +26,27 @@ class LoginBloc {
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     loginStreamController.sink.add(responseOb);
     odoo = Odoo(BASEURL);
-    AuthenticateCallback auth = await odoo.authenticate(email, password, db);
+
     try {
+      print('Try Login');
+      AuthenticateCallback auth = await odoo.authenticate(email, password, db);
       if (auth.isSuccess) {
         Sharef.saveUser(auth.getUser());
         responseOb.msgState = MsgState.data;
         loginStreamController.sink.add(responseOb);
       } else if (!auth.isSuccess) {
+        auth.getError().forEach(
+          (key, value) {
+            if (key == 'data') {
+              Map map = value;
+              responseOb.data = map['message'];
+              log('GetCall Action Confirm Error: ${map['message']}');
+            }
+          },
+        );
+        print('Get Login Error:' + auth.getError().keys.toString());
         responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.unKnownErr;
+        responseOb.errState = ErrState.severErr;
         loginStreamController.sink.add(responseOb);
       }
     } catch (e) {
@@ -53,16 +66,16 @@ class LoginBloc {
   }
 
   getDatabasesList() async {
-    print('EntergetQuotationData');
+    print('EntergetDatabaseData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     getDBListStreamController.sink.add(responseOb);
     List<dynamic>? data;
     odoo = Odoo(BASEURL);
-    data = await odoo.getDatabases();
     try {
-      print('Try');
+      print('Try Get Databases');
+      data = await odoo.getDatabases();
       if (data.isNotEmpty) {
-        print('QuotationResult: $data');
+        print('DatabaseResult: $data');
         // data = res.getResult()['records'];
         responseOb.msgState = MsgState.data;
         responseOb.data = data;
@@ -70,15 +83,14 @@ class LoginBloc {
             ? getDBListStreamController.sink.add(responseOb)
             : null;
       } else {
-        print('Quotation error');
+        print('Database error');
         data = [];
-        // print('GetquoError:' + res.getErrorMessage().toString());
         responseOb.msgState = MsgState.error;
         responseOb.errState = ErrState.unKnownErr;
         getDBListStreamController.sink.add(responseOb);
       }
     } catch (e) {
-      print('Quotation catch: $e');
+      print('Database catch: $e');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
         responseOb.msgState = MsgState.error;
