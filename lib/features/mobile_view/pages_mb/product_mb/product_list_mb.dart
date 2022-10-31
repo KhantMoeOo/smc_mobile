@@ -76,17 +76,15 @@ class _ProductListMBState extends State<ProductListMB> {
     }
   }
 
-  void getStockOnHand(int i) {
+  getStockOnHand(int i) {
     print('workgetStockOnHand');
     for (var stockquant in stockquantList) {
-      print('loop stockquant________');
+      // print('loop stockquant________');
       if (productList[i]['id'] == stockquant['product_id'][0]) {
         print('StockonHand ${stockquant['detail_qty']}');
         print('StockproductId: ${stockquant['product_id']}');
-        stockonhand = stockquant['detail_qty'];
-      } else {
-        print('NotSame productId');
-        stockonhand = '';
+        productList[i]['detail_qty'] = stockquant['detail_qty'];
+        print('stockonhand: ${productList[i]['detail_qty']}');
       }
     }
   }
@@ -251,7 +249,8 @@ class _ProductListMBState extends State<ProductListMB> {
                                                   false
                                               ? 0.0
                                               : productList[i]['list_price'],
-                                          qtyAvailable: stockonhand,
+                                          qtyAvailable: productList[i]
+                                              ['detail_qty'],
                                           uomId:
                                               productList[i]['uom_id'] == false
                                                   ? []
@@ -504,13 +503,12 @@ class _ProductListMBState extends State<ProductListMB> {
                                                           searchDone = true;
                                                           productListBloc
                                                               .getProductListData(
-                                                            name: [
-                                                              'list_price',
-                                                              'ilike',
-                                                              productSearchController
-                                                                  .text
-                                                            ]
-                                                          );
+                                                                  name: [
+                                                                'list_price',
+                                                                'ilike',
+                                                                productSearchController
+                                                                    .text
+                                                              ]);
                                                         },
                                                         child: Container(
                                                           alignment: Alignment

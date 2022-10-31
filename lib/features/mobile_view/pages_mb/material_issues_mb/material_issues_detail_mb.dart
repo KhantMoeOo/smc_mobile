@@ -1444,23 +1444,23 @@ class _MaterialIssuesDetailMBState extends State<MaterialIssuesDetailMB> {
                               overlayColor: Colors.black,
                               overlayOpacity: 0.5,
                               children: [
-                                SpeedDialChild(
-                                  visible: stockpickingList[0]['state'] ==
-                                          'issue_confirm'
-                                      ? true
-                                      : false,
-                                  onTap: () async {
-                                    setState(() {
-                                      isCallActionValidate = true;
-                                    });
-                                    await databaseHelper
-                                        .deleteAllStockMoveUpdate();
-                                    materialissuesBloc
-                                        .callActionConfirm(widget.id);
-                                  },
-                                  child: const Icon(Icons.check),
-                                  label: 'Validate',
-                                ),
+                                // SpeedDialChild(
+                                //   visible: stockpickingList[0]['state'] ==
+                                //           'issue_confirm'
+                                //       ? true
+                                //       : false,
+                                //   onTap: () async {
+                                //     setState(() {
+                                //       isCallActionValidate = true;
+                                //     });
+                                //     await databaseHelper
+                                //         .deleteAllStockMoveUpdate();
+                                //     materialissuesBloc
+                                //         .callActionConfirm(widget.id);
+                                //   },
+                                //   child: const Icon(Icons.check),
+                                //   label: 'Validate',
+                                // ),
                                 SpeedDialChild(
                                   visible:
                                       stockpickingList[0]['state'] == 'assigned'

@@ -23,12 +23,13 @@ class _ProductDetailMBState extends State<ProductDetailMB> {
   List<dynamic> userList = [];
   List<dynamic> stockwarehouseList = [];
   List<dynamic> stockquantList = [];
-  String stockonhand = '';
+  String stockonhand = 'Null';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    print('ProductId: ${widget.productId}');
     profileBloc.getResUsersData();
     profileBloc.getResUsersStream().listen(getResUsersData);
     productListBloc.getStockWarehouseStream().listen(getStockWarehouseListen);
@@ -73,15 +74,15 @@ class _ProductDetailMBState extends State<ProductDetailMB> {
   void getStockOnHand() {
     print('workgetStockOnHand');
     for (var stockquant in stockquantList) {
-      print('loop stockquant________');
-      if (widget.productId == stockquant['product_id'][0]) {
-        print('StockonHand ${stockquant['detail_qty']}');
-        print('StockproductId: ${stockquant['product_id']}');
-        stockonhand = stockquant['detail_qty'];
-      } else {
-        print('NotSame productId');
-        stockonhand = '';
-      }
+      // print('loop stockquant________');
+      setState(() {
+        if (widget.productId == stockquant['product_id'][0]) {
+          print('StockonHand ${stockquant['detail_qty']}');
+          print('StockproductId: ${stockquant['product_id']}');
+          stockonhand = stockquant['detail_qty'];
+          print('stockonhand: $stockonhand');
+        }
+      });
     }
   }
 
@@ -95,7 +96,9 @@ class _ProductDetailMBState extends State<ProductDetailMB> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: StreamBuilder<ResponseOb>(
-          initialData: productList.isNotEmpty ? null: ResponseOb(msgState: MsgState.loading),
+          initialData: productList.isNotEmpty
+              ? null
+              : ResponseOb(msgState: MsgState.loading),
           stream: productListBloc.getProductListStream(),
           builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
             ResponseOb? responseOb = snapshot.data;
@@ -198,7 +201,7 @@ class _ProductDetailMBState extends State<ProductDetailMB> {
                                       const SizedBox(
                                         width: 200,
                                         child: Text(
-                                          'Can be Sold',
+                                          'Can be Purchase',
                                           style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,
@@ -256,8 +259,7 @@ class _ProductDetailMBState extends State<ProductDetailMB> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
                                               children: [
-                                            Text(
-                                                stockonhand,
+                                            Text(stockonhand,
                                                 style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 18))

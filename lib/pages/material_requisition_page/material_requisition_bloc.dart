@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 import '../../dbs/sharef.dart';
@@ -33,9 +34,9 @@ class MaterialRequisitionBloc {
     materialrequisitionListStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
+    Sharef.getOdooClientInstance().then((value) async {
+      try {
+        print('Try Get Material Requisition List');
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
@@ -67,29 +68,36 @@ class MaterialRequisitionBloc {
           responseOb.data = data;
           materialrequisitionListStreamController.sink.add(responseOb);
         } else {
-          print('error');
-          data = null;
-          print('GetMaterialRequisitionError:' +
-              res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Material Requisition Error: ${map['message']}');
+              }
+            },
+          );
+          print('Get Material Requisition Error:' +
+              res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           materialrequisitionListStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
-      print('catch');
-      if (e.toString().contains("SocketException")) {
-        responseOb.data = "Internet Connection Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.noConnection;
-        materialrequisitionListStreamController.sink.add(responseOb);
-      } else {
-        responseOb.data = "Unknown Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.unKnownErr;
-        materialrequisitionListStreamController.sink.add(responseOb);
+      } catch (e) {
+        print('catch get Material Requisiton List');
+        if (e.toString().contains("SocketException")) {
+          responseOb.data = "Internet Connection Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.noConnection;
+          materialrequisitionListStreamController.sink.add(responseOb);
+        } else {
+          responseOb.data = "Unknown Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          materialrequisitionListStreamController.sink.add(responseOb);
+        }
       }
-    }
+    });
   }
 
   getMaterialRequisitionListWithIdData(id) {

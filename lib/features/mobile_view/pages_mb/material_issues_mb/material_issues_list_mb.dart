@@ -115,7 +115,7 @@ class _MaterialIssuesListMBState extends State<MaterialIssuesListMB> {
       ], [
         'state',
         'in',
-        ['assigned', 'done']
+        ['assigned', 'issue_confirm', 'done']
       ]);
     }
   }

@@ -136,6 +136,7 @@ class _MaterialRequisitionListMBState extends State<MaterialRequisitionListMB> {
                               Navigator.of(context)
                                   .push(MaterialPageRoute(builder: (context) {
                                 return MaterialRequisitionCreateMB(
+                                  mrList: materialrequisitionList,
                                   name: '',
                                   neworedit: 0,
                                   userId: userList[0]['zone_id'][0],

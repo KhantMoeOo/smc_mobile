@@ -85,6 +85,10 @@ class _MenuListMBState extends State<MenuListMB> {
         hasProfileData = true;
       });
       profileList = responseOb.data;
+    } else if (responseOb.msgState == MsgState.error) {
+      setState(() {
+        hasProfileData = false;
+      });
     }
   }
 
@@ -99,6 +103,10 @@ class _MenuListMBState extends State<MenuListMB> {
             ['request_person.user_id.id', '=', userList[0]['id']],
             ['id', 'ilike', '']);
       }
+    } else if (responseOb.msgState == MsgState.error) {
+      setState(() {
+        hasUserData = false;
+      });
     }
   }
 
@@ -115,6 +123,10 @@ class _MenuListMBState extends State<MenuListMB> {
       }
       print('MrIdList $mrIdList');
       materialissuesBloc.getPurchaseRequisitionListData(mrIdList);
+    } else if (responseOb.msgState == MsgState.error) {
+      setState(() {
+        hasMRData = false;
+      });
     }
   }
 
@@ -131,8 +143,12 @@ class _MenuListMBState extends State<MenuListMB> {
       ], [
         'state',
         'in',
-        ['assigned']
+        ['assigned', 'issue_confirm']
       ]);
+    } else if (responseOb.msgState == MsgState.error) {
+      setState(() {
+        hasStockWarehouseData = false;
+      });
     }
   }
 
@@ -149,6 +165,10 @@ class _MenuListMBState extends State<MenuListMB> {
       }
       print('Pr id List : $prIdList');
       productBloc.getStockWarehouseData(zoneId: userList[0]['zone_id'][0]);
+    } else if (responseOb.msgState == MsgState.error) {
+      setState(() {
+        hasPRData = false;
+      });
     }
   }
 
@@ -178,6 +198,10 @@ class _MenuListMBState extends State<MenuListMB> {
           issuseCount = stockpickingupdateList.length;
         });
       }
+    } else if (responseOb.msgState == MsgState.error) {
+      setState(() {
+        hasStockPickingData = false;
+      });
     }
   }
 
@@ -204,14 +228,53 @@ class _MenuListMBState extends State<MenuListMB> {
             ),
           );
         } else if (responseOb?.msgState == MsgState.error) {
-          if (responseOb?.errState == ErrState.noConnection) {
-            print('no internet connection');
-            return const Center(
-              child: Text('No Internet connection'),
+          if (responseOb?.errState == ErrState.severErr) {
+            return Scaffold(
+              body: Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('${responseOb?.data}'),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        profileBloc.getResUsersData();
+                      },
+                      child: const Text('Try Again'))
+                ],
+              )),
+            );
+          } else if (responseOb?.errState == ErrState.noConnection) {
+            return Scaffold(
+              body: Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/imgs/no_internet_connection_icon.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text('No Internet Connection!'),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        profileBloc.getResUsersData();
+                      },
+                      child: const Text('Try Again'))
+                ],
+              )),
             );
           } else {
-            return const Center(
-              child: Text('Get User Error'),
+            return const Scaffold(
+              body: Center(child: Text('Unknown Error')),
             );
           }
         } else {
@@ -234,13 +297,73 @@ class _MenuListMBState extends State<MenuListMB> {
                     ),
                   );
                 } else if (responseOb?.msgState == MsgState.error) {
-                  if (responseOb?.errState == ErrState.noConnection) {
-                    return const Center(
-                      child: Text('No Internet connection'),
+                  if (responseOb?.errState == ErrState.severErr) {
+                    return Scaffold(
+                      body: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('${responseOb?.data}'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                if (userList.isNotEmpty) {
+                                  mrBloc.getMaterialRequisitionListData([
+                                    'request_person.user_id.id',
+                                    '=',
+                                    userList[0]['id']
+                                  ], [
+                                    'id',
+                                    'ilike',
+                                    ''
+                                  ]);
+                                }
+                              },
+                              child: const Text('Try Again'))
+                        ],
+                      )),
+                    );
+                  } else if (responseOb?.errState == ErrState.noConnection) {
+                    return Scaffold(
+                      body: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/imgs/no_internet_connection_icon.png',
+                            width: 100,
+                            height: 100,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Text('No Internet Connection!'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                if (userList.isNotEmpty) {
+                                  mrBloc.getMaterialRequisitionListData([
+                                    'request_person.user_id.id',
+                                    '=',
+                                    userList[0]['id']
+                                  ], [
+                                    'id',
+                                    'ilike',
+                                    ''
+                                  ]);
+                                }
+                              },
+                              child: const Text('Try Again'))
+                        ],
+                      )),
                     );
                   } else {
-                    return const Center(
-                      child: Text('Get User Error'),
+                    return const Scaffold(
+                      body: Center(child: Text('Unknown Error')),
                     );
                   }
                 } else {
@@ -264,13 +387,58 @@ class _MenuListMBState extends State<MenuListMB> {
                             ),
                           );
                         } else if (responseOb?.msgState == MsgState.error) {
-                          if (responseOb?.errState == ErrState.noConnection) {
-                            return const Center(
-                              child: Text('No Internet connection'),
+                          if (responseOb?.errState == ErrState.severErr) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('${responseOb?.data}'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {
+                                        materialissuesBloc
+                                            .getPurchaseRequisitionListData(
+                                                mrIdList);
+                                      },
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else if (responseOb?.errState ==
+                              ErrState.noConnection) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/imgs/no_internet_connection_icon.png',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  const Text('No Internet Connection!'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {
+                                        materialissuesBloc
+                                            .getPurchaseRequisitionListData(
+                                                mrIdList);
+                                      },
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
                             );
                           } else {
-                            return const Center(
-                              child: Text('Get User Error'),
+                            return const Scaffold(
+                              body: Center(child: Text('Unknown Error')),
                             );
                           }
                         } else {
@@ -294,9 +462,66 @@ class _MenuListMBState extends State<MenuListMB> {
                                   );
                                 } else if (responseOb?.msgState ==
                                     MsgState.error) {
-                                  return const Center(
-                                    child: Text('Get User Error'),
-                                  );
+                                  if (responseOb?.errState ==
+                                      ErrState.severErr) {
+                                    return Scaffold(
+                                      body: Center(
+                                          child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text('${responseOb?.data}'),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          TextButton(
+                                              onPressed: () {
+                                                productBloc
+                                                    .getStockWarehouseData(
+                                                        zoneId: userList[0]
+                                                            ['zone_id'][0]);
+                                              },
+                                              child: const Text('Try Again'))
+                                        ],
+                                      )),
+                                    );
+                                  } else if (responseOb?.errState ==
+                                      ErrState.noConnection) {
+                                    return Scaffold(
+                                      body: Center(
+                                          child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/imgs/no_internet_connection_icon.png',
+                                            width: 100,
+                                            height: 100,
+                                          ),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          const Text('No Internet Connection!'),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          TextButton(
+                                              onPressed: () {
+                                                productBloc
+                                                    .getStockWarehouseData(
+                                                        zoneId: userList[0]
+                                                            ['zone_id'][0]);
+                                              },
+                                              child: const Text('Try Again'))
+                                        ],
+                                      )),
+                                    );
+                                  } else {
+                                    return const Scaffold(
+                                      body:
+                                          Center(child: Text('Unknown Error')),
+                                    );
+                                  }
                                 } else {
                                   return StreamBuilder<ResponseOb>(
                                       initialData: hasStockPickingData == true
@@ -321,9 +546,85 @@ class _MenuListMBState extends State<MenuListMB> {
                                           );
                                         } else if (responseOb?.msgState ==
                                             MsgState.error) {
-                                          return const Center(
-                                            child: Text('Get User Error'),
-                                          );
+                                          if (responseOb?.errState ==
+                                              ErrState.severErr) {
+                                            return Scaffold(
+                                              body: Center(
+                                                  child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text('${responseOb?.data}'),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        materialissuesBloc
+                                                            .getStockPickingData(
+                                                                [
+                                                              'material_id',
+                                                              'in',
+                                                              prIdList
+                                                            ],
+                                                                [
+                                                              'state',
+                                                              'in',
+                                                              ['assigned']
+                                                            ]);
+                                                      },
+                                                      child: const Text(
+                                                          'Try Again'))
+                                                ],
+                                              )),
+                                            );
+                                          } else if (responseOb?.errState ==
+                                              ErrState.noConnection) {
+                                            return Scaffold(
+                                              body: Center(
+                                                  child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Image.asset(
+                                                    'assets/imgs/no_internet_connection_icon.png',
+                                                    width: 100,
+                                                    height: 100,
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  const Text(
+                                                      'No Internet Connection!'),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        materialissuesBloc
+                                                            .getStockPickingData(
+                                                                [
+                                                              'material_id',
+                                                              'in',
+                                                              prIdList
+                                                            ],
+                                                                [
+                                                              'state',
+                                                              'in',
+                                                              ['assigned']
+                                                            ]);
+                                                      },
+                                                      child: const Text(
+                                                          'Try Again'))
+                                                ],
+                                              )),
+                                            );
+                                          } else {
+                                            return const Scaffold(
+                                              body: Center(
+                                                  child: Text('Unknown Error')),
+                                            );
+                                          }
                                         } else {
                                           return SafeArea(
                                               child: Scaffold(
@@ -343,467 +644,489 @@ class _MenuListMBState extends State<MenuListMB> {
                                                     ),
                                                     //title: Text('Menu'),
                                                   ),
-                                                  body: GridView(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                      left: 20,
-                                                      right: 20,
-                                                      top: 20,
-                                                      bottom: 20,
-                                                    ),
-                                                    gridDelegate:
-                                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                                            crossAxisSpacing:
-                                                                10,
-                                                            mainAxisSpacing: 30,
-                                                            crossAxisCount: 2,
-                                                            childAspectRatio:
-                                                                1),
+                                                  body: Column(
                                                     children: [
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return const QuotationListMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
+                                                      Expanded(
+                                                        child: GridView(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            left: 20,
+                                                            right: 20,
+                                                            top: 20,
+                                                            bottom: 20,
+                                                          ),
+                                                          gridDelegate:
+                                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                                                  crossAxisSpacing:
+                                                                      10,
+                                                                  mainAxisSpacing:
+                                                                      30,
+                                                                  crossAxisCount:
+                                                                      2,
+                                                                  childAspectRatio:
+                                                                      1),
+                                                          children: [
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return const QuotationListMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
                                                                           10),
-                                                            ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/quotation_icon.png',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                const Text(
-                                                                  "Quotation",
-                                                                  style: TextStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      // fontSize:
-                                                                      //     20,
-                                                                      color: AppColors.appBarColor),
-                                                                )
-                                                              ],
-                                                            )),
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return const WayPlanningListMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/way_plan_icon.png',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                const Text(
-                                                                  "Way Planning",
-                                                                  style: TextStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      // fontSize:
-                                                                      //     20,
-                                                                      color: AppColors.appBarColor),
-                                                                )
-                                                              ],
-                                                            )),
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return MaterialRequisitionListMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/material_requisition_icon.png',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                const Text(
-                                                                  "Material Requisition",
-                                                                  style: TextStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      // fontSize:
-                                                                      //     20,
-                                                                      color: AppColors.appBarColor),
-                                                                )
-                                                              ],
-                                                            )),
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return MaterialIssuesListMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/material_requisition_icon.png',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    const Text(
-                                                                      "Material Issues",
-                                                                      style: TextStyle(
-                                                                          fontWeight: FontWeight.bold,
-                                                                          // fontSize:
-                                                                          //     20,
-                                                                          color: AppColors.appBarColor),
-                                                                    ),
-                                                                    Visibility(
-                                                                      visible: issuseCount >
-                                                                              0
-                                                                          ? true
-                                                                          : false,
-                                                                      child:
-                                                                          Container(
-                                                                        padding:
-                                                                            const EdgeInsets.all(5),
-                                                                        decoration:
-                                                                            const BoxDecoration(
-                                                                          color:
-                                                                              Colors.green,
-                                                                          shape:
-                                                                              BoxShape.circle,
-                                                                        ),
-                                                                        child:
-                                                                            Text(
-                                                                          '$issuseCount',
-                                                                          style:
-                                                                              const TextStyle(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/quotation_icon.png',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Quotation",
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
                                                                             // fontSize:
                                                                             //     20,
-                                                                            color:
-                                                                                Colors.white,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
+                                                                            color: AppColors.appBarColor),
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return const WayPlanningListMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/way_plan_icon.png',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Way Planning",
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            // fontSize:
+                                                                            //     20,
+                                                                            color: AppColors.appBarColor),
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return MaterialRequisitionListMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/material_requisition_icon.png',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Material Requisition",
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            // fontSize:
+                                                                            //     20,
+                                                                            color: AppColors.appBarColor),
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return MaterialIssuesListMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/material_requisition_icon.png',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          const Text(
+                                                                            "Material Issues",
+                                                                            style: TextStyle(
+                                                                                fontWeight: FontWeight.bold,
+                                                                                // fontSize:
+                                                                                //     20,
+                                                                                color: AppColors.appBarColor),
                                                                           ),
+                                                                          Visibility(
+                                                                            visible: issuseCount > 0
+                                                                                ? true
+                                                                                : false,
+                                                                            child:
+                                                                                Container(
+                                                                              padding: const EdgeInsets.all(5),
+                                                                              decoration: const BoxDecoration(
+                                                                                color: Colors.green,
+                                                                                shape: BoxShape.circle,
+                                                                              ),
+                                                                              child: Text(
+                                                                                '$issuseCount',
+                                                                                style: const TextStyle(
+                                                                                  // fontSize:
+                                                                                  //     20,
+                                                                                  color: Colors.white,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          )
+                                                                        ],
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return SalePricelistTypeMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/sale_pricelist_icon.png',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Sale Pricelists",
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            // fontSize:
+                                                                            //     20,
+                                                                            color: AppColors.appBarColor),
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return ProductListMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/product_icon.png',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Products",
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            // fontSize:
+                                                                            //     20,
+                                                                            color: AppColors.appBarColor),
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return const CustomerListMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/customer_icon.jpg',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Customers",
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            // fontSize:
+                                                                            //     20,
+                                                                            color: AppColors.appBarColor),
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(context).pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                  return ProfileMB();
+                                                                }),
+                                                                    (route) =>
+                                                                        false);
+                                                              },
+                                                              child: Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        'assets/imgs/person_icon.png',
+                                                                        height:
+                                                                            80,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Profile",
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            // fontSize:
+                                                                            //     20,
+                                                                            color: AppColors.appBarColor),
+                                                                      )
+                                                                    ],
+                                                                  )),
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(10),
+                                                              decoration: const BoxDecoration(
+                                                                  // boxShadow: const [
+                                                                  //   BoxShadow(
+                                                                  //       color: Colors.black,
+                                                                  //       offset: Offset(-2, 2),
+                                                                  //       blurRadius: 2),
+                                                                  // ],
+                                                                  // borderRadius: BorderRadius.circular(10),
+                                                                  // color: Colors.grey[200],
+                                                                  // color: AppColors
+                                                                  //     .appBarColor,
+                                                                  ),
+                                                              height: 60,
+                                                              child: InkWell(
+                                                                  onTap: () {
+                                                                    showDialog(
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (context) {
+                                                                          return AlertDialog(
+                                                                            title:
+                                                                                const Text("Do you want to Log Out?"),
+                                                                            actions: [
+                                                                              TextButton(
+                                                                                  onPressed: () {
+                                                                                    Navigator.of(context).pop();
+                                                                                  },
+                                                                                  child: const Text('Cancel')),
+                                                                              TextButton(
+                                                                                  style: TextButton.styleFrom(
+                                                                                    backgroundColor: Colors.purple,
+                                                                                  ),
+                                                                                  onPressed: () async {
+                                                                                    var sessionId = await Sharef.clearSessionId();
+                                                                                    await Sharef.logout();
+                                                                                    if (sessionId == true) {
+                                                                                      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {
+                                                                                        return const LogoutPage();
+                                                                                      }), (route) => false);
+                                                                                    }
+                                                                                  },
+                                                                                  child: const Text(
+                                                                                    'Ok',
+                                                                                    style: TextStyle(color: Colors.white),
+                                                                                  ))
+                                                                            ],
+                                                                          );
+                                                                        });
+                                                                  },
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Image
+                                                                          .asset(
+                                                                        "assets/imgs/logout_icon.png",
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                        height:
+                                                                            80,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      const Text(
+                                                                        'Log Out',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          // fontSize:
+                                                                          //     20,
+                                                                          color:
+                                                                              AppColors.appBarColor,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
                                                                         ),
                                                                       ),
-                                                                    )
-                                                                  ],
-                                                                )
-                                                              ],
-                                                            )),
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return SalePricelistTypeMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
+                                                                    ],
+                                                                  )),
                                                             ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/sale_pricelist_icon.png',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                const Text(
-                                                                  "Sale Pricelists",
-                                                                  style: TextStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      // fontSize:
-                                                                      //     20,
-                                                                      color: AppColors.appBarColor),
-                                                                )
-                                                              ],
-                                                            )),
+                                                          ],
+                                                        ),
                                                       ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return ProductListMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/product_icon.png',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                const Text(
-                                                                  "Products",
-                                                                  style: TextStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      // fontSize:
-                                                                      //     20,
-                                                                      color: AppColors.appBarColor),
-                                                                )
-                                                              ],
-                                                            )),
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return const CustomerListMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/customer_icon.jpg',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                const Text(
-                                                                  "Customers",
-                                                                  style: TextStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      // fontSize:
-                                                                      //     20,
-                                                                      color: AppColors.appBarColor),
-                                                                )
-                                                              ],
-                                                            )),
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                            return ProfileMB();
-                                                          }), (route) => false);
-                                                        },
-                                                        child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/imgs/person_icon.png',
-                                                                  height: 80,
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                ),
-                                                                const Text(
-                                                                  "Profile",
-                                                                  style: TextStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      // fontSize:
-                                                                      //     20,
-                                                                      color: AppColors.appBarColor),
-                                                                )
-                                                              ],
-                                                            )),
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10),
-                                                        decoration: const BoxDecoration(
-                                                            // boxShadow: const [
-                                                            //   BoxShadow(
-                                                            //       color: Colors.black,
-                                                            //       offset: Offset(-2, 2),
-                                                            //       blurRadius: 2),
-                                                            // ],
-                                                            // borderRadius: BorderRadius.circular(10),
-                                                            // color: Colors.grey[200],
-                                                            // color: AppColors
-                                                            //     .appBarColor,
-                                                            ),
-                                                        height: 60,
-                                                        child: InkWell(
-                                                            onTap: () {
-                                                              showDialog(
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (context) {
-                                                                    return AlertDialog(
-                                                                      title: const Text(
-                                                                          "Do you want to Log Out?"),
-                                                                      actions: [
-                                                                        TextButton(
-                                                                            onPressed:
-                                                                                () {
-                                                                              Navigator.of(context).pop();
-                                                                            },
-                                                                            child:
-                                                                                const Text('Cancel')),
-                                                                        TextButton(
-                                                                            style: TextButton
-                                                                                .styleFrom(
-                                                                              backgroundColor: Colors.purple,
-                                                                            ),
-                                                                            onPressed:
-                                                                                () async {
-                                                                              var sessionId = await Sharef.clearSessionId();
-                                                                              await Sharef.logout();
-                                                                              if (sessionId == true) {
-                                                                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {
-                                                                                  return const LogoutPage();
-                                                                                }), (route) => false);
-                                                                              }
-                                                                            },
-                                                                            child:
-                                                                                const Text(
-                                                                              'Ok',
-                                                                              style: TextStyle(color: Colors.white),
-                                                                            ))
-                                                                      ],
-                                                                    );
-                                                                  });
-                                                            },
-                                                            child: Column(
-                                                              children: [
-                                                                Image.asset(
-                                                                  "assets/imgs/logout_icon.png",
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                  height: 80,
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 10,
-                                                                ),
-                                                                const Text(
-                                                                  'Log Out',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    // fontSize:
-                                                                    //     20,
-                                                                    color: AppColors
-                                                                        .appBarColor,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                      ),
+                                                      const Text(
+                                                          'Version 31.10.2022')
                                                     ],
                                                   )));
                                         }

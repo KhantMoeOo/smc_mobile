@@ -469,33 +469,24 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
         stockpickingcreateBloc.callActionConfirm(id: widget.quotationId);
       } else {
         showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (context) {
-                                                                  return AlertDialog(
-                                                                      title: const Text(
-                                                                          'Something went wrong !'),
-                                                                      content:
-                                                                          const Text(
-                                                                              'Not enough Remaining Stock.'),
-                                                                      actions: [
-                                                                        TextButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.of(context).pop();
-                                                                          },
-                                                                          style:
-                                                                              TextButton.styleFrom(
-                                                                            backgroundColor:
-                                                                                Colors.cyan,
-                                                                          ),
-                                                                          child: const Text(
-                                                                              'Ok',
-                                                                              style: TextStyle(color: Colors.white)),
-                                                                        )
-                                                                      ]);
-                                                                });
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  title: const Text('Something went wrong !'),
+                  content: const Text('Not enough Remaining Stock.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.cyan,
+                      ),
+                      child: const Text('Ok',
+                          style: TextStyle(color: Colors.white)),
+                    )
+                  ]);
+            });
         print('Not enough stock');
       }
     }
@@ -672,6 +663,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
       saleorderlineBloc.waitingSaleOrderLineData();
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

@@ -890,7 +890,8 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
                 "UOM:",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
-              SizedBox(
+              Container(
+                color: Colors.white,
                 height: 40,
                 child: StreamBuilder<ResponseOb>(
                     initialData: hasUOMData == true

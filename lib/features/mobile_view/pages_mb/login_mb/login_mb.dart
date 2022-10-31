@@ -34,6 +34,7 @@ class _LoginMBState extends State<LoginMB> {
 
   late var listener;
   bool isConnection = true;
+  bool hasDatabases = false;
 
   @override
   void initState() {
@@ -128,6 +129,9 @@ class _LoginMBState extends State<LoginMB> {
   void getDBListListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       dbList = responseOb.data;
+      setState(() {
+        hasDatabases = true;
+      });
     }
   }
 
@@ -174,361 +178,386 @@ class _LoginMBState extends State<LoginMB> {
                 backgroundColor: Colors.grey[200],
                 body: Form(
                   child: Center(
-                    child: ListView(
+                    child: Column(
                       children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.only(
-                              left: 30, right: 30, top: 100, bottom: 100),
-                          decoration: const BoxDecoration(
-                              color: Color.fromARGB(255, 12, 41, 92),
-                              // gradient: LinearGradient(colors: [
-                              //   Color(0xFFf31a22),
-                              //   Color(0xFFa80b11),
-                              // ]),
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(100),
-                                  topRight: Radius.circular(100))),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image:
-                                      AssetImage('assets/imgs/smc_logo.jpg')),
-                            ),
-                            width: 100,
-                            height: 100,
-                          ),
-                        ),
-                        Container(
-                          // color: Color(0xFFf31a22),
-                          decoration: const BoxDecoration(
-                              // gradient: LinearGradient(colors: [
-                              //   Color(0xFFf31a22),
-                              //   Color(0xFFa80b11),
-                              // ]),
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.only(
+                                    left: 30, right: 30, top: 100, bottom: 100),
+                                decoration: const BoxDecoration(
+                                    color: Color.fromARGB(255, 12, 41, 92),
+                                    // gradient: LinearGradient(colors: [
+                                    //   Color(0xFFf31a22),
+                                    //   Color(0xFFa80b11),
+                                    // ]),
+                                    borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(100),
+                                        topRight: Radius.circular(100))),
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black,
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/imgs/smc_logo.jpg')),
+                                  ),
+                                  width: 100,
+                                  height: 100,
+                                ),
                               ),
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                              left: 30,
-                              right: 30,
-                            ),
-                            decoration: const BoxDecoration(
-                                // color: Colors.red,
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(100))),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                // const Divider(
-                                //   color: Colors.grey,
-                                //   thickness: 1.5,
-                                // ),
-                                const SizedBox(
-                                  height: 30,
-                                ),
-                                const Text(
-                                  'Database',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                    color: Colors.white,
-                                    height: 50,
-                                    child: StreamBuilder<ResponseOb>(
-                                      initialData: ResponseOb(
-                                          msgState: MsgState.loading),
-                                      stream: loginBloc.getDBListStream(),
-                                      builder: (context, snapshot) {
-                                        ResponseOb? responseOb = snapshot.data;
-                                        if (responseOb?.msgState ==
-                                            MsgState.loading) {
-                                          return Center(
-                                            child: Image.asset(
-                                              'assets/gifs/loading.gif',
-                                              width: 100,
-                                              height: 100,
-                                            ),
-                                          );
-                                        } else if (responseOb?.msgState ==
-                                            MsgState.error) {
-                                          if (responseOb?.errState ==
-                                              ErrState.severErr) {
-                                            return Container(
+                              Container(
+                                // color: Color(0xFFf31a22),
+                                decoration: const BoxDecoration(
+                                    // gradient: LinearGradient(colors: [
+                                    //   Color(0xFFf31a22),
+                                    //   Color(0xFFa80b11),
+                                    // ]),
+                                    ),
+                                child: Container(
+                                  padding: const EdgeInsets.only(
+                                    left: 30,
+                                    right: 30,
+                                  ),
+                                  decoration: const BoxDecoration(
+                                      // color: Colors.red,
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(100))),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      // const Divider(
+                                      //   color: Colors.grey,
+                                      //   thickness: 1.5,
+                                      // ),
+                                      const SizedBox(
+                                        height: 30,
+                                      ),
+                                      const Text(
+                                        'Database',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                          color: Colors.white,
+                                          height: 50,
+                                          child: StreamBuilder<ResponseOb>(
+                                            initialData: hasDatabases == true
+                                                ? null
+                                                : ResponseOb(
+                                                    msgState: MsgState.loading),
+                                            stream: loginBloc.getDBListStream(),
+                                            builder: (context, snapshot) {
+                                              ResponseOb? responseOb =
+                                                  snapshot.data;
+                                              if (responseOb?.msgState ==
+                                                  MsgState.loading) {
+                                                return Center(
+                                                  child: Image.asset(
+                                                    'assets/gifs/loading.gif',
+                                                    width: 100,
+                                                    height: 100,
+                                                  ),
+                                                );
+                                              } else if (responseOb?.msgState ==
+                                                  MsgState.error) {
+                                                if (responseOb?.errState ==
+                                                    ErrState.severErr) {
+                                                  return Container(
+                                                      height: 50,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Center(
+                                                              child: Text(
+                                                                  '${responseOb?.data}',
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .red))),
+                                                          IconButton(
+                                                              onPressed: () {
+                                                                loginBloc
+                                                                    .getDatabasesList();
+                                                              },
+                                                              icon: const Icon(
+                                                                  Icons
+                                                                      .refresh))
+                                                        ],
+                                                      ));
+                                                } else if (responseOb
+                                                        ?.errState ==
+                                                    ErrState.noConnection) {
+                                                  return SizedBox(
+                                                      height: 50,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          const Center(
+                                                              child: Text(
+                                                                  'No Internet Connection!',
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .red))),
+                                                          IconButton(
+                                                              onPressed: () {
+                                                                loginBloc
+                                                                    .getDatabasesList();
+                                                              },
+                                                              icon: const Icon(
+                                                                  Icons
+                                                                      .refresh))
+                                                        ],
+                                                      ));
+                                                } else {
+                                                  return const Center(
+                                                      child: Text(
+                                                          'Unknown Error'));
+                                                }
+                                              } else {
+                                                return DropdownSearch<String>(
+                                                  dropDownButton: const Icon(
+                                                    Icons.table_rows,
+                                                    color:
+                                                        AppColors.appBarColor,
+                                                  ),
+                                                  popupItemBuilder: (context,
+                                                      item, isSelected) {
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(item.toString()),
+                                                          const Divider(),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                  showSearchBox: true,
+                                                  showSelectedItems: true,
+                                                  // showClearButton:
+                                                  //     !hasNotPaymentTerms,
+                                                  items: dbList
+                                                      .map((e) => e.toString())
+                                                      .toList(),
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      dbName = value!;
+                                                    });
+                                                  },
+                                                  selectedItem: dbName,
+                                                );
+                                              }
+                                            },
+                                          )),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      const Text(
+                                        'Email',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        color: Colors.white,
+                                        height: 50,
+                                        child: TextFormField(
+                                          focusNode: emailFocus,
+                                          scrollPadding:
+                                              const EdgeInsets.only(bottom: 40),
+                                          onEditingComplete: (() =>
+                                              FocusScope.of(context)
+                                                  .requestFocus(pwdFocus)),
+                                          controller: _emailcontroller,
+                                          autofocus: false,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                          decoration: const InputDecoration(
+                                              // focusedBorder: OutlineInputBorder(
+                                              //     borderSide: BorderSide(
+                                              //         color:
+                                              //             Theme.of(context).primaryColor),
+                                              //     borderRadius: BorderRadius.circular(10)),
+                                              border: OutlineInputBorder(
+                                                  // borderRadius: BorderRadius.circular(10),
+                                                  )),
+                                        ),
+                                      ), // Email Text Field
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      const Text(
+                                        'Password',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        color: Colors.white,
+                                        height: 50,
+                                        child: TextFormField(
+                                          scrollPadding:
+                                              const EdgeInsets.only(bottom: 40),
+                                          onEditingComplete: () {
+                                            FocusScope.of(context).unfocus();
+                                            // loginButton();
+                                          },
+                                          focusNode: pwdFocus,
+                                          controller: _passwordcontroller,
+                                          autofocus: false,
+                                          obscureText: !ispwdshow,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                          decoration: InputDecoration(
+                                              suffixIcon: IconButton(
+                                                splashColor: Colors.transparent,
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    ispwdshow = !ispwdshow;
+                                                  });
+                                                },
+                                                icon: ispwdshow
+                                                    ? const Icon(
+                                                        Icons.visibility)
+                                                    : const Icon(
+                                                        Icons.visibility_off),
+                                              ),
+                                              // focusedBorder: OutlineInputBorder(
+                                              //     borderSide: BorderSide(
+                                              //         color:
+                                              //             Theme.of(context).primaryColor),
+                                              //     borderRadius: BorderRadius.circular(10)),
+                                              border: const OutlineInputBorder(
+                                                  //     // borderRadius: BorderRadius.circular(10)
+                                                  )),
+                                        ),
+                                      ), // Password Text Field
+                                      const SizedBox(
+                                        height: 50,
+                                      ),
+                                      StreamBuilder<ResponseOb>(
+                                          stream: loginBloc.getLoginStream(),
+                                          builder: (context,
+                                              AsyncSnapshot<ResponseOb>
+                                                  snapshot) {
+                                            ResponseOb? responseOb =
+                                                snapshot.data;
+                                            if (responseOb?.msgState ==
+                                                MsgState.loading) {
+                                              return Container(
+                                                decoration: const BoxDecoration(
+                                                  // color: Color(0xFFf31a22),
+                                                  color: Color.fromARGB(
+                                                      255, 12, 41, 92),
+                                                  // borderRadius: BorderRadius.only(
+                                                  //     bottomLeft: Radius.circular(20),
+                                                  //     bottomRight: Radius.circular(20)),
+                                                  // boxShadow: [
+                                                  //   BoxShadow(
+                                                  //     offset: Offset(0, 2),
+                                                  //     blurRadius: 4,
+                                                  //   )
+                                                  // ]
+                                                ),
                                                 height: 50,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [Center(
-                                                        child: Text(
-                                                            '${responseOb?.data}',
-                                                            style: const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .red))),
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          loginBloc
-                                                              .getDatabasesList();
-                                                        },
-                                                        icon: const Icon(
-                                                            Icons.refresh))
-                                                  ],
-                                                ));
-                                          } else if (responseOb?.errState ==
-                                              ErrState.noConnection) {
-                                            return SizedBox(
-                                                height: 50,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    const Center(
-                                                        child: Text(
-                                                            'No Internet Connection!',
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .red))),
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          loginBloc
-                                                              .getDatabasesList();
-                                                        },
-                                                        icon: const Icon(
-                                                            Icons.refresh))
-                                                  ],
-                                                ));
-                                          } else {
-                                            return const Center(
-                                                child: Text('Unknown Error'));
-                                          }
-                                        } else {
-                                          return DropdownSearch<String>(
-                                            dropDownButton: const Icon(
-                                              Icons.table_rows,
-                                              color: AppColors.appBarColor,
-                                            ),
-                                            popupItemBuilder:
-                                                (context, item, isSelected) {
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(item.toString()),
-                                                    const Divider(),
-                                                  ],
+                                                child: Center(
+                                                  child: Image.asset(
+                                                    'assets/gifs/loading.gif',
+                                                    width: 100,
+                                                    height: 100,
+                                                  ),
                                                 ),
                                               );
-                                            },
-                                            showSearchBox: true,
-                                            showSelectedItems: true,
-                                            // showClearButton:
-                                            //     !hasNotPaymentTerms,
-                                            items: dbList
-                                                .map((e) => e.toString())
-                                                .toList(),
-                                            onChanged: (value) {
-                                              setState(() {
-                                                dbName = value!;
-                                              });
-                                            },
-                                            selectedItem: dbName,
-                                          );
-                                        }
-                                      },
-                                    )),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                const Text(
-                                  'Email',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  color: Colors.white,
-                                  height: 50,
-                                  child: TextFormField(
-                                    focusNode: emailFocus,
-                                    scrollPadding:
-                                        const EdgeInsets.only(bottom: 40),
-                                    onEditingComplete: (() =>
-                                        FocusScope.of(context)
-                                            .requestFocus(pwdFocus)),
-                                    controller: _emailcontroller,
-                                    autofocus: false,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                    decoration: const InputDecoration(
-                                        // focusedBorder: OutlineInputBorder(
-                                        //     borderSide: BorderSide(
-                                        //         color:
-                                        //             Theme.of(context).primaryColor),
-                                        //     borderRadius: BorderRadius.circular(10)),
-                                        border: OutlineInputBorder(
-                                            // borderRadius: BorderRadius.circular(10),
-                                            )),
+                                            }
+                                            return Container(
+                                              height: 50,
+                                              width: double.infinity,
+                                              decoration: const BoxDecoration(
+                                                // color: Color(0xFFf31a22),
+                                                color: Color.fromARGB(
+                                                    255, 12, 41, 92),
+                                                // borderRadius: BorderRadius.only(
+                                                //     bottomLeft: Radius.circular(20),
+                                                //     bottomRight: Radius.circular(20)),
+                                                // boxShadow: [
+                                                //   BoxShadow(
+                                                //     offset: Offset(0, 2),
+                                                //     blurRadius: 4,
+                                                //   )
+                                                // ]
+                                              ),
+                                              child: TextButton(
+                                                  onPressed: () {
+                                                    // loginBloc.quotationLogin('admin',
+                                                    //     'Pr0fess!0n@l', 'smc_db_test');
+                                                    // loginBloc.quotationLogin(
+                                                    //     'Sai Nay Lin',
+                                                    //     '123',
+                                                    //     'smc_sale_test');
+                                                    print('db: $dbName');
+                                                    print(
+                                                        'email: ${_emailcontroller.text}');
+                                                    print(
+                                                        'pwd: ${_passwordcontroller.text}');
+                                                    loginBloc.quotationLogin(
+                                                        email: _emailcontroller
+                                                            .text,
+                                                        password:
+                                                            _passwordcontroller
+                                                                .text,
+                                                        db: dbName);
+                                                  },
+                                                  child: const Text(
+                                                    'Log in',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20),
+                                                  )),
+                                            );
+                                          }),
+                                    ],
                                   ),
-                                ), // Email Text Field
-                                const SizedBox(
-                                  height: 20,
                                 ),
-                                const Text(
-                                  'Password',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  color: Colors.white,
-                                  height: 50,
-                                  child: TextFormField(
-                                    scrollPadding:
-                                        const EdgeInsets.only(bottom: 40),
-                                    onEditingComplete: () {
-                                      FocusScope.of(context).unfocus();
-                                      // loginButton();
-                                    },
-                                    focusNode: pwdFocus,
-                                    controller: _passwordcontroller,
-                                    autofocus: false,
-                                    obscureText: !ispwdshow,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                    decoration: InputDecoration(
-                                        suffixIcon: IconButton(
-                                          splashColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          onPressed: () {
-                                            setState(() {
-                                              ispwdshow = !ispwdshow;
-                                            });
-                                          },
-                                          icon: ispwdshow
-                                              ? const Icon(Icons.visibility)
-                                              : const Icon(
-                                                  Icons.visibility_off),
-                                        ),
-                                        // focusedBorder: OutlineInputBorder(
-                                        //     borderSide: BorderSide(
-                                        //         color:
-                                        //             Theme.of(context).primaryColor),
-                                        //     borderRadius: BorderRadius.circular(10)),
-                                        border: const OutlineInputBorder(
-                                            //     // borderRadius: BorderRadius.circular(10)
-                                            )),
-                                  ),
-                                ), // Password Text Field
-                                const SizedBox(
-                                  height: 50,
-                                ),
-                                StreamBuilder<ResponseOb>(
-                                    stream: loginBloc.getLoginStream(),
-                                    builder: (context,
-                                        AsyncSnapshot<ResponseOb> snapshot) {
-                                      ResponseOb? responseOb = snapshot.data;
-                                      if (responseOb?.msgState ==
-                                          MsgState.loading) {
-                                        return Container(
-                                          decoration: const BoxDecoration(
-                                            // color: Color(0xFFf31a22),
-                                            color:
-                                                Color.fromARGB(255, 12, 41, 92),
-                                            // borderRadius: BorderRadius.only(
-                                            //     bottomLeft: Radius.circular(20),
-                                            //     bottomRight: Radius.circular(20)),
-                                            // boxShadow: [
-                                            //   BoxShadow(
-                                            //     offset: Offset(0, 2),
-                                            //     blurRadius: 4,
-                                            //   )
-                                            // ]
-                                          ),
-                                          height: 50,
-                                          child: Center(
-                                            child: Image.asset(
-                                              'assets/gifs/loading.gif',
-                                              width: 100,
-                                              height: 100,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                      return Container(
-                                        height: 50,
-                                        width: double.infinity,
-                                        decoration: const BoxDecoration(
-                                          // color: Color(0xFFf31a22),
-                                          color:
-                                              Color.fromARGB(255, 12, 41, 92),
-                                          // borderRadius: BorderRadius.only(
-                                          //     bottomLeft: Radius.circular(20),
-                                          //     bottomRight: Radius.circular(20)),
-                                          // boxShadow: [
-                                          //   BoxShadow(
-                                          //     offset: Offset(0, 2),
-                                          //     blurRadius: 4,
-                                          //   )
-                                          // ]
-                                        ),
-                                        child: TextButton(
-                                            onPressed: () {
-                                              // loginBloc.quotationLogin('admin',
-                                              //     'Pr0fess!0n@l', 'smc_db_test');
-                                              // loginBloc.quotationLogin(
-                                              //     'Sai Nay Lin',
-                                              //     '123',
-                                              //     'smc_sale_test');
-                                              print('db: $dbName');
-                                              print(
-                                                  'email: ${_emailcontroller.text}');
-                                              print(
-                                                  'pwd: ${_passwordcontroller.text}');
-                                              loginBloc.quotationLogin(
-                                                  email: _emailcontroller.text,
-                                                  password:
-                                                      _passwordcontroller.text,
-                                                  db: dbName);
-                                            },
-                                            child: const Text(
-                                              'Log in',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 20),
-                                            )),
-                                      );
-                                    }),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
+                        const Text('Version 31.10.2022')
                       ],
                     ),
                   ),

@@ -19,6 +19,7 @@ import '../../../../pages/way_planning_page/delivery_page/delivery_bloc.dart';
 import '../../../../pages/way_planning_page/sale_team_page/sale_team_bloc.dart';
 import '../../../../utils/app_const.dart';
 import '../../../pages/material_requisition/material_requisition_list.dart';
+import 'material_product_line/material_product_line_edit_mb.dart';
 import 'material_product_line/material_product_line_multi_selection_mb.dart';
 import 'material_requisition_list_mb.dart';
 
@@ -26,11 +27,13 @@ class MaterialRequisitionCreateMB extends StatefulWidget {
   String name;
   int neworedit;
   int userId;
+  List<dynamic> mrList;
   MaterialRequisitionCreateMB({
     Key? key,
     required this.name,
     required this.neworedit,
     required this.userId,
+    required this.mrList,
   }) : super(key: key);
 
   @override
@@ -96,11 +99,19 @@ class _MaterialRequisitionCreateMBState
   bool hasNotStockLocation = true;
 
   List<ProductLineOb>? productlineList = [];
+  List<ProductLineOb>? productlineListUpdate;
+  List<dynamic> mpldeleteList = [];
+  List<dynamic> productlineListInt = [];
 
   bool isCreateMaterialRequisition = false;
   bool isCreateMaterialProductLine = false;
+  bool isUpdateMaterialRequisition = false;
+
+  bool isDeleteMPL = false;
+  bool isUpdateMPL = false;
 
   String priorityrate = 'a';
+  double initialpriority = 0;
 
   List<dynamic> userList = [];
 
@@ -110,6 +121,9 @@ class _MaterialRequisitionCreateMBState
   void initState() {
     // TODO: implement initState
     super.initState();
+    transferData();
+    print('New Or Edit MR: ${widget.neworedit}');
+    setEditValues();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -130,15 +144,82 @@ class _MaterialRequisitionCreateMBState
     materialrequisitioncreateBloc
         .getCreateMaterialRequisitionStream()
         .listen(getCreateMaterialRequisitionListen);
+    materialrequisitioncreateBloc
+        .getUpdateMaterialRequisitionDataStream()
+        .listen(getUpdateMaterialRequisitionListen);
     materialproductlineBloc
         .getMaterialProductLineCreateStream()
         .listen(getCreateMaterialProductLineListen);
+    materialproductlineBloc
+        .getEditMaterialProductLineStream()
+        .listen(listenUpdateMaterialProductLine);
+    materialproductlineBloc
+        .getDeleteMaterialProductLineStream()
+        .listen(listenDeleteMaterialProductLine);
     saleorderlineBloc
         .waitingproductlineListStream()
         .listen(getproductlineListListen);
-    dateorderController.text = DateTime.now().toString().split('.')[0];
-    hasNotScheduledDate = false;
-    scheduleddateController.text = DateTime.now().toString().split('.')[0];
+  }
+
+  Future<void> transferData() async {
+    productlineListUpdate =
+        await databaseHelper.getMaterialProductLineUpdateList();
+    for (var element in productlineListUpdate!) {
+      productlineListInt.add(element.id);
+    }
+    print('ProductlineList Int: $productlineListInt');
+    if (widget.neworedit == 1) {
+      print('TransferData');
+      print('Material Requisition Id: ${widget.mrList[0]['id']}');
+      productlineList = await databaseHelper.insertMPLUpdateToMPL();
+      print('MPL Length: ${productlineList?.length}');
+    }
+    setState(() {});
+  }
+
+  setEditValues() {
+    if (widget.neworedit == 1) {
+      setState(() {
+        priorityrate = widget.mrList[0]['priority'];
+      });
+      if (widget.mrList[0]['priority'] == 'b') {
+        setState(() {
+          initialpriority = 1.0;
+        });
+      } else if (widget.mrList[0]['priority'] == 'c') {
+        setState(() {
+          initialpriority = 2.0;
+        });
+      } else if (widget.mrList[0]['priority'] == 'd') {
+        setState(() {
+          initialpriority = 3.0;
+        });
+      } else if (widget.mrList[0]['priority'] == 'e') {
+        setState(() {
+          initialpriority = 4.0;
+        });
+      } else if (widget.mrList[0]['priority'] == 'f') {
+        setState(() {
+          initialpriority = 5.0;
+        });
+      } else {
+        setState(() {
+          initialpriority = 0.0;
+        });
+      }
+      print('Edit Initial Priority Rate: $priorityrate');
+      hasNotScheduledDate = false;
+      hasNotDescription = false;
+      descriptionController.text = widget.mrList[0]['desc'];
+      dateorderController.text = widget.mrList[0]['order_date'];
+      dateorder = widget.mrList[0]['order_date'];
+      scheduleddateController.text = widget.mrList[0]['scheduled_date'];
+      scheduleddate = widget.mrList[0]['scheduled_date'];
+    } else {
+      dateorderController.text = DateTime.now().toString().split('.')[0];
+      hasNotScheduledDate = false;
+      scheduleddateController.text = DateTime.now().toString().split('.')[0];
+    }
   }
 
   void getResUsersData(ResponseOb responseOb) {
@@ -343,6 +424,34 @@ class _MaterialRequisitionCreateMBState
     }
   }
 
+  void updateMaterialRequisitionData() {
+    bool isValid = _formKey.currentState!.validate();
+    if (isValid) {
+      setState(() {
+        isUpdateMaterialRequisition = true;
+      });
+      materialrequisitioncreateBloc.updateMaterialRequisitionData(
+        ids: widget.mrList[0]['id'],
+        priority: priorityrate,
+        orderdate: dateorderController.text,
+        scheduleddate: scheduleddateController.text,
+        locationId: stocklocationId,
+        desc: descriptionController.text,
+      );
+    } else {
+      const snackbar = SnackBar(
+          elevation: 0.0,
+          // shape:
+          //     RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          behavior: SnackBarBehavior.fixed,
+          duration: Duration(seconds: 1),
+          backgroundColor: Colors.red,
+          content: Text('Please fill first required fields!',
+              textAlign: TextAlign.center));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
+  }
+
   void getCreateMaterialRequisitionListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       materialrequisitionId = responseOb.data;
@@ -381,11 +490,112 @@ class _MaterialRequisitionCreateMBState
     }
   }
 
+  void getUpdateMaterialRequisitionListen(ResponseOb responseOb) async {
+    if (responseOb.msgState == MsgState.data) {
+      materialrequisitionId = responseOb.data;
+      setState(() {
+        isCreateMaterialProductLine = true;
+      });
+      if (mpldeleteList.isNotEmpty) {
+        for (var element in mpldeleteList) {
+          bool deleteFound = productlineListInt.contains(element);
+          if (deleteFound) {
+            setState(() {
+              isDeleteMPL = true;
+              print('isDeleteMPL: $isDeleteMPL');
+            });
+            for (var element in mpldeleteList) {
+              await materialproductlineBloc
+                  .deleteMaterialProductLineData(element);
+            }
+          }
+        }
+      }
+      for (var element in productlineList!) {
+        print('workdeeee: ${element.id}');
+        bool found = productlineListInt.contains(element.id);
+        if (found) {
+          setState(() {
+            isUpdateMPL = true;
+            print('isUpdateMPL: $isUpdateMPL');
+          });
+          await materialproductlineBloc.editMaterialProductLineData(
+              ids: element.id,
+              materialproductId: widget.mrList[0]['id'],
+              productId: element.productCodeId,
+              productName: element.description,
+              qty: element.quantity,
+              uomId: element.uomId);
+          print('Found');
+          print('FOund: ${element.id}');
+        } else {
+          setState(() {
+            isCreateMaterialProductLine = true;
+            print('isCreateMaterialProductLine: $isCreateMaterialProductLine');
+          });
+          materialproductlineBloc.createMaterialProductLine(
+              materialproductId: widget.mrList[0]['id'],
+              productId: element.productCodeId,
+              productName: element.description,
+              qty: element.quantity,
+              uomId: element.uomId);
+          print('DbId: ${element.id}');
+          print('NotFound');
+          print('NotFOund: ${element.id}');
+        }
+      }
+      if (productlineList!.isEmpty) {
+        final snackbar = SnackBar(
+            elevation: 0.0,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 1),
+            backgroundColor: Colors.green,
+            content: const Text('Create Successfully!',
+                textAlign: TextAlign.center));
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) {
+          return MaterialRequisitionListMB();
+        }), (route) => false);
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      }
+      print('Create Successfully!');
+    }
+  }
+
   void getCreateMaterialProductLineListen(ResponseOb responseOb) async {
     if (responseOb.msgState == MsgState.data) {
       SharefCount.setTotal(productlineList!.length);
       await saleorderlineBloc.waitingSaleOrderLineData();
       print('Create MPL Sccess');
+    }
+  }
+
+  void listenUpdateMaterialProductLine(ResponseOb responseOb) async {
+    if (responseOb.msgState == MsgState.data) {
+      print("MPLupdatelength: ${productlineList!.length}");
+      SharefCount.setTotal(productlineList!.length);
+      await saleorderlineBloc.waitingSaleOrderLineData();
+      print('Update MPL Sccess');
+    } else {
+      setState(() {
+        isUpdateMPL = false;
+        print('isUpdateMPL: $isUpdateMPL');
+      });
+      print("Update MPL fail");
+    }
+  }
+
+  void listenDeleteMaterialProductLine(ResponseOb responseOb) async {
+    if (responseOb.msgState == MsgState.data) {
+      print('Delete MPL Successfully');
+    } else if (responseOb.msgState == MsgState.error) {
+      // setState(() {
+      //   isDeleteSOL = false;
+      //   print('isDeleteSOL: $isDeleteSOL');
+      // });
+      print('Delete MPL Fail');
     }
   }
 
@@ -438,7 +648,9 @@ class _MaterialRequisitionCreateMBState
                         width: 10,
                       ),
                       TextButton(
-                          onPressed: createMaterialRequisition,
+                          onPressed: widget.neworedit == 1
+                              ? updateMaterialRequisitionData
+                              : createMaterialRequisition,
                           child: const Text(
                             'Save',
                             style: TextStyle(color: Colors.white),
@@ -472,7 +684,21 @@ class _MaterialRequisitionCreateMBState
                                           actions: [
                                             IconSlideAction(
                                               color: Colors.yellow,
-                                              onTap: () {},
+                                              onTap: () {
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) {
+                                                  return MaterialProductLineEditMB(
+                                                    mrId: widget.mrList[0]
+                                                        ['id'],
+                                                    newOrEdit: widget.neworedit,
+                                                    productlineList:
+                                                        productlineList![i],
+                                                  );
+                                                })).then((value) {
+                                                  setState(() {});
+                                                });
+                                              },
                                               // iconWidget: const Icon(
                                               //   Icons.edit,
                                               //   size: 40,
@@ -503,6 +729,10 @@ class _MaterialRequisitionCreateMBState
                                                 await databaseHelper
                                                     .deleteMaterialProductLineManul(
                                                         productlineList![i].id);
+                                                mpldeleteList.add(
+                                                    productlineList![i].id);
+                                                print(
+                                                    'MPL Delete List: $mpldeleteList');
                                                 // saleorderlineDeleteList
                                                 //     .add(productlineList![i].id);
                                                 setState(() {});
@@ -1404,7 +1634,7 @@ class _MaterialRequisitionCreateMBState
                                                   color: Colors.black),
                                             ),
                                             RatingBar.builder(
-                                                initialRating: 0,
+                                                initialRating: initialpriority,
                                                 itemBuilder: (c, _) =>
                                                     const Icon(Icons.star,
                                                         color: Colors.amber),
@@ -1554,111 +1784,111 @@ class _MaterialRequisitionCreateMBState
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            // const Text(
-                                            //   "Location:",
-                                            //   style: TextStyle(
-                                            //       fontWeight: FontWeight.bold,
-                                            //       fontSize: 20),
-                                            // ),
-                                            // Container(
-                                            //   color: Colors.white,
-                                            //   height: 40,
-                                            //   width: 20,
-                                            //   child: StreamBuilder<ResponseOb>(
-                                            //       initialData:
-                                            //           hasStockLocationData ==
-                                            //                   true
-                                            //               ? null
-                                            //               : ResponseOb(
-                                            //                   msgState: MsgState
-                                            //                       .loading),
-                                            //       stream: materialrequisitionBloc
-                                            //           .getStockLocationListStream(),
-                                            //       builder: (context,
-                                            //           AsyncSnapshot<ResponseOb>
-                                            //               snapshot) {
-                                            //         ResponseOb? responseOb =
-                                            //             snapshot.data;
-                                            //         if (responseOb?.msgState ==
-                                            //             MsgState.loading) {
-                                            //           return Center(
-                                            //             child: Image.asset(
-                                            //               'assets/gifs/loading.gif',
-                                            //               width: 100,
-                                            //               height: 100,
-                                            //             ),
-                                            //           );
-                                            //         } else if (responseOb
-                                            //                 ?.msgState ==
-                                            //             MsgState.error) {
-                                            //           return const Center(
-                                            //             child: Text(
-                                            //                 "Something went Wrong!"),
-                                            //           );
-                                            //         } else {
-                                            //           return DropdownSearch<
-                                            //               String>(
-                                            //             clearButtonBuilder:
-                                            //                 (context) {
-                                            //               print(
-                                            //                   'locationId: $stocklocationId');
-                                            //               return Icon(
-                                            //                   Icons.clear);
-                                            //             },
-                                            //             // clearButton: IconButton(
-                                            //             //     onPressed: () {}),
-                                            //             popupItemBuilder:
-                                            //                 (context, item,
-                                            //                     isSelected) {
-                                            //               return Padding(
-                                            //                 padding:
-                                            //                     const EdgeInsets
-                                            //                         .all(8.0),
-                                            //                 child: Column(
-                                            //                   crossAxisAlignment:
-                                            //                       CrossAxisAlignment
-                                            //                           .start,
-                                            //                   children: [
-                                            //                     Text(item
-                                            //                         .toString()
-                                            //                         .split(
-                                            //                             ',')[1]),
-                                            //                     const Divider(),
-                                            //                   ],
-                                            //                 ),
-                                            //               );
-                                            //             },
-                                            //             dropdownBuilder:
-                                            //                 (c, i) {
-                                            //               // print(
-                                            //               //     'i : ${i.toString().split(',')[1]}');
-                                            //               return Text(i == null
-                                            //                   ? ''
-                                            //                   : i.contains(',')
-                                            //                       ? i
-                                            //                           .toString()
-                                            //                           .split(
-                                            //                               ',')[1]
-                                            //                       : i);
-                                            //             },
-                                            //             showSearchBox: true,
-                                            //             showSelectedItems:
-                                            //                 false,
-                                            //             showClearButton:
-                                            //                 !hasNotStockLocation,
-                                            //             items: stocklocationList
-                                            //                 .map((e) =>
-                                            //                     '${e['id']},${e['name']}')
-                                            //                 .toList(),
-                                            //             onChanged:
-                                            //                 getStockLocationListId,
-                                            //             selectedItem:
-                                            //                 stocklocationName,
-                                            //           );
-                                            //         }
-                                            //       }),
-                                            // ),
-                                            // const SizedBox(height: 10),
+                                            const Text(
+                                              "Location:",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20),
+                                            ),
+                                            Container(
+                                              color: Colors.white,
+                                              height: 40,
+                                              width: 20,
+                                              child: StreamBuilder<ResponseOb>(
+                                                  initialData:
+                                                      hasStockLocationData ==
+                                                              true
+                                                          ? null
+                                                          : ResponseOb(
+                                                              msgState: MsgState
+                                                                  .loading),
+                                                  stream: materialrequisitionBloc
+                                                      .getStockLocationListStream(),
+                                                  builder: (context,
+                                                      AsyncSnapshot<ResponseOb>
+                                                          snapshot) {
+                                                    ResponseOb? responseOb =
+                                                        snapshot.data;
+                                                    if (responseOb?.msgState ==
+                                                        MsgState.loading) {
+                                                      return Center(
+                                                        child: Image.asset(
+                                                          'assets/gifs/loading.gif',
+                                                          width: 100,
+                                                          height: 100,
+                                                        ),
+                                                      );
+                                                    } else if (responseOb
+                                                            ?.msgState ==
+                                                        MsgState.error) {
+                                                      return const Center(
+                                                        child: Text(
+                                                            "Something went Wrong!"),
+                                                      );
+                                                    } else {
+                                                      return DropdownSearch<
+                                                          String>(
+                                                        clearButtonBuilder:
+                                                            (context) {
+                                                          print(
+                                                              'locationId: $stocklocationId');
+                                                          return Icon(
+                                                              Icons.clear);
+                                                        },
+                                                        // clearButton: IconButton(
+                                                        //     onPressed: () {}),
+                                                        popupItemBuilder:
+                                                            (context, item,
+                                                                isSelected) {
+                                                          return Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(item
+                                                                    .toString()
+                                                                    .split(
+                                                                        ',')[1]),
+                                                                const Divider(),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                        dropdownBuilder:
+                                                            (c, i) {
+                                                          // print(
+                                                          //     'i : ${i.toString().split(',')[1]}');
+                                                          return Text(i == null
+                                                              ? ''
+                                                              : i.contains(',')
+                                                                  ? i
+                                                                      .toString()
+                                                                      .split(
+                                                                          ',')[1]
+                                                                  : i);
+                                                        },
+                                                        showSearchBox: true,
+                                                        showSelectedItems:
+                                                            false,
+                                                        showClearButton:
+                                                            !hasNotStockLocation,
+                                                        items: stocklocationList
+                                                            .map((e) =>
+                                                                '${e['id']},${e['name']}')
+                                                            .toList(),
+                                                        onChanged:
+                                                            getStockLocationListId,
+                                                        selectedItem:
+                                                            stocklocationName,
+                                                      );
+                                                    }
+                                                  }),
+                                            ),
+                                            const SizedBox(height: 10),
                                             Text(
                                               "Description*:",
                                               style: TextStyle(
@@ -1814,6 +2044,53 @@ class _MaterialRequisitionCreateMBState
                               ),
                             ),
                           );
+                        } else if (responseOb?.msgState == MsgState.error) {
+                          if (responseOb?.errState == ErrState.severErr) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('${responseOb?.data}'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else if (responseOb?.errState ==
+                              ErrState.noConnection) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/imgs/no_internet_connection_icon.png',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  const Text('No Internet Connection!'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else {
+                            return const Scaffold(
+                              body: Center(child: Text('Unknown Error')),
+                            );
+                          }
                         }
                         return Container(
                           color: Colors.black.withOpacity(0.5),
@@ -1838,6 +2115,195 @@ class _MaterialRequisitionCreateMBState
                               ),
                             ),
                           );
+                        } else if (responseOb?.msgState == MsgState.error) {
+                          if (responseOb?.errState == ErrState.severErr) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('${responseOb?.data}'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else if (responseOb?.errState ==
+                              ErrState.noConnection) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/imgs/no_internet_connection_icon.png',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  const Text('No Internet Connection!'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else {
+                            return const Scaffold(
+                              body: Center(child: Text('Unknown Error')),
+                            );
+                          }
+                        }
+                        return Container(
+                          color: Colors.black.withOpacity(0.5),
+                        );
+                      })
+                  : Container(),
+              isUpdateMPL == true
+                  ? StreamBuilder<ResponseOb>(
+                      initialData: ResponseOb(msgState: MsgState.loading),
+                      stream: materialproductlineBloc
+                          .getEditMaterialProductLineStream(),
+                      builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                        ResponseOb? responseOb = snapshot.data;
+                        if (responseOb?.msgState == MsgState.loading) {
+                          return Container(
+                            color: Colors.black.withOpacity(0.5),
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/loading.gif',
+                                width: 100,
+                                height: 100,
+                              ),
+                            ),
+                          );
+                        } else if (responseOb?.msgState == MsgState.error) {
+                          if (responseOb?.errState == ErrState.severErr) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('${responseOb?.data}'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else if (responseOb?.errState ==
+                              ErrState.noConnection) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/imgs/no_internet_connection_icon.png',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  const Text('No Internet Connection!'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else {
+                            return const Scaffold(
+                              body: Center(child: Text('Unknown Error')),
+                            );
+                          }
+                        }
+                        return Container(
+                          color: Colors.black.withOpacity(0.5),
+                        );
+                      })
+                  : Container(),
+              isDeleteMPL == true
+                  ? StreamBuilder<ResponseOb>(
+                      initialData: ResponseOb(msgState: MsgState.loading),
+                      stream: materialproductlineBloc
+                          .getDeleteMaterialProductLineStream(),
+                      builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                        ResponseOb? responseOb = snapshot.data;
+                        if (responseOb?.msgState == MsgState.loading) {
+                          return Container(
+                            color: Colors.black.withOpacity(0.5),
+                            child: Center(
+                              child: Image.asset(
+                                'assets/gifs/loading.gif',
+                                width: 100,
+                                height: 100,
+                              ),
+                            ),
+                          );
+                        } else if (responseOb?.msgState == MsgState.error) {
+                          if (responseOb?.errState == ErrState.severErr) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('${responseOb?.data}'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else if (responseOb?.errState ==
+                              ErrState.noConnection) {
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/imgs/no_internet_connection_icon.png',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  const Text('No Internet Connection!'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
+                            );
+                          } else {
+                            return const Scaffold(
+                              body: Center(child: Text('Unknown Error')),
+                            );
+                          }
                         }
                         return Container(
                           color: Colors.black.withOpacity(0.5),

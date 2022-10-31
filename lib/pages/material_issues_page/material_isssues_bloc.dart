@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 import '../../dbs/sharef.dart';
@@ -41,9 +42,9 @@ class MaterialIssuesBloc {
     purchaserequisitionListStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
+    Sharef.getOdooClientInstance().then((value) async {
+      try {
+        print('Try Get Purchase Requisition List');
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
@@ -65,28 +66,36 @@ class MaterialIssuesBloc {
           responseOb.data = data;
           purchaserequisitionListStreamController.sink.add(responseOb);
         } else {
-          data = null;
-          print('GetPurchaseRequisitionError:' +
-              res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Purchase Requisition Error: ${map['message']}');
+              }
+            },
+          );
+          print('Get Purchase Requisition Error:' +
+              res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           purchaserequisitionListStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
-      print('catch');
-      if (e.toString().contains("SocketException")) {
-        responseOb.data = "Internet Connection Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.noConnection;
-        purchaserequisitionListStreamController.sink.add(responseOb);
-      } else {
-        responseOb.data = "Unknown Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.unKnownErr;
-        purchaserequisitionListStreamController.sink.add(responseOb);
+      } catch (e) {
+        print('catch Get Purchase Requisiton List');
+        if (e.toString().contains("SocketException")) {
+          responseOb.data = "Internet Connection Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.noConnection;
+          purchaserequisitionListStreamController.sink.add(responseOb);
+        } else {
+          responseOb.data = "Unknown Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          purchaserequisitionListStreamController.sink.add(responseOb);
+        }
       }
-    }
+    });
   }
 
   getStockPickingData(materialId, state) async {
@@ -95,9 +104,9 @@ class MaterialIssuesBloc {
     stockpickingStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
+    Sharef.getOdooClientInstance().then((value) async {
+      try {
+        print('Try Get Stock Picking List');
         odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
@@ -132,27 +141,35 @@ class MaterialIssuesBloc {
               ? stockpickingStreamController.sink.add(responseOb)
               : null;
         } else {
-          data = null;
-          print('GetStockPickingError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Stock Picking Error: ${map['message']}');
+              }
+            },
+          );
+          print('Get Stock Picking Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           stockpickingStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
-      print('Stock Picking catch: $e');
-      if (e.toString().contains("SocketException")) {
-        responseOb.data = "Internet Connection Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.noConnection;
-        stockpickingStreamController.sink.add(responseOb);
-      } else {
-        responseOb.data = "Unknown Error";
-        responseOb.msgState = MsgState.error;
-        responseOb.errState = ErrState.unKnownErr;
-        stockpickingStreamController.sink.add(responseOb);
+      } catch (e) {
+        print('Stock Picking catch: $e');
+        if (e.toString().contains("SocketException")) {
+          responseOb.data = "Internet Connection Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.noConnection;
+          stockpickingStreamController.sink.add(responseOb);
+        } else {
+          responseOb.data = "Unknown Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          stockpickingStreamController.sink.add(responseOb);
+        }
       }
-    }
+    });
   }
 
   callActionConfirm(id) async {

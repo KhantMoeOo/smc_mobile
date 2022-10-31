@@ -318,6 +318,30 @@ class DatabaseHelper {
     });
   } // insert datas list from sale_order_line_multi_select table to sale_order_line table
 
+  Future<List<ProductLineOb>> insertMPLUpdateToMPL() async {
+    print('Worked');
+    Database db = await database();
+    await db.rawInsert(
+        'INSERT INTO material_product_line(id,isSelect, material_product_id, product_code_id, product_code_name, description, full_name, quantity, uom_id, uom_name) SELECT id,isSelect, material_product_id, product_code_id, product_code_name, description, full_name, quantity, uom_id, uom_name FROM material_product_line_update WHERE isSelect = 1');
+
+    List<Map<String, dynamic>> productlineMap =
+        await db.query('material_product_line');
+    return List.generate(productlineMap.length, (i) {
+      return ProductLineOb(
+        id: productlineMap[i]['id'],
+        isSelect: productlineMap[i]['isSelect'],
+        materialproductId: productlineMap[i]['material_product_id'],
+        productCodeName: productlineMap[i]['product_code_name'],
+        productCodeId: productlineMap[i]['product_code_id'],
+        description: productlineMap[i]['description'],
+        fullName: productlineMap[i]['full_name'],
+        quantity: productlineMap[i]['quantity'],
+        uomName: productlineMap[i]['uom_name'],
+        uomId: productlineMap[i]['uom_id'],
+      );
+    });
+  } // insert values material_product_line to material_product_line_update
+
   Future<List<ProductLineOb>> updateMPLSelect() async {
     print('Worked');
     Database db = await database();
@@ -995,6 +1019,19 @@ class DatabaseHelper {
     await _db.rawUpdate(
         "UPDATE sale_order_line_multi_select SET quotation_id = $quotationId, isSelect = $isSelect, product_code_id = $productCodeId, product_code_name = '$productCodeName', description = '$description', quantity = '$quantity', uom_id = $uomId, uom_name = '$uomName', unit_price = '$unitPrice',tax_id = '$taxId',tax_name = '$taxName', price_subtotal = '$subTotal' WHERE id = $id");
   } // Update datas to sale_order_line_multi_select table
+
+  Future<void> updateMaterialProductLine({
+    int? id,
+    int? mrId,
+    int? isSelect,
+    String? quantity,
+    int? uomId,
+    String? uomName,
+  }) async {
+    Database _db = await database();
+    await _db.rawUpdate(
+        "UPDATE material_product_line SET isSelect = $isSelect, material_product_id = $mrId,  quantity = '$quantity', uom_id = $uomId, uom_name = '$uomName' WHERE id = $id");
+  } // Update datas to sale_order_line table
 
   Future<void> updateProductLineMultiSelect({
     int? id,

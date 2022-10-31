@@ -13,6 +13,7 @@ import '../../../../pages/material_requisition_page/material_requisition_create_
 import '../../../../pages/material_requisition_page/purchase_requisition_bloc.dart';
 import '../../../../pages/quotation_page/sale_order_line_page/sale_order_line_bloc.dart';
 import '../../../../utils/app_const.dart';
+import 'material_requisition_create_mb.dart';
 import 'material_requisition_list_mb.dart';
 
 class MaterialRequisitionDetailMB extends StatefulWidget {
@@ -1088,29 +1089,30 @@ class _MaterialRequisitionDetailMBState
                                     overlayColor: Colors.black,
                                     overlayOpacity: 0.5,
                                     children: [
-                                      // SpeedDialChild(
-                                      //   visible: materialRequisitionList[0]
-                                      //               ['state'] ==
-                                      //           'confirm'
-                                      //       ? false
-                                      //       : true,
-                                      //   onTap: () {
-                                      //     Navigator.of(context).push(
-                                      //         MaterialPageRoute(
-                                      //             builder: (context) {
-                                      //       return MaterialRequisitionCreatePage(
-                                      //         name: materialRequisitionList[0]
-                                      //             ['name'],
-                                      //         neworedit: 0,
-                                      //         userId: widget.userId,
-                                      //       );
-                                      //     })).then((value) {
-                                      //       setState(() {});
-                                      //     });
-                                      //   },
-                                      //   child: const Icon(Icons.edit),
-                                      //   label: 'Edit',
-                                      // ),
+                                      SpeedDialChild(
+                                        visible: materialRequisitionList[0]
+                                                    ['state'] ==
+                                                'confirm'
+                                            ? false
+                                            : true,
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                            return MaterialRequisitionCreateMB(
+                                              mrList: materialRequisitionList,
+                                              name: materialRequisitionList[0]
+                                                  ['name'],
+                                              neworedit: 1,
+                                              userId: widget.userId,
+                                            );
+                                          })).then((value) {
+                                            setState(() {});
+                                          });
+                                        },
+                                        child: const Icon(Icons.edit),
+                                        label: 'Edit',
+                                      ),
                                       // SpeedDialChild(
                                       //   onTap: () {
                                       //     Navigator.of(context).push(

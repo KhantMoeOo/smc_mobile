@@ -2225,29 +2225,29 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  const Text(
-                                    "Pricelist*:",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                  Container(
-                                      height: 40,
-                                      color: Colors.white,
-                                      child: TextField(
-                                        textAlignVertical:
-                                            TextAlignVertical.center,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        readOnly: true,
-                                        controller: pricelistController
-                                          ..text = 'Publice Pricelist (MMK)',
-                                      )),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  // const Text(
+                                  //   "Pricelist*:",
+                                  //   style: TextStyle(
+                                  //       fontSize: 20,
+                                  //       fontWeight: FontWeight.bold,
+                                  //       color: Colors.black),
+                                  // ),
+                                  // Container(
+                                  //     height: 40,
+                                  //     color: Colors.white,
+                                  //     child: TextField(
+                                  //       textAlignVertical:
+                                  //           TextAlignVertical.center,
+                                  //       decoration: const InputDecoration(
+                                  //         border: OutlineInputBorder(),
+                                  //       ),
+                                  //       readOnly: true,
+                                  //       controller: pricelistController
+                                  //         ..text = 'Publice Pricelist (MMK)',
+                                  //     )),
+                                  // const SizedBox(
+                                  //   height: 10,
+                                  // ),
                                   const Text(
                                     "Payment Terms:",
                                     style: TextStyle(
