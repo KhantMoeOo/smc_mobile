@@ -557,7 +557,7 @@ class _LoginMBState extends State<LoginMB> {
                             ],
                           ),
                         ),
-                        const Text('Version 31.10.2022')
+                        const Text(version)
                       ],
                     ),
                   ),

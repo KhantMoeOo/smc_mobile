@@ -1080,6 +1080,11 @@ class _MaterialRequisitionDetailMBState
                                       );
                                     }),
                                 floatingActionButton: SpeedDial(
+                                    visible: materialRequisitionList[0]
+                                                ['state'] ==
+                                            'confirm'
+                                        ? false
+                                        : true,
                                     backgroundColor: AppColors.appBarColor,
                                     buttonSize: 80,
                                     childrenButtonSize: 75,

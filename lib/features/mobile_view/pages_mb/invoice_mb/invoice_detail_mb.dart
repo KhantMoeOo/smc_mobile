@@ -711,184 +711,186 @@ class _InvoiceDetailMBState extends State<InvoiceDetailMB>
                                     borderRadius: BorderRadius.circular(10),
                                     // color: AppColors.appBarColor,
                                   ),
-                                  child: MediaQuery.of(context).size.width >
-                                          400.0
-                                      ? SpeedDial(
-                                          buttonSize: 80,
-                                          childrenButtonSize: 100,
-                                          backgroundColor: Colors.transparent,
-                                          elevation: 0.0,
-                                          activeChild: const Icon(
-                                            Icons.close,
-                                            color: AppColors.appBarColor,
-                                          ),
-                                          child: invoiceList[0]['state'] ==
-                                                  'draft'
-                                              ? Container(
-                                                  width: 80,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        AppColors.appBarColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: const Center(
-                                                    child: Text('Draft',
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            fontSize: 10)),
-                                                  ),
-                                                )
-                                              : invoiceList[0]['state'] ==
-                                                      'posted'
-                                                  ? Container(
-                                                      width: 80,
-                                                      height: 40,
-                                                      decoration: BoxDecoration(
-                                                        color: AppColors
-                                                            .appBarColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      child: const Center(
-                                                        child: Text('Posted',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                                fontSize: 10)),
-                                                      ),
-                                                    )
-                                                  : Container(
-                                                      width: 80,
-                                                      height: 40,
-                                                      decoration: BoxDecoration(
-                                                        color: AppColors
-                                                            .appBarColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      child: const Center(
-                                                        child: Text('Cancelled',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                                fontSize: 10)),
-                                                      ),
-                                                    ),
-                                          spaceBetweenChildren: 5,
-                                          direction: SpeedDialDirection.left,
-                                          renderOverlay: false,
-                                          children: [
-                                              SpeedDialChild(
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                elevation: 0.0,
-                                                child: Container(
-                                                  height: 40,
-                                                  width: 80,
-                                                  decoration: BoxDecoration(
-                                                      border:
-                                                          Border.all(width: 1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: invoiceList[0]
-                                                                  ['state'] ==
-                                                              'cancel'
-                                                          ? AppColors
-                                                              .appBarColor
-                                                          : Colors.white),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Cancelled",
-                                                      style: TextStyle(
-                                                          color: invoiceList[0][
-                                                                      'state'] ==
-                                                                  'cancel'
-                                                              ? Colors.white
-                                                              : Colors.grey,
-                                                          fontSize: 15),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SpeedDialChild(
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                elevation: 0.0,
-                                                child: Container(
-                                                  height: 40,
-                                                  width: 80,
-                                                  decoration: BoxDecoration(
-                                                      border:
-                                                          Border.all(width: 1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: invoiceList[0]
-                                                                  ['state'] ==
-                                                              'posted'
-                                                          ? AppColors
-                                                              .appBarColor
-                                                          : Colors.white),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Posted",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          color: invoiceList[0][
-                                                                      'state'] ==
-                                                                  'posted'
-                                                              ? Colors.white
-                                                              : Colors.grey,
-                                                          fontSize: 15),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SpeedDialChild(
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                elevation: 0.0,
-                                                child: Container(
-                                                  height: 40,
-                                                  width: 80,
-                                                  decoration: BoxDecoration(
-                                                      border:
-                                                          Border.all(width: 1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: invoiceList[0]
-                                                                  ['state'] ==
-                                                              'draft'
-                                                          ? AppColors
-                                                              .appBarColor
-                                                          : Colors.white),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Draft",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          color: invoiceList[0][
-                                                                      'state'] ==
-                                                                  'draft'
-                                                              ? Colors.white
-                                                              : Colors.grey,
-                                                          fontSize: 15),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ])
-                                      : Container(
+                                  child: 
+                                  // MediaQuery.of(context).size.width >
+                                  //         400.0
+                                  //     ? SpeedDial(
+                                  //         buttonSize: 80,
+                                  //         childrenButtonSize: 100,
+                                  //         backgroundColor: Colors.transparent,
+                                  //         elevation: 0.0,
+                                  //         activeChild: const Icon(
+                                  //           Icons.close,
+                                  //           color: AppColors.appBarColor,
+                                  //         ),
+                                  //         child: invoiceList[0]['state'] ==
+                                  //                 'draft'
+                                  //             ? Container(
+                                  //                 width: 80,
+                                  //                 height: 40,
+                                  //                 decoration: BoxDecoration(
+                                  //                   color:
+                                  //                       AppColors.appBarColor,
+                                  //                   borderRadius:
+                                  //                       BorderRadius.circular(
+                                  //                           10),
+                                  //                 ),
+                                  //                 child: const Center(
+                                  //                   child: Text('Draft',
+                                  //                       textAlign:
+                                  //                           TextAlign.center,
+                                  //                       style: TextStyle(
+                                  //                           fontSize: 10)),
+                                  //                 ),
+                                  //               )
+                                  //             : invoiceList[0]['state'] ==
+                                  //                     'posted'
+                                  //                 ? Container(
+                                  //                     width: 80,
+                                  //                     height: 40,
+                                  //                     decoration: BoxDecoration(
+                                  //                       color: AppColors
+                                  //                           .appBarColor,
+                                  //                       borderRadius:
+                                  //                           BorderRadius
+                                  //                               .circular(10),
+                                  //                     ),
+                                  //                     child: const Center(
+                                  //                       child: Text('Posted',
+                                  //                           textAlign: TextAlign
+                                  //                               .center,
+                                  //                           style: TextStyle(
+                                  //                               fontSize: 10)),
+                                  //                     ),
+                                  //                   )
+                                  //                 : Container(
+                                  //                     width: 80,
+                                  //                     height: 40,
+                                  //                     decoration: BoxDecoration(
+                                  //                       color: AppColors
+                                  //                           .appBarColor,
+                                  //                       borderRadius:
+                                  //                           BorderRadius
+                                  //                               .circular(10),
+                                  //                     ),
+                                  //                     child: const Center(
+                                  //                       child: Text('Cancelled',
+                                  //                           textAlign: TextAlign
+                                  //                               .center,
+                                  //                           style: TextStyle(
+                                  //                               fontSize: 10)),
+                                  //                     ),
+                                  //                   ),
+                                  //         spaceBetweenChildren: 5,
+                                  //         direction: SpeedDialDirection.left,
+                                  //         renderOverlay: false,
+                                  //         children: [
+                                  //             SpeedDialChild(
+                                  //               backgroundColor:
+                                  //                   Colors.transparent,
+                                  //               elevation: 0.0,
+                                  //               child: Container(
+                                  //                 height: 40,
+                                  //                 width: 80,
+                                  //                 decoration: BoxDecoration(
+                                  //                     border:
+                                  //                         Border.all(width: 1),
+                                  //                     borderRadius:
+                                  //                         BorderRadius.circular(
+                                  //                             10),
+                                  //                     color: invoiceList[0]
+                                  //                                 ['state'] ==
+                                  //                             'cancel'
+                                  //                         ? AppColors
+                                  //                             .appBarColor
+                                  //                         : Colors.white),
+                                  //                 child: Center(
+                                  //                   child: Text(
+                                  //                     "Cancelled",
+                                  //                     style: TextStyle(
+                                  //                         color: invoiceList[0][
+                                  //                                     'state'] ==
+                                  //                                 'cancel'
+                                  //                             ? Colors.white
+                                  //                             : Colors.grey,
+                                  //                         fontSize: 15),
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //             ),
+                                  //             SpeedDialChild(
+                                  //               backgroundColor:
+                                  //                   Colors.transparent,
+                                  //               elevation: 0.0,
+                                  //               child: Container(
+                                  //                 height: 40,
+                                  //                 width: 80,
+                                  //                 decoration: BoxDecoration(
+                                  //                     border:
+                                  //                         Border.all(width: 1),
+                                  //                     borderRadius:
+                                  //                         BorderRadius.circular(
+                                  //                             10),
+                                  //                     color: invoiceList[0]
+                                  //                                 ['state'] ==
+                                  //                             'posted'
+                                  //                         ? AppColors
+                                  //                             .appBarColor
+                                  //                         : Colors.white),
+                                  //                 child: Center(
+                                  //                   child: Text(
+                                  //                     "Posted",
+                                  //                     textAlign:
+                                  //                         TextAlign.center,
+                                  //                     style: TextStyle(
+                                  //                         color: invoiceList[0][
+                                  //                                     'state'] ==
+                                  //                                 'posted'
+                                  //                             ? Colors.white
+                                  //                             : Colors.grey,
+                                  //                         fontSize: 15),
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //             ),
+                                  //             SpeedDialChild(
+                                  //               backgroundColor:
+                                  //                   Colors.transparent,
+                                  //               elevation: 0.0,
+                                  //               child: Container(
+                                  //                 height: 40,
+                                  //                 width: 80,
+                                  //                 decoration: BoxDecoration(
+                                  //                     border:
+                                  //                         Border.all(width: 1),
+                                  //                     borderRadius:
+                                  //                         BorderRadius.circular(
+                                  //                             10),
+                                  //                     color: invoiceList[0]
+                                  //                                 ['state'] ==
+                                  //                             'draft'
+                                  //                         ? AppColors
+                                  //                             .appBarColor
+                                  //                         : Colors.white),
+                                  //                 child: Center(
+                                  //                   child: Text(
+                                  //                     "Draft",
+                                  //                     textAlign:
+                                  //                         TextAlign.center,
+                                  //                     style: TextStyle(
+                                  //                         color: invoiceList[0][
+                                  //                                     'state'] ==
+                                  //                                 'draft'
+                                  //                             ? Colors.white
+                                  //                             : Colors.grey,
+                                  //                         fontSize: 15),
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //             ),
+                                  //           ])
+                                      // : 
+                                      Container(
                                           child: invoiceList[0]['state'] ==
                                                   'draft'
                                               ? Container(

@@ -26,15 +26,14 @@ class _LogoutPageState extends State<LogoutPage> {
 
   void getLogoutListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
-      final snackbar = SnackBar(
+      const snackbar = SnackBar(
           elevation: 0.0,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 1),
+          // shape:
+          //     RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          behavior: SnackBarBehavior.fixed,
+          duration: Duration(seconds: 1),
           backgroundColor: Colors.green,
-          content:
-              const Text('Logout Successfully!', textAlign: TextAlign.center));
+          content: Text('Logout Successfully!', textAlign: TextAlign.center));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (BuildContext context) {

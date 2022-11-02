@@ -1209,7 +1209,9 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
               backgroundColor: Colors.grey[200],
               appBar: AppBar(
                 backgroundColor: AppColors.appBarColor,
-                title: Text(widget.newOrEdit == 1 ? widget.name : 'New'),
+                title: Text(widget.newOrEdit == 1
+                    ? '${widget.name} (${userList[0]['zone_id'][1]})'
+                    : 'New (${userList[0]['zone_id'][1]})'),
                 actions: [
                   TextButton(
                     onPressed: () {

@@ -759,7 +759,8 @@ class _SaleOrderLineMultiSelectionMBState
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: SizedBox(
+                    child: Container(
+                      color: Colors.white,
                       height: 40,
                       child: TextField(
                           onChanged: (value) {
@@ -1314,7 +1315,7 @@ class _SaleOrderLineMultiSelectionMBState
                                                                   } else {
                                                                     return TextField(
                                                                         decoration:
-                                                                            InputDecoration(
+                                                                            const InputDecoration(
                                                                           border:
                                                                               OutlineInputBorder(),
                                                                         ),

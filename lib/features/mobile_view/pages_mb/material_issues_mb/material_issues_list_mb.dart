@@ -534,7 +534,11 @@ class _MaterialIssuesListMBState extends State<MaterialIssuesListMB> {
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               children: [
                                                                             Text(
-                                                                              stockpickingupdateList[i]['state'] == 'assigned' ? 'Ready' : 'Done',
+                                                                              stockpickingupdateList[i]['state'] == 'assigned'
+                                                                                  ? 'Ready'
+                                                                                  : stockpickingupdateList[i]['state'] == 'done'
+                                                                                      ? 'Done'
+                                                                                      : 'Waiting For Related Manager',
                                                                               style: const TextStyle(color: Colors.black, fontSize: 13),
                                                                             )
                                                                           ])),

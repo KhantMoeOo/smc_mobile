@@ -281,7 +281,8 @@ class _QuotationListMBState extends State<QuotationListMB> {
                                   icon: const Icon(Icons.menu),
                                 ),
                                 // backgroundColor: Color.fromARGB(255, 12, 41, 92),
-                                title: const Text("Quotation"),
+                                title: Text(
+                                    "Quotation (${userList[0]['zone_id'][1]})"),
                                 actions: [
                                   Visibility(
                                       visible:

@@ -1435,6 +1435,11 @@ class _MaterialIssuesDetailMBState extends State<MaterialIssuesDetailMB> {
                                 );
                               }),
                           floatingActionButton: SpeedDial(
+                              visible: stockpickingList[0]['state'] ==
+                                          'issue_confirm' ||
+                                      stockpickingList[0]['state'] == 'done'
+                                  ? false
+                                  : true,
                               backgroundColor: AppColors.appBarColor,
                               buttonSize: 80,
                               childrenButtonSize: 75,
@@ -1472,9 +1477,9 @@ class _MaterialIssuesDetailMBState extends State<MaterialIssuesDetailMB> {
                                         builder: (context) {
                                           return AlertDialog(
                                             title: const Text(
-                                                'Order Confirmation!'),
+                                                'Issue Confirmation!'),
                                             content: const Text(
-                                                'Do you want to Order Confirm?'),
+                                                'Do you want to Issue Confirm?'),
                                             actions: [
                                               TextButton(
                                                   onPressed: () {
@@ -1482,6 +1487,10 @@ class _MaterialIssuesDetailMBState extends State<MaterialIssuesDetailMB> {
                                                   },
                                                   child: const Text('No')),
                                               TextButton(
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor:
+                                                        AppColors.appBarColor,
+                                                  ),
                                                   onPressed: () async {
                                                     setState(() {
                                                       isCallActionConfirm =
@@ -1494,7 +1503,11 @@ class _MaterialIssuesDetailMBState extends State<MaterialIssuesDetailMB> {
                                                         .callActionConfirmIssues(
                                                             widget.id);
                                                   },
-                                                  child: const Text('Yes'))
+                                                  child: const Text(
+                                                    'Yes',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ))
                                             ],
                                           );
                                         });

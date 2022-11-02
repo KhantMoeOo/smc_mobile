@@ -472,8 +472,9 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                  title: const Text('Something went wrong !'),
-                  content: const Text('Not enough Remaining Stock.'),
+                  title: const Text('Warning!'),
+                  content:
+                      const Text('Not enough Remaining Stock in Warehouse'),
                   actions: [
                     TextButton(
                       onPressed: () {
@@ -2153,9 +2154,9 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             children: [
                                                                               TextSpan(text: '${quotationList[i]['customer_filter'] == false ? '' : quotationList[i]['customer_filter']} - ', style: const TextStyle(color: Colors.black, fontSize: 18)),
                                                                               quotationList[i]['customer_filter'] == 'zone'
-                                                                                  ? TextSpan(text: '${widget.zoneFilterId[1]}', style: const TextStyle(color: Colors.black, fontSize: 18))
-                                                                                  : quotationList[i]['customer_filter'] == 'segemnt'
-                                                                                      ? TextSpan(text: '${widget.segmentFilterId[1]}', style: const TextStyle(color: Colors.black, fontSize: 18))
+                                                                                  ? TextSpan(text: '${quotationList[i]['zone_filter_id'][1]}', style: const TextStyle(color: Colors.black, fontSize: 18))
+                                                                                  : quotationList[i]['customer_filter'] == 'segment'
+                                                                                      ? TextSpan(text: '${quotationList[i]['seg_filter_id'][1]}', style: const TextStyle(color: Colors.black, fontSize: 18))
                                                                                       : const TextSpan(),
                                                                             ]),
                                                                       ),
@@ -3095,413 +3096,410 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                   BorderRadius.circular(10),
                                               // color: AppColors.appBarColor,
                                             ),
-                                            child: MediaQuery.of(context)
-                                                        .size
-                                                        .width >
-                                                    400.0
-                                                ? SpeedDial(
-                                                    buttonSize: 80,
-                                                    childrenButtonSize: 100,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    elevation: 0.0,
-                                                    activeChild: const Icon(
-                                                      Icons.close,
-                                                      color:
-                                                          AppColors.appBarColor,
-                                                    ),
-                                                    child: quotationList[0]
-                                                                ['state'] ==
-                                                            'draft'
-                                                        ? Container(
-                                                            width: 80,
-                                                            height: 40,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: AppColors
-                                                                  .appBarColor,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: const Center(
-                                                              child: Text(
-                                                                  'Quotation',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style: TextStyle(
+                                            child:
+                                                // MediaQuery.of(context)
+                                                //             .size
+                                                //             .width >
+                                                //         400.0
+                                                //     ? SpeedDial(
+                                                //         buttonSize: 80,
+                                                //         childrenButtonSize: 100,
+                                                //         backgroundColor:
+                                                //             Colors.transparent,
+                                                //         elevation: 0.0,
+                                                //         activeChild: const Icon(
+                                                //           Icons.close,
+                                                //           color:
+                                                //               AppColors.appBarColor,
+                                                //         ),
+                                                //         child: quotationList[0]
+                                                //                     ['state'] ==
+                                                //                 'draft'
+                                                //             ? Container(
+                                                //                 width: 80,
+                                                //                 height: 40,
+                                                //                 decoration:
+                                                //                     BoxDecoration(
+                                                //                   color: AppColors
+                                                //                       .appBarColor,
+                                                //                   borderRadius:
+                                                //                       BorderRadius
+                                                //                           .circular(
+                                                //                               10),
+                                                //                 ),
+                                                //                 child: const Center(
+                                                //                   child: Text(
+                                                //                       'Quotation',
+                                                //                       textAlign:
+                                                //                           TextAlign
+                                                //                               .center,
+                                                //                       style: TextStyle(
+                                                //                           fontSize:
+                                                //                               10)),
+                                                //                 ),
+                                                //               )
+                                                //             : quotationList[0]
+                                                //                         ['state'] ==
+                                                //                     'sent'
+                                                //                 ? Container(
+                                                //                     width: 80,
+                                                //                     height: 40,
+                                                //                     decoration:
+                                                //                         BoxDecoration(
+                                                //                       color: AppColors
+                                                //                           .appBarColor,
+                                                //                       borderRadius:
+                                                //                           BorderRadius
+                                                //                               .circular(
+                                                //                                   10),
+                                                //                     ),
+                                                //                     child:
+                                                //                         const Center(
+                                                //                       child: Text(
+                                                //                           'Quotation Sent',
+                                                //                           textAlign:
+                                                //                               TextAlign
+                                                //                                   .center,
+                                                //                           style: TextStyle(
+                                                //                               fontSize:
+                                                //                                   10)),
+                                                //                     ),
+                                                //                   )
+                                                //                 : quotationList[0][
+                                                //                             'state'] ==
+                                                //                         'sale'
+                                                //                     ? Container(
+                                                //                         width: 80,
+                                                //                         height: 40,
+                                                //                         decoration:
+                                                //                             BoxDecoration(
+                                                //                           color: AppColors
+                                                //                               .appBarColor,
+                                                //                           borderRadius:
+                                                //                               BorderRadius.circular(
+                                                //                                   10),
+                                                //                         ),
+                                                //                         child:
+                                                //                             const Center(
+                                                //                           child: Text(
+                                                //                               'Sale Order',
+                                                //                               textAlign: TextAlign
+                                                //                                   .center,
+                                                //                               style:
+                                                //                                   TextStyle(fontSize: 10)),
+                                                //                         ),
+                                                //                       )
+                                                //                     : Container(
+                                                //                         width: 80,
+                                                //                         height: 40,
+                                                //                         decoration:
+                                                //                             BoxDecoration(
+                                                //                           color: AppColors
+                                                //                               .appBarColor,
+                                                //                           borderRadius:
+                                                //                               BorderRadius.circular(
+                                                //                                   10),
+                                                //                         ),
+                                                //                         child:
+                                                //                             const Center(
+                                                //                           child: Text(
+                                                //                               'Cancelled',
+                                                //                               textAlign: TextAlign
+                                                //                                   .center,
+                                                //                               style:
+                                                //                                   TextStyle(fontSize: 10)),
+                                                //                         ),
+                                                //                       ),
+                                                //         spaceBetweenChildren: 5,
+                                                //         direction:
+                                                //             SpeedDialDirection.left,
+                                                //         renderOverlay: false,
+                                                //         children: [
+                                                //             SpeedDialChild(
+                                                //               backgroundColor:
+                                                //                   Colors
+                                                //                       .transparent,
+                                                //               elevation: 0.0,
+                                                //               child: Container(
+                                                //                 height: 40,
+                                                //                 width: 80,
+                                                //                 decoration: BoxDecoration(
+                                                //                     border:
+                                                //                         Border.all(
+                                                //                             width:
+                                                //                                 1),
+                                                //                     borderRadius:
+                                                //                         BorderRadius
+                                                //                             .circular(
+                                                //                                 10),
+                                                //                     color: quotationList[0]
+                                                //                                 [
+                                                //                                 'state'] ==
+                                                //                             'cancel'
+                                                //                         ? AppColors
+                                                //                             .appBarColor
+                                                //                         : Colors
+                                                //                             .white),
+                                                //                 child: Center(
+                                                //                   child: Text(
+                                                //                     "Cancelled",
+                                                //                     style: TextStyle(
+                                                //                         color: quotationList[0]['state'] ==
+                                                //                                 'cancel'
+                                                //                             ? Colors
+                                                //                                 .white
+                                                //                             : Colors
+                                                //                                 .grey,
+                                                //                         fontSize:
+                                                //                             15),
+                                                //                   ),
+                                                //                 ),
+                                                //               ),
+                                                //             ),
+                                                //             SpeedDialChild(
+                                                //               backgroundColor:
+                                                //                   Colors
+                                                //                       .transparent,
+                                                //               elevation: 0.0,
+                                                //               child: Container(
+                                                //                 height: 40,
+                                                //                 width: 80,
+                                                //                 decoration: BoxDecoration(
+                                                //                     border:
+                                                //                         Border.all(
+                                                //                             width:
+                                                //                                 1),
+                                                //                     borderRadius:
+                                                //                         BorderRadius
+                                                //                             .circular(
+                                                //                                 10),
+                                                //                     color: quotationList[0]
+                                                //                                 [
+                                                //                                 'state'] ==
+                                                //                             'sale'
+                                                //                         ? AppColors
+                                                //                             .appBarColor
+                                                //                         : Colors
+                                                //                             .white),
+                                                //                 child: Center(
+                                                //                   child: Text(
+                                                //                     "Sale Order",
+                                                //                     textAlign:
+                                                //                         TextAlign
+                                                //                             .center,
+                                                //                     style: TextStyle(
+                                                //                         color: quotationList[0]['state'] ==
+                                                //                                 'sale'
+                                                //                             ? Colors
+                                                //                                 .white
+                                                //                             : Colors
+                                                //                                 .grey,
+                                                //                         fontSize:
+                                                //                             15),
+                                                //                   ),
+                                                //                 ),
+                                                //               ),
+                                                //             ),
+                                                //             SpeedDialChild(
+                                                //               backgroundColor:
+                                                //                   Colors
+                                                //                       .transparent,
+                                                //               elevation: 0.0,
+                                                //               child: Container(
+                                                //                 height: 40,
+                                                //                 width: 80,
+                                                //                 decoration: BoxDecoration(
+                                                //                     border:
+                                                //                         Border.all(
+                                                //                             width:
+                                                //                                 1),
+                                                //                     borderRadius:
+                                                //                         BorderRadius
+                                                //                             .circular(
+                                                //                                 10),
+                                                //                     color: quotationList[0]
+                                                //                                 [
+                                                //                                 'state'] ==
+                                                //                             'sent'
+                                                //                         ? AppColors
+                                                //                             .appBarColor
+                                                //                         : Colors
+                                                //                             .white),
+                                                //                 child: Center(
+                                                //                   child: Text(
+                                                //                     "Quotation Sent",
+                                                //                     textAlign:
+                                                //                         TextAlign
+                                                //                             .center,
+                                                //                     style: TextStyle(
+                                                //                         color: quotationList[0]['state'] ==
+                                                //                                 'sent'
+                                                //                             ? Colors
+                                                //                                 .white
+                                                //                             : Colors
+                                                //                                 .grey,
+                                                //                         fontSize:
+                                                //                             15),
+                                                //                   ),
+                                                //                 ),
+                                                //               ),
+                                                //             ),
+                                                //             SpeedDialChild(
+                                                //               backgroundColor:
+                                                //                   Colors
+                                                //                       .transparent,
+                                                //               elevation: 0.0,
+                                                //               child: Container(
+                                                //                 height: 40,
+                                                //                 width: 80,
+                                                //                 decoration: BoxDecoration(
+                                                //                     border:
+                                                //                         Border.all(
+                                                //                             width:
+                                                //                                 1),
+                                                //                     borderRadius:
+                                                //                         BorderRadius
+                                                //                             .circular(
+                                                //                                 10),
+                                                //                     color: quotationList[0]
+                                                //                                 [
+                                                //                                 'state'] ==
+                                                //                             'draft'
+                                                //                         ? AppColors
+                                                //                             .appBarColor
+                                                //                         : Colors
+                                                //                             .white),
+                                                //                 child: Center(
+                                                //                   child: Text(
+                                                //                     "Quotation",
+                                                //                     style: TextStyle(
+                                                //                         color: quotationList[0]['state'] ==
+                                                //                                 'draft'
+                                                //                             ? Colors
+                                                //                                 .white
+                                                //                             : Colors
+                                                //                                 .grey,
+                                                //                         fontSize:
+                                                //                             15),
+                                                //                   ),
+                                                //                 ),
+                                                //               ),
+                                                //             ),
+                                                //           ])
+                                                //     :
+                                                Container(
+                                              child: quotationList[0]
+                                                          ['state'] ==
+                                                      'draft'
+                                                  ? Container(
+                                                      width: 80,
+                                                      height: 40,
+                                                      decoration: BoxDecoration(
+                                                        color: AppColors
+                                                            .appBarColor,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      child: const Center(
+                                                        child: Text('Quotation',
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                              fontSize: 15,
+                                                              color:
+                                                                  Colors.white,
+                                                            )),
+                                                      ),
+                                                    )
+                                                  : quotationList[0]['state'] ==
+                                                          'sent'
+                                                      ? Container(
+                                                          width: 80,
+                                                          height: 40,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: AppColors
+                                                                .appBarColor,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          ),
+                                                          child: const Center(
+                                                            child: Text(
+                                                                'Quotation Sent',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 15,
+                                                                  color: Colors
+                                                                      .white,
+                                                                )),
+                                                          ),
+                                                        )
+                                                      : quotationList[0]
+                                                                  ['state'] ==
+                                                              'sale'
+                                                          ? Container(
+                                                              width: 80,
+                                                              height: 40,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: AppColors
+                                                                    .appBarColor,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10),
+                                                              ),
+                                                              child:
+                                                                  const Center(
+                                                                child: Text(
+                                                                    'Sale Order',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style:
+                                                                        TextStyle(
                                                                       fontSize:
-                                                                          10)),
-                                                            ),
-                                                          )
-                                                        : quotationList[0]
-                                                                    ['state'] ==
-                                                                'sent'
-                                                            ? Container(
-                                                                width: 80,
-                                                                height: 40,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              10),
-                                                                ),
-                                                                child:
-                                                                    const Center(
-                                                                  child: Text(
-                                                                      'Quotation Sent',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              10)),
-                                                                ),
-                                                              )
-                                                            : quotationList[0][
-                                                                        'state'] ==
-                                                                    'sale'
-                                                                ? Container(
-                                                                    width: 80,
-                                                                    height: 40,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: AppColors
-                                                                          .appBarColor,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10),
-                                                                    ),
-                                                                    child:
-                                                                        const Center(
-                                                                      child: Text(
-                                                                          'Sale Order',
-                                                                          textAlign: TextAlign
-                                                                              .center,
-                                                                          style:
-                                                                              TextStyle(fontSize: 10)),
-                                                                    ),
-                                                                  )
-                                                                : Container(
-                                                                    width: 80,
-                                                                    height: 40,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: AppColors
-                                                                          .appBarColor,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10),
-                                                                    ),
-                                                                    child:
-                                                                        const Center(
-                                                                      child: Text(
-                                                                          'Cancelled',
-                                                                          textAlign: TextAlign
-                                                                              .center,
-                                                                          style:
-                                                                              TextStyle(fontSize: 10)),
-                                                                    ),
-                                                                  ),
-                                                    spaceBetweenChildren: 5,
-                                                    direction:
-                                                        SpeedDialDirection.left,
-                                                    renderOverlay: false,
-                                                    children: [
-                                                        SpeedDialChild(
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          elevation: 0.0,
-                                                          child: Container(
-                                                            height: 40,
-                                                            width: 80,
-                                                            decoration: BoxDecoration(
-                                                                border:
-                                                                    Border.all(
-                                                                        width:
-                                                                            1),
+                                                                          15,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    )),
+                                                              ),
+                                                            )
+                                                          : Container(
+                                                              width: 80,
+                                                              height: 40,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: AppColors
+                                                                    .appBarColor,
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
                                                                             10),
-                                                                color: quotationList[0]
-                                                                            [
-                                                                            'state'] ==
-                                                                        'cancel'
-                                                                    ? AppColors
-                                                                        .appBarColor
-                                                                    : Colors
-                                                                        .white),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Cancelled",
-                                                                style: TextStyle(
-                                                                    color: quotationList[0]['state'] ==
-                                                                            'cancel'
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .grey,
-                                                                    fontSize:
-                                                                        15),
+                                                              ),
+                                                              child:
+                                                                  const Center(
+                                                                child: Text(
+                                                                    'Cancelled',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    )),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ),
-                                                        SpeedDialChild(
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          elevation: 0.0,
-                                                          child: Container(
-                                                            height: 40,
-                                                            width: 80,
-                                                            decoration: BoxDecoration(
-                                                                border:
-                                                                    Border.all(
-                                                                        width:
-                                                                            1),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10),
-                                                                color: quotationList[0]
-                                                                            [
-                                                                            'state'] ==
-                                                                        'sale'
-                                                                    ? AppColors
-                                                                        .appBarColor
-                                                                    : Colors
-                                                                        .white),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Sale Order",
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style: TextStyle(
-                                                                    color: quotationList[0]['state'] ==
-                                                                            'sale'
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .grey,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SpeedDialChild(
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          elevation: 0.0,
-                                                          child: Container(
-                                                            height: 40,
-                                                            width: 80,
-                                                            decoration: BoxDecoration(
-                                                                border:
-                                                                    Border.all(
-                                                                        width:
-                                                                            1),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10),
-                                                                color: quotationList[0]
-                                                                            [
-                                                                            'state'] ==
-                                                                        'sent'
-                                                                    ? AppColors
-                                                                        .appBarColor
-                                                                    : Colors
-                                                                        .white),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Quotation Sent",
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style: TextStyle(
-                                                                    color: quotationList[0]['state'] ==
-                                                                            'sent'
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .grey,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SpeedDialChild(
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          elevation: 0.0,
-                                                          child: Container(
-                                                            height: 40,
-                                                            width: 80,
-                                                            decoration: BoxDecoration(
-                                                                border:
-                                                                    Border.all(
-                                                                        width:
-                                                                            1),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10),
-                                                                color: quotationList[0]
-                                                                            [
-                                                                            'state'] ==
-                                                                        'draft'
-                                                                    ? AppColors
-                                                                        .appBarColor
-                                                                    : Colors
-                                                                        .white),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Quotation",
-                                                                style: TextStyle(
-                                                                    color: quotationList[0]['state'] ==
-                                                                            'draft'
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .grey,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ])
-                                                : Container(
-                                                    child: quotationList[0]
-                                                                ['state'] ==
-                                                            'draft'
-                                                        ? Container(
-                                                            width: 80,
-                                                            height: 40,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: AppColors
-                                                                  .appBarColor,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: const Center(
-                                                              child: Text(
-                                                                  'Quotation',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        15,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  )),
-                                                            ),
-                                                          )
-                                                        : quotationList[0]
-                                                                    ['state'] ==
-                                                                'sent'
-                                                            ? Container(
-                                                                width: 80,
-                                                                height: 40,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: AppColors
-                                                                      .appBarColor,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              10),
-                                                                ),
-                                                                child:
-                                                                    const Center(
-                                                                  child: Text(
-                                                                      'Quotation Sent',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            15,
-                                                                        color: Colors
-                                                                            .white,
-                                                                      )),
-                                                                ),
-                                                              )
-                                                            : quotationList[0][
-                                                                        'state'] ==
-                                                                    'sale'
-                                                                ? Container(
-                                                                    width: 80,
-                                                                    height: 40,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: AppColors
-                                                                          .appBarColor,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10),
-                                                                    ),
-                                                                    child:
-                                                                        const Center(
-                                                                      child: Text(
-                                                                          'Sale Order',
-                                                                          textAlign: TextAlign
-                                                                              .center,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                Colors.white,
-                                                                          )),
-                                                                    ),
-                                                                  )
-                                                                : Container(
-                                                                    width: 80,
-                                                                    height: 40,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: AppColors
-                                                                          .appBarColor,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10),
-                                                                    ),
-                                                                    child:
-                                                                        const Center(
-                                                                      child: Text(
-                                                                          'Cancelled',
-                                                                          textAlign: TextAlign
-                                                                              .center,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                Colors.white,
-                                                                          )),
-                                                                    ),
-                                                                  ),
-                                                  ),
+                                            ),
                                           ),
                                         ),
                                       ),

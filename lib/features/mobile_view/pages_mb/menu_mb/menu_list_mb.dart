@@ -62,6 +62,8 @@ class _MenuListMBState extends State<MenuListMB> {
 
   Timer? _timer;
 
+  String dbName = '';
+
   @override
   void initState() {
     // TODO: implement initState
@@ -77,6 +79,12 @@ class _MenuListMBState extends State<MenuListMB> {
         .listen(getPurchaseRequisitionListen);
     materialissuesBloc.getStockPickingStream().listen(getStockPickingListen);
     productBloc.getStockWarehouseStream().listen(getStockWarehouseListen);
+    Sharef.getOdooClientInstance().then((value) {
+      setState(() {
+        dbName = value['database'];
+        print('Db Name: $dbName');
+      });
+    });
   }
 
   void getProfileDataListen(ResponseOb responseOb) {
@@ -633,7 +641,8 @@ class _MenuListMBState extends State<MenuListMB> {
                                                   appBar: AppBar(
                                                     backgroundColor:
                                                         AppColors.appBarColor,
-                                                    title: const Text('Menus'),
+                                                    title:
+                                                        Text('Menus ($dbName)'),
                                                     leading: IconButton(
                                                       onPressed: () {
                                                         Navigator.of(context)
@@ -1126,7 +1135,7 @@ class _MenuListMBState extends State<MenuListMB> {
                                                         ),
                                                       ),
                                                       const Text(
-                                                          'Version 31.10.2022')
+                                                          version)
                                                     ],
                                                   )));
                                         }
