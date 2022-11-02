@@ -3551,6 +3551,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                               widget.segmentFilterId.isNotEmpty
                                                   ? widget.segmentFilterId[0]
                                                   : 0,
+                                                  userzoneId: userList[0]['zone_id']
                                         );
                                       })).then((value) {
                                         setState(() {});
@@ -3582,6 +3583,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                           filter: '',
                                           zoneFilterId: 0,
                                           segmentFilterId: 0,
+                                          userzoneId: userList[0]['zone_id']
                                         );
                                       })).then((value) {
                                         setState(() {});

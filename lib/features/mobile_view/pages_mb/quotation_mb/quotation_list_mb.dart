@@ -314,6 +314,7 @@ class _QuotationListMBState extends State<QuotationListMB> {
                                               filter: '',
                                               zoneFilterId: 0,
                                               segmentFilterId: 0,
+                                              userzoneId: userList[0]['zone_id'],
                                             );
                                           })).then((value) {
                                             setState(() {
@@ -515,6 +516,7 @@ class _QuotationListMBState extends State<QuotationListMB> {
                                                                 zoneFilterId: 0,
                                                                 segmentFilterId:
                                                                     0,
+                                                                    userzoneId: userList[0]['zone_id']
                                                               );
                                                             })).then((value) {
                                                               setState(() {

@@ -44,6 +44,7 @@ class QuotationCreateMB extends StatefulWidget {
   String filter;
   int zoneFilterId;
   int segmentFilterId;
+  List<dynamic> userzoneId;
   QuotationCreateMB({
     Key? key,
     required this.quotationId,
@@ -64,6 +65,7 @@ class QuotationCreateMB extends StatefulWidget {
     required this.filter,
     required this.zoneFilterId,
     required this.segmentFilterId,
+    required this.userzoneId,
   }) : super(key: key);
 
   @override
@@ -1210,8 +1212,8 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
               appBar: AppBar(
                 backgroundColor: AppColors.appBarColor,
                 title: Text(widget.newOrEdit == 1
-                    ? '${widget.name} (${userList[0]['zone_id'][1]})'
-                    : 'New (${userList[0]['zone_id'][1]})'),
+                    ? '${widget.name} (${widget.userzoneId == false ? '':widget.userzoneId[1]})'
+                    : 'New (${widget.userzoneId == false ? '':widget.userzoneId[1]})'),
                 actions: [
                   TextButton(
                     onPressed: () {
