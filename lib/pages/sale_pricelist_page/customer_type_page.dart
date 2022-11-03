@@ -98,7 +98,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
       print('loop');
       if (salepricelistproductlineList[i]['currency_id'][0] == currency['id']) {
         print('same');
-        currencysymbol = currency['symbol'];
+        salepricelistproductlineList[i]['symbol'] = currency['symbol'];
       }
     }
   }
@@ -370,7 +370,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                                                           .all(8),
                                                                   width: 80,
                                                                   child: Text(
-                                                                    '${salepricelistproductlineList[i]['custom_price']} $currencysymbol',
+                                                                    '${salepricelistproductlineList[i]['custom_price']} ${salepricelistproductlineList[i]['symbol']}',
                                                                     textAlign:
                                                                         TextAlign
                                                                             .end,
@@ -389,7 +389,7 @@ class _CustomerTypePageState extends State<CustomerTypePage> {
                                                                           .all(8),
                                                                   width: 80,
                                                                   child: Text(
-                                                                    '${salepricelistproductlineList[i]['ctn_price']} $currencysymbol',
+                                                                    '${salepricelistproductlineList[i]['ctn_price']} ${salepricelistproductlineList[i]['symbol']}',
                                                                     textAlign:
                                                                         TextAlign
                                                                             .end,

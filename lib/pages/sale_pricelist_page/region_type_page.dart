@@ -110,7 +110,7 @@ class _RegionTypePageState extends State<RegionTypePage> {
       print('loop');
       if (salepricelistproductlineList[i]['currency_id'][0] == currency['id']) {
         print('same');
-        currencysymbol = currency['symbol'];
+        salepricelistproductlineList[i]['symbol'] = currency['symbol'];
       }
     }
   }
@@ -429,7 +429,7 @@ class _RegionTypePageState extends State<RegionTypePage> {
                                                                               80,
                                                                           child:
                                                                               Text(
-                                                                            '${salepricelistproductlineList[i]['custom_price']} $currencysymbol',
+                                                                            '${salepricelistproductlineList[i]['custom_price']} ${salepricelistproductlineList[i]['symbol']}',
                                                                             textAlign:
                                                                                 TextAlign.end,
                                                                             style:
@@ -445,7 +445,7 @@ class _RegionTypePageState extends State<RegionTypePage> {
                                                                               80,
                                                                           child:
                                                                               Text(
-                                                                            '${salepricelistproductlineList[i]['ctn_price']} $currencysymbol',
+                                                                            '${salepricelistproductlineList[i]['ctn_price']} ${salepricelistproductlineList[i]['symbol']}',
                                                                             textAlign:
                                                                                 TextAlign.end,
                                                                             style:

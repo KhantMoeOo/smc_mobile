@@ -64,7 +64,7 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
       print('loop');
       if (salepricelistproductlineList[i]['currency_id'][0] == currency['id']) {
         print('same');
-        currencysymbol = currency['symbol'];
+        salepricelistproductlineList[i]['symbol'] = currency['symbol'];
       }
     }
   }
@@ -208,7 +208,7 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
                                                               8),
                                                       width: 80,
                                                       child: Text(
-                                                        '${salepricelistproductlineUpdateList[i]['custom_price']} $currencysymbol',
+                                                        '${salepricelistproductlineUpdateList[i]['custom_price']} ${salepricelistproductlineList[i]['symbol']}',
                                                         textAlign:
                                                             TextAlign.end,
                                                         style: const TextStyle(
@@ -223,7 +223,7 @@ class _SalePricelistPageState extends State<SalePricelistPage> {
                                                               8),
                                                       width: 80,
                                                       child: Text(
-                                                        '${salepricelistproductlineUpdateList[i]['ctn_price']} $currencysymbol',
+                                                        '${salepricelistproductlineUpdateList[i]['ctn_price']} ${salepricelistproductlineList[i]['symbol']}',
                                                         textAlign:
                                                             TextAlign.end,
                                                         style: const TextStyle(

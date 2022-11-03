@@ -30,6 +30,7 @@ class _ProductListMBState extends State<ProductListMB> {
   bool searchDone = false;
   bool isSearch = false;
   String stockonhand = '';
+  bool hasStockWarehouseData = false;
 
   @override
   void initState() {
@@ -55,8 +56,17 @@ class _ProductListMBState extends State<ProductListMB> {
   void getStockWarehouseListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       stockwarehouseList = responseOb.data;
-      productListBloc.getStockQuantData(
-          locationId: stockwarehouseList[0]['lot_stock_id'][0]);
+      if (stockwarehouseList.isEmpty) {
+        setState(() {
+          hasStockWarehouseData = false;
+        });
+      } else {
+        setState(() {
+          hasStockWarehouseData = true;
+        });
+        productListBloc.getStockQuantData(
+            locationId: stockwarehouseList[0]['lot_stock_id'][0]);
+      }
     }
   }
 
@@ -123,449 +133,536 @@ class _ProductListMBState extends State<ProductListMB> {
       },
       child: SafeArea(
         child: StreamBuilder<ResponseOb>(
-          initialData: productList.isNotEmpty
-              ? null
-              : ResponseOb(msgState: MsgState.loading),
-          stream: productListBloc.getProductListStream(),
-          builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
-            ResponseOb? responseOb = snapshot.data;
-            if (responseOb?.msgState == MsgState.error) {
-              return const Center(
-                child: Text('Error'),
-              );
-            } else if (responseOb?.msgState == MsgState.data) {
-              productList = responseOb!.data;
-              return Scaffold(
-                  backgroundColor: Colors.grey[200],
-                  appBar: AppBar(
-                    leading: IconButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return const MenuListMB();
-                        }));
-                      },
-                      icon: const Icon(Icons.menu),
+            initialData: userList.isNotEmpty
+                ? null
+                : ResponseOb(msgState: MsgState.loading),
+            stream: profileBloc.getResUsersStream(),
+            builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+              ResponseOb? responseOb = snapshot.data;
+              if (responseOb?.msgState == MsgState.error) {
+                return const Center(
+                  child: Text('Error in UserProfile'),
+                );
+              } else if (responseOb?.msgState == MsgState.loading) {
+                return Container(
+                  color: Colors.white,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/gifs/loading.gif',
+                      width: 100,
+                      height: 100,
                     ),
-                    backgroundColor: AppColors.appBarColor,
-                    title: const Text("Products"),
                   ),
-                  body: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 10, right: 10, top: 10, bottom: 10),
-                        child: SizedBox(
-                          height: 50,
-                          child: TextField(
-                            controller: productSearchController,
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                setState(() {
-                                  isSearch = true;
-                                });
-                              } else {
-                                setState(() {
-                                  isSearch = false;
-                                });
-                              }
-                            },
-                            readOnly: searchDone,
-                            decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.white,
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    if (searchDone == true) {
-                                      setState(() {
-                                        productSearchController.clear();
-                                        searchDone = false;
-                                        productListBloc.getProductListData(
-                                            name: ['name', 'ilike', '']);
-                                      });
-                                    } else {
-                                      setState(() {
-                                        searchDone = true;
-                                        isSearch = false;
-                                        productListBloc.getProductListData(
-                                            name: [
-                                              'name',
-                                              'ilike',
-                                              productSearchController.text
-                                            ]);
-                                      });
-                                    }
-                                  },
-                                  icon: searchDone == true
-                                      ? const Icon(Icons.close)
-                                      : const Icon(Icons.search),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10))),
+                );
+              } else {
+                return StreamBuilder<ResponseOb>(
+                    initialData: stockwarehouseList.isNotEmpty
+                        ? null
+                        : ResponseOb(msgState: MsgState.loading),
+                    stream: productListBloc.getStockWarehouseStream(),
+                    builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                      ResponseOb? responseOb = snapshot.data;
+                      if (responseOb?.msgState == MsgState.error) {
+                        return const Center(
+                          child: Text('Error in UserProfile'),
+                        );
+                      } else if (responseOb?.msgState == MsgState.loading) {
+                        return Container(
+                          color: Colors.white,
+                          child: Center(
+                            child: Image.asset(
+                              'assets/gifs/loading.gif',
+                              width: 100,
+                              height: 100,
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "Total Products: " +
-                                  productList.length.toString(),
-                              style: const TextStyle(fontSize: 15),
-                            )),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      productList.isEmpty
-                          ? const Center(
-                              child: Text('No Data'),
-                            )
-                          : Expanded(
-                              child: Stack(
-                                children: [
-                                  ListView.builder(
-                                      controller: scrollController,
-                                      padding: const EdgeInsets.only(
-                                          left: 10, right: 10),
-                                      itemCount: productList.length,
-                                      itemBuilder: (context, i) {
-                                        getStockOnHand(i);
-                                        return ProductCardWidget(
-                                          productid: productList[i]['id'],
-                                          productName: productList[i]['name'],
-                                          productCode: productList[i]
-                                                      ['product_code'] ==
-                                                  false
-                                              ? ''
-                                              : productList[i]['product_code'],
-                                          saleOk: productList[i]['sale_ok'],
-                                          purchaseOk: productList[i]
-                                              ['purchase_ok'],
-                                          listPrice: productList[i]
-                                                      ['list_price'] ==
-                                                  false
-                                              ? 0.0
-                                              : productList[i]['list_price'],
-                                          qtyAvailable: productList[i]
-                                              ['detail_qty'],
-                                          uomId:
-                                              productList[i]['uom_id'] == false
-                                                  ? []
-                                                  : productList[i]['uom_id'],
+                        );
+                      } else {
+                        return stockwarehouseList.isEmpty
+                            ? Scaffold(
+                                body: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                          'There is no Warehouse in ${userList[0]['name']} (${userList[0]['zone_id'][1]})'),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      TextButton(
+                                          onPressed: () {
+                                            productListBloc
+                                                .getStockWarehouseData(
+                                                    zoneId: userList[0]
+                                                        ['zone_id'][0]);
+                                          },
+                                          child: const Text('Try Again'))
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : stockwarehouseList.length > 1
+                                ? Scaffold(
+                                    body: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                            'There is more than one Warehouse in ${userList[0]['name']} (${userList[0]['zone_id'][1]})'),
+                                        const SizedBox(
+                                        height: 20,
+                                      ),
+                                        TextButton(
+                                            onPressed: () {
+                                              productListBloc
+                                                  .getStockWarehouseData(
+                                                      zoneId: userList[0]
+                                                          ['zone_id'][0]);
+                                            },
+                                            child: const Text('Try Again'))
+                                      ],
+                                    ),
+                                  ))
+                                : StreamBuilder<ResponseOb>(
+                                    initialData: productList.isNotEmpty
+                                        ? null
+                                        : ResponseOb(
+                                            msgState: MsgState.loading),
+                                    stream:
+                                        productListBloc.getProductListStream(),
+                                    builder: (context,
+                                        AsyncSnapshot<ResponseOb> snapshot) {
+                                      ResponseOb? responseOb = snapshot.data;
+                                      if (responseOb?.msgState ==
+                                          MsgState.error) {
+                                        return const Center(
+                                          child: Text('Error'),
                                         );
-                                      }),
-                                  Visibility(
-                                    visible: isSearch,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(5),
-                                      margin: const EdgeInsets.only(
-                                          left: 15, right: 15),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.grey[200],
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.black,
-                                              blurRadius: 2,
-                                              offset: Offset(0, 0),
-                                            )
-                                          ]),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: ListView(
-                                              shrinkWrap: true,
+                                      } else if (responseOb?.msgState ==
+                                          MsgState.data) {
+                                        productList = responseOb!.data;
+                                        return Scaffold(
+                                            backgroundColor: Colors.grey[200],
+                                            appBar: AppBar(
+                                              leading: IconButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) {
+                                                    return const MenuListMB();
+                                                  }));
+                                                },
+                                                icon: const Icon(Icons.menu),
+                                              ),
+                                              backgroundColor:
+                                                  AppColors.appBarColor,
+                                              title: const Text("Products"),
+                                            ),
+                                            body: Column(
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      child: InkWell(
-                                                        onTap: () {
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10,
+                                                          right: 10,
+                                                          top: 10,
+                                                          bottom: 10),
+                                                  child: SizedBox(
+                                                    height: 50,
+                                                    child: TextField(
+                                                      controller:
+                                                          productSearchController,
+                                                      onChanged: (value) {
+                                                        if (value.isNotEmpty) {
+                                                          setState(() {
+                                                            isSearch = true;
+                                                          });
+                                                        } else {
                                                           setState(() {
                                                             isSearch = false;
-                                                            searchDone = true;
-                                                            productListBloc
-                                                                .getProductListData(
-                                                                    name: [
-                                                                  'name',
-                                                                  'ilike',
-                                                                  productSearchController
-                                                                      .text
-                                                                ]);
                                                           });
-                                                        },
-                                                        child: Container(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          height: 50,
-                                                          child: RichText(
-                                                              text: TextSpan(
-                                                                  children: [
-                                                                const TextSpan(
-                                                                    text:
-                                                                        "Search Product for: ",
-                                                                    style: TextStyle(
-                                                                        fontStyle:
-                                                                            FontStyle
-                                                                                .italic,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.bold)),
-                                                                TextSpan(
-                                                                    text: productSearchController
-                                                                        .text,
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .black))
-                                                              ])),
-                                                        ),
-                                                      ),
+                                                        }
+                                                      },
+                                                      readOnly: searchDone,
+                                                      decoration:
+                                                          InputDecoration(
+                                                              filled: true,
+                                                              fillColor:
+                                                                  Colors.white,
+                                                              suffixIcon:
+                                                                  IconButton(
+                                                                onPressed: () {
+                                                                  if (searchDone ==
+                                                                      true) {
+                                                                    setState(
+                                                                        () {
+                                                                      productSearchController
+                                                                          .clear();
+                                                                      searchDone =
+                                                                          false;
+                                                                      productListBloc
+                                                                          .getProductListData(
+                                                                              name: [
+                                                                            'name',
+                                                                            'ilike',
+                                                                            ''
+                                                                          ]);
+                                                                    });
+                                                                  } else {
+                                                                    setState(
+                                                                        () {
+                                                                      searchDone =
+                                                                          true;
+                                                                      isSearch =
+                                                                          false;
+                                                                      productListBloc
+                                                                          .getProductListData(
+                                                                              name: [
+                                                                            'name',
+                                                                            'ilike',
+                                                                            productSearchController.text
+                                                                          ]);
+                                                                    });
+                                                                  }
+                                                                },
+                                                                icon: searchDone ==
+                                                                        true
+                                                                    ? const Icon(
+                                                                        Icons
+                                                                            .close)
+                                                                    : const Icon(
+                                                                        Icons
+                                                                            .search),
+                                                              ),
+                                                              border: OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10))),
                                                     ),
-                                                  ],
+                                                  ),
                                                 ),
-                                                const Divider(
-                                                  thickness: 1.5,
+                                                const SizedBox(height: 10),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Align(
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      child: Text(
+                                                        "Total Products: " +
+                                                            productList.length
+                                                                .toString(),
+                                                        style: const TextStyle(
+                                                            fontSize: 15),
+                                                      )),
                                                 ),
                                                 const SizedBox(
                                                   height: 10,
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: InkWell(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            isSearch = false;
-                                                            searchDone = true;
-                                                            productListBloc
-                                                                .getProductListData(
-                                                                    name: [
-                                                                  'product_code',
-                                                                  'ilike',
-                                                                  productSearchController
-                                                                      .text
-                                                                ]);
-                                                          });
-                                                        },
-                                                        child: Container(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          height: 50,
-                                                          child: RichText(
-                                                              text: TextSpan(
-                                                                  children: [
-                                                                const TextSpan(
-                                                                    text:
-                                                                        "Search Code for: ",
-                                                                    style: TextStyle(
-                                                                        fontStyle:
-                                                                            FontStyle
-                                                                                .italic,
+                                                productList.isEmpty
+                                                    ? const Center(
+                                                        child: Text('No Data'),
+                                                      )
+                                                    : Expanded(
+                                                        child: Stack(
+                                                          children: [
+                                                            ListView.builder(
+                                                                controller:
+                                                                    scrollController,
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        left:
+                                                                            10,
+                                                                        right:
+                                                                            10),
+                                                                itemCount:
+                                                                    productList
+                                                                        .length,
+                                                                itemBuilder:
+                                                                    (context,
+                                                                        i) {
+                                                                  getStockOnHand(
+                                                                      i);
+                                                                  return ProductCardWidget(
+                                                                    productid:
+                                                                        productList[i]
+                                                                            [
+                                                                            'id'],
+                                                                    productName:
+                                                                        productList[i]
+                                                                            [
+                                                                            'name'],
+                                                                    productCode: productList[i]['product_code'] ==
+                                                                            false
+                                                                        ? ''
+                                                                        : productList[i]
+                                                                            [
+                                                                            'product_code'],
+                                                                    saleOk: productList[
+                                                                            i][
+                                                                        'sale_ok'],
+                                                                    purchaseOk:
+                                                                        productList[i]
+                                                                            [
+                                                                            'purchase_ok'],
+                                                                    listPrice: productList[i]['list_price'] ==
+                                                                            false
+                                                                        ? 0.0
+                                                                        : productList[i]
+                                                                            [
+                                                                            'list_price'],
+                                                                    qtyAvailable:
+                                                                        productList[i]
+                                                                            [
+                                                                            'detail_qty'],
+                                                                    uomId: productList[i]['uom_id'] ==
+                                                                            false
+                                                                        ? []
+                                                                        : productList[i]
+                                                                            [
+                                                                            'uom_id'],
+                                                                  );
+                                                                }),
+                                                            Visibility(
+                                                              visible: isSearch,
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(5),
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        left:
+                                                                            15,
+                                                                        right:
+                                                                            15),
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    color: Colors
+                                                                            .grey[
+                                                                        200],
+                                                                    boxShadow: const [
+                                                                      BoxShadow(
                                                                         color: Colors
                                                                             .black,
-                                                                        fontWeight:
-                                                                            FontWeight.bold)),
-                                                                TextSpan(
-                                                                    text: productSearchController
-                                                                        .text,
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .black))
-                                                              ])),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(
-                                                  thickness: 1.5,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: InkWell(
-                                                        onTap: () {
-                                                          isSearch = false;
-                                                          searchDone = true;
-                                                          productListBloc
-                                                              .getProductListData(
-                                                                  name: [
-                                                                'categ_id',
-                                                                'ilike',
-                                                                productSearchController
-                                                                    .text
-                                                              ]);
-                                                        },
-                                                        child: Container(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          height: 50,
-                                                          child: RichText(
-                                                              text: TextSpan(
+                                                                        blurRadius:
+                                                                            2,
+                                                                        offset: Offset(
+                                                                            0,
+                                                                            0),
+                                                                      )
+                                                                    ]),
+                                                                child: Row(
                                                                   children: [
-                                                                const TextSpan(
-                                                                    text:
-                                                                        "Search Product Category for: ",
-                                                                    style: TextStyle(
-                                                                        fontStyle:
-                                                                            FontStyle
-                                                                                .italic,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.bold)),
-                                                                TextSpan(
-                                                                    text: productSearchController
-                                                                        .text,
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .black))
-                                                              ])),
+                                                                    Expanded(
+                                                                      child:
+                                                                          ListView(
+                                                                        shrinkWrap:
+                                                                            true,
+                                                                        children: [
+                                                                          Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.start,
+                                                                            children: [
+                                                                              Expanded(
+                                                                                child: InkWell(
+                                                                                  onTap: () {
+                                                                                    setState(() {
+                                                                                      isSearch = false;
+                                                                                      searchDone = true;
+                                                                                      productListBloc.getProductListData(name: [
+                                                                                        'name',
+                                                                                        'ilike',
+                                                                                        productSearchController.text
+                                                                                      ]);
+                                                                                    });
+                                                                                  },
+                                                                                  child: Container(
+                                                                                    alignment: Alignment.centerLeft,
+                                                                                    height: 50,
+                                                                                    child: RichText(
+                                                                                        text: TextSpan(children: [
+                                                                                      const TextSpan(text: "Search Product for: ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black, fontWeight: FontWeight.bold)),
+                                                                                      TextSpan(text: productSearchController.text, style: const TextStyle(color: Colors.black))
+                                                                                    ])),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          const Divider(
+                                                                            thickness:
+                                                                                1.5,
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            height:
+                                                                                10,
+                                                                          ),
+                                                                          Row(
+                                                                            children: [
+                                                                              Expanded(
+                                                                                child: InkWell(
+                                                                                  onTap: () {
+                                                                                    setState(() {
+                                                                                      isSearch = false;
+                                                                                      searchDone = true;
+                                                                                      productListBloc.getProductListData(name: [
+                                                                                        'product_code',
+                                                                                        'ilike',
+                                                                                        productSearchController.text
+                                                                                      ]);
+                                                                                    });
+                                                                                  },
+                                                                                  child: Container(
+                                                                                    alignment: Alignment.centerLeft,
+                                                                                    height: 50,
+                                                                                    child: RichText(
+                                                                                        text: TextSpan(children: [
+                                                                                      const TextSpan(text: "Search Code for: ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black, fontWeight: FontWeight.bold)),
+                                                                                      TextSpan(text: productSearchController.text, style: const TextStyle(color: Colors.black))
+                                                                                    ])),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          const Divider(
+                                                                            thickness:
+                                                                                1.5,
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            height:
+                                                                                10,
+                                                                          ),
+                                                                          Row(
+                                                                            children: [
+                                                                              Expanded(
+                                                                                child: InkWell(
+                                                                                  onTap: () {
+                                                                                    isSearch = false;
+                                                                                    searchDone = true;
+                                                                                    productListBloc.getProductListData(name: [
+                                                                                      'categ_id',
+                                                                                      'ilike',
+                                                                                      productSearchController.text
+                                                                                    ]);
+                                                                                  },
+                                                                                  child: Container(
+                                                                                    alignment: Alignment.centerLeft,
+                                                                                    height: 50,
+                                                                                    child: RichText(
+                                                                                        text: TextSpan(children: [
+                                                                                      const TextSpan(text: "Search Product Category for: ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black, fontWeight: FontWeight.bold)),
+                                                                                      TextSpan(text: productSearchController.text, style: const TextStyle(color: Colors.black))
+                                                                                    ])),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          const Divider(
+                                                                            thickness:
+                                                                                1.5,
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            height:
+                                                                                10,
+                                                                          ),
+                                                                          Row(
+                                                                            children: [
+                                                                              Expanded(
+                                                                                child: InkWell(
+                                                                                  onTap: () {
+                                                                                    isSearch = false;
+                                                                                    searchDone = true;
+                                                                                    productListBloc.getProductListData(name: [
+                                                                                      'main_category_id',
+                                                                                      'ilike',
+                                                                                      productSearchController.text
+                                                                                    ]);
+                                                                                  },
+                                                                                  child: Container(
+                                                                                    alignment: Alignment.centerLeft,
+                                                                                    height: 50,
+                                                                                    child: RichText(
+                                                                                        text: TextSpan(children: [
+                                                                                      const TextSpan(text: "Search Main Category for: ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black, fontWeight: FontWeight.bold)),
+                                                                                      TextSpan(text: productSearchController.text, style: const TextStyle(color: Colors.black))
+                                                                                    ])),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          const Divider(
+                                                                            thickness:
+                                                                                1.5,
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            height:
+                                                                                10,
+                                                                          ),
+                                                                          Row(
+                                                                            children: [
+                                                                              Expanded(
+                                                                                child: InkWell(
+                                                                                  onTap: () {
+                                                                                    isSearch = false;
+                                                                                    searchDone = true;
+                                                                                    productListBloc.getProductListData(name: [
+                                                                                      'list_price',
+                                                                                      'ilike',
+                                                                                      productSearchController.text
+                                                                                    ]);
+                                                                                  },
+                                                                                  child: Container(
+                                                                                    alignment: Alignment.centerLeft,
+                                                                                    height: 50,
+                                                                                    child: RichText(
+                                                                                        text: TextSpan(children: [
+                                                                                      const TextSpan(text: "Search Pricelist for: ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black, fontWeight: FontWeight.bold)),
+                                                                                      TextSpan(text: productSearchController.text, style: const TextStyle(color: Colors.black))
+                                                                                    ])),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          )
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            )
+                                                          ],
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(
-                                                  thickness: 1.5,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: InkWell(
-                                                        onTap: () {
-                                                          isSearch = false;
-                                                          searchDone = true;
-                                                          productListBloc
-                                                              .getProductListData(
-                                                                  name: [
-                                                                'main_category_id',
-                                                                'ilike',
-                                                                productSearchController
-                                                                    .text
-                                                              ]);
-                                                        },
-                                                        child: Container(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          height: 50,
-                                                          child: RichText(
-                                                              text: TextSpan(
-                                                                  children: [
-                                                                const TextSpan(
-                                                                    text:
-                                                                        "Search Main Category for: ",
-                                                                    style: TextStyle(
-                                                                        fontStyle:
-                                                                            FontStyle
-                                                                                .italic,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.bold)),
-                                                                TextSpan(
-                                                                    text: productSearchController
-                                                                        .text,
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .black))
-                                                              ])),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(
-                                                  thickness: 1.5,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: InkWell(
-                                                        onTap: () {
-                                                          isSearch = false;
-                                                          searchDone = true;
-                                                          productListBloc
-                                                              .getProductListData(
-                                                                  name: [
-                                                                'list_price',
-                                                                'ilike',
-                                                                productSearchController
-                                                                    .text
-                                                              ]);
-                                                        },
-                                                        child: Container(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          height: 50,
-                                                          child: RichText(
-                                                              text: TextSpan(
-                                                                  children: [
-                                                                const TextSpan(
-                                                                    text:
-                                                                        "Search Pricelist for: ",
-                                                                    style: TextStyle(
-                                                                        fontStyle:
-                                                                            FontStyle
-                                                                                .italic,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.bold)),
-                                                                TextSpan(
-                                                                    text: productSearchController
-                                                                        .text,
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .black))
-                                                              ])),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
                                               ],
+                                            ));
+                                      } else {
+                                        return Container(
+                                          color: Colors.white,
+                                          child: Center(
+                                            child: Image.asset(
+                                              'assets/gifs/loading.gif',
+                                              width: 100,
+                                              height: 100,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                    ],
-                  ));
-            } else {
-              return Container(
-                color: Colors.white,
-                child: Center(
-                  child: Image.asset(
-                    'assets/gifs/loading.gif',
-                    width: 100,
-                    height: 100,
-                  ),
-                ),
-              );
-            }
-          },
-        ),
+                                        );
+                                      }
+                                    },
+                                  );
+                      }
+                    });
+              }
+            }),
       ),
     );
   }
