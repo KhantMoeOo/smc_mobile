@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -167,404 +169,677 @@ class _MaterialIssuesListMBState extends State<MaterialIssuesListMB> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: StreamBuilder<ResponseOb>(
-      initialData: hasUserData == true
-          ? null
-          : ResponseOb(
-              msgState: MsgState.loading,
-            ),
-      stream: profileBloc.getResUsersStream(),
-      builder: (context, snapshot) {
-        ResponseOb? responseOb = snapshot.data;
-        if (responseOb?.msgState == MsgState.loading) {
-          return Container(
-            color: Colors.white,
-            child: Center(
-              child: Image.asset(
-                'assets/gifs/loading.gif',
-                width: 100,
-                height: 100,
+    return WillPopScope(
+      onWillPop: () async {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Do you want to exit?"),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () {
+                        exit(0);
+                      },
+                      child: const Text('OK'))
+                ],
+              );
+            });
+        return true;
+      },
+      child: SafeArea(
+          child: StreamBuilder<ResponseOb>(
+        initialData: hasUserData == true
+            ? null
+            : ResponseOb(
+                msgState: MsgState.loading,
               ),
-            ),
-          );
-        } else if (responseOb?.msgState == MsgState.error) {
-          return const Center(
-            child: Text('Get User Error'),
-          );
-        } else {
-          return StreamBuilder<ResponseOb>(
-              initialData: hasMRData == true
-                  ? null
-                  : ResponseOb(msgState: MsgState.loading),
-              stream: mrBloc.getMaterialRequisitionListStream(),
-              builder: (context, snapshot) {
-                ResponseOb? responseOb = snapshot.data;
-                if (responseOb?.msgState == MsgState.loading) {
-                  return Container(
-                    color: Colors.white,
-                    child: Center(
-                      child: Image.asset(
-                        'assets/gifs/loading.gif',
-                        width: 100,
-                        height: 100,
-                      ),
+        stream: profileBloc.getResUsersStream(),
+        builder: (context, snapshot) {
+          ResponseOb? responseOb = snapshot.data;
+          if (responseOb?.msgState == MsgState.loading) {
+            return Container(
+              color: Colors.white,
+              child: Center(
+                child: Image.asset(
+                  'assets/gifs/loading.gif',
+                  width: 100,
+                  height: 100,
+                ),
+              ),
+            );
+          } else if (responseOb?.msgState == MsgState.error) {
+            if (responseOb?.errState == ErrState.severErr) {
+              return Scaffold(
+                body: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('${responseOb?.data}'),
+                    const SizedBox(
+                      height: 20,
                     ),
-                  );
-                } else if (responseOb?.msgState == MsgState.error) {
-                  return const Center(
-                    child: Text('Get User Error'),
-                  );
-                } else {
-                  return StreamBuilder<ResponseOb>(
-                      initialData: hasPRData == true
-                          ? null
-                          : ResponseOb(msgState: MsgState.loading),
-                      stream:
-                          materialissuesBloc.getPurchaseRequisitionListStream(),
-                      builder: (context, snapshot) {
-                        ResponseOb? responseOb = snapshot.data;
-                        if (responseOb?.msgState == MsgState.loading) {
-                          return Container(
-                            color: Colors.white,
-                            child: Center(
-                              child: Image.asset(
-                                'assets/gifs/loading.gif',
-                                width: 100,
-                                height: 100,
-                              ),
+                    TextButton(
+                        onPressed: () {
+                          profileBloc.getResUsersData();
+                        },
+                        child: const Text('Try Again'))
+                  ],
+                )),
+              );
+            } else if (responseOb?.errState == ErrState.noConnection) {
+              return Scaffold(
+                body: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/imgs/no_internet_connection_icon.png',
+                      width: 100,
+                      height: 100,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text('No Internet Connection!'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          profileBloc.getResUsersData();
+                        },
+                        child: const Text('Try Again'))
+                  ],
+                )),
+              );
+            } else {
+              return Scaffold(
+                body: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Unknown Error'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          profileBloc.getResUsersData();
+                        },
+                        child: const Text('Try Again'))
+                  ],
+                )),
+              );
+            }
+          } else {
+            return StreamBuilder<ResponseOb>(
+                initialData: hasMRData == true
+                    ? null
+                    : ResponseOb(msgState: MsgState.loading),
+                stream: mrBloc.getMaterialRequisitionListStream(),
+                builder: (context, snapshot) {
+                  ResponseOb? responseOb = snapshot.data;
+                  if (responseOb?.msgState == MsgState.loading) {
+                    return Container(
+                      color: Colors.white,
+                      child: Center(
+                        child: Image.asset(
+                          'assets/gifs/loading.gif',
+                          width: 100,
+                          height: 100,
+                        ),
+                      ),
+                    );
+                  } else if (responseOb?.msgState == MsgState.error) {
+                    if (responseOb?.errState == ErrState.severErr) {
+                      return Scaffold(
+                        body: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('${responseOb?.data}'),
+                            const SizedBox(
+                              height: 20,
                             ),
-                          );
-                        } else if (responseOb?.msgState == MsgState.error) {
-                          return const Center(
-                            child: Text('Get User Error'),
-                          );
-                        } else {
-                          return StreamBuilder<ResponseOb>(
-                              initialData: hasStockWarehouseData == true
-                                  ? null
-                                  : ResponseOb(msgState: MsgState.loading),
-                              stream: productBloc.getStockWarehouseStream(),
-                              builder: (context, snapshot) {
-                                ResponseOb? responseOb = snapshot.data;
-                                if (responseOb?.msgState == MsgState.loading) {
-                                  return Container(
-                                    color: Colors.white,
-                                    child: Center(
-                                      child: Image.asset(
-                                        'assets/gifs/loading.gif',
-                                        width: 100,
-                                        height: 100,
-                                      ),
+                            TextButton(
+                                onPressed: () {
+                                  profileBloc.getResUsersData();
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                      );
+                    } else if (responseOb?.errState == ErrState.noConnection) {
+                      return Scaffold(
+                        body: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/imgs/no_internet_connection_icon.png',
+                              width: 100,
+                              height: 100,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text('No Internet Connection!'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  profileBloc.getResUsersData();
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                      );
+                    } else {
+                      return Scaffold(
+                        body: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Unknown Error'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  profileBloc.getResUsersData();
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                      );
+                    }
+                  } else {
+                    return StreamBuilder<ResponseOb>(
+                        initialData: hasPRData == true
+                            ? null
+                            : ResponseOb(msgState: MsgState.loading),
+                        stream: materialissuesBloc
+                            .getPurchaseRequisitionListStream(),
+                        builder: (context, snapshot) {
+                          ResponseOb? responseOb = snapshot.data;
+                          if (responseOb?.msgState == MsgState.loading) {
+                            return Container(
+                              color: Colors.white,
+                              child: Center(
+                                child: Image.asset(
+                                  'assets/gifs/loading.gif',
+                                  width: 100,
+                                  height: 100,
+                                ),
+                              ),
+                            );
+                          } else if (responseOb?.msgState == MsgState.error) {
+                            if (responseOb?.errState == ErrState.severErr) {
+                              return Scaffold(
+                                body: Center(
+                                    child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('${responseOb?.data}'),
+                                    const SizedBox(
+                                      height: 20,
                                     ),
-                                  );
-                                } else if (responseOb?.msgState ==
-                                    MsgState.error) {
-                                  return const Center(
-                                    child: Text('Get User Error'),
-                                  );
-                                } else {
-                                  return StreamBuilder<ResponseOb>(
-                                      initialData: hasStockPickingData == true
-                                          ? null
-                                          : ResponseOb(
-                                              msgState: MsgState.loading),
-                                      stream: materialissuesBloc
-                                          .getStockPickingStream(),
-                                      builder: (context, snapshot) {
-                                        ResponseOb? responseOb = snapshot.data;
-                                        if (responseOb?.msgState ==
-                                            MsgState.loading) {
-                                          return Container(
-                                            color: Colors.white,
-                                            child: Center(
-                                              child: Image.asset(
-                                                'assets/gifs/loading.gif',
-                                                width: 100,
-                                                height: 100,
-                                              ),
+                                    TextButton(
+                                        onPressed: () {
+                                          profileBloc.getResUsersData();
+                                        },
+                                        child: const Text('Try Again'))
+                                  ],
+                                )),
+                              );
+                            } else if (responseOb?.errState ==
+                                ErrState.noConnection) {
+                              return Scaffold(
+                                body: Center(
+                                    child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/imgs/no_internet_connection_icon.png',
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    const Text('No Internet Connection!'),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          profileBloc.getResUsersData();
+                                        },
+                                        child: const Text('Try Again'))
+                                  ],
+                                )),
+                              );
+                            } else {
+                              return Scaffold(
+                                body: Center(
+                                    child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text('Unknown Error'),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          profileBloc.getResUsersData();
+                                        },
+                                        child: const Text('Try Again'))
+                                  ],
+                                )),
+                              );
+                            }
+                          } else {
+                            return StreamBuilder<ResponseOb>(
+                                initialData: hasStockWarehouseData == true
+                                    ? null
+                                    : ResponseOb(msgState: MsgState.loading),
+                                stream: productBloc.getStockWarehouseStream(),
+                                builder: (context, snapshot) {
+                                  ResponseOb? responseOb = snapshot.data;
+                                  if (responseOb?.msgState ==
+                                      MsgState.loading) {
+                                    return Container(
+                                      color: Colors.white,
+                                      child: Center(
+                                        child: Image.asset(
+                                          'assets/gifs/loading.gif',
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (responseOb?.msgState ==
+                                      MsgState.error) {
+                                    if (responseOb?.errState ==
+                                        ErrState.severErr) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text('${responseOb?.data}'),
+                                            const SizedBox(
+                                              height: 20,
                                             ),
-                                          );
-                                        } else if (responseOb?.msgState ==
-                                            MsgState.error) {
-                                          return const Center(
-                                            child: Text('Get User Error'),
-                                          );
-                                        } else {
-                                          return Scaffold(
-                                            backgroundColor: Colors.grey[200],
-                                            // drawer: const DrawerWidget(),
-                                            appBar: AppBar(
-                                              backgroundColor:
-                                                  AppColors.appBarColor,
-                                              leading: IconButton(
+                                            TextButton(
                                                 onPressed: () {
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder: (context) {
-                                                    return MenuListMB();
-                                                  }));
+                                                  profileBloc.getResUsersData();
                                                 },
-                                                icon: const Icon(Icons.menu),
-                                              ),
-                                              title:
-                                                  const Text('Material Issues'),
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else if (responseOb?.errState ==
+                                        ErrState.noConnection) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/imgs/no_internet_connection_icon.png',
+                                              width: 100,
+                                              height: 100,
                                             ),
-                                            body: stockpickingupdateList.isEmpty
-                                                ? Container()
-                                                : ListView.builder(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    itemCount:
-                                                        stockpickingupdateList
-                                                            .length,
-                                                    itemBuilder: (c, i) {
-                                                      return Column(
-                                                        children: [
-                                                          Slidable(
-                                                            controller:
-                                                                slidableController,
-                                                            actionPane:
-                                                                const SlidableBehindActionPane(),
-                                                            secondaryActions: [
-                                                              IconSlideAction(
-                                                                color: AppColors
-                                                                    .appBarColor,
-                                                                onTap: () {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .push(MaterialPageRoute(
-                                                                          builder:
-                                                                              (context) {
-                                                                    return MaterialIssuesDetailMB(
-                                                                        id: stockpickingupdateList[i]
-                                                                            [
-                                                                            'id']);
-                                                                  })).then(
-                                                                          (value) {
-                                                                    profileBloc
-                                                                        .getResUsersData();
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'No Internet Connection!'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  profileBloc.getResUsersData();
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Text('Unknown Error'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  profileBloc.getResUsersData();
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    }
+                                  } else {
+                                    return StreamBuilder<ResponseOb>(
+                                        initialData: hasStockPickingData == true
+                                            ? null
+                                            : ResponseOb(
+                                                msgState: MsgState.loading),
+                                        stream: materialissuesBloc
+                                            .getStockPickingStream(),
+                                        builder: (context, snapshot) {
+                                          ResponseOb? responseOb =
+                                              snapshot.data;
+                                          if (responseOb?.msgState ==
+                                              MsgState.loading) {
+                                            return Container(
+                                              color: Colors.white,
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/gifs/loading.gif',
+                                                  width: 100,
+                                                  height: 100,
+                                                ),
+                                              ),
+                                            );
+                                          } else if (responseOb?.msgState ==
+                                              MsgState.error) {
+                                            return const Center(
+                                              child: Text('Get User Error'),
+                                            );
+                                          } else {
+                                            return Scaffold(
+                                              backgroundColor: Colors.grey[200],
+                                              // drawer: const DrawerWidget(),
+                                              appBar: AppBar(
+                                                backgroundColor:
+                                                    AppColors.appBarColor,
+                                                leading: IconButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder: (context) {
+                                                      return MenuListMB();
+                                                    }));
+                                                  },
+                                                  icon: const Icon(Icons.menu),
+                                                ),
+                                                title: const Text(
+                                                    'Material Issues'),
+                                              ),
+                                              body: stockpickingupdateList
+                                                      .isEmpty
+                                                  ? Container()
+                                                  : ListView.builder(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      itemCount:
+                                                          stockpickingupdateList
+                                                              .length,
+                                                      itemBuilder: (c, i) {
+                                                        return Column(
+                                                          children: [
+                                                            Slidable(
+                                                              controller:
+                                                                  slidableController,
+                                                              actionPane:
+                                                                  const SlidableBehindActionPane(),
+                                                              secondaryActions: [
+                                                                IconSlideAction(
+                                                                  color: AppColors
+                                                                      .appBarColor,
+                                                                  onTap: () {
+                                                                    Navigator.of(context).push(MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) {
+                                                                      return MaterialIssuesDetailMB(
+                                                                          id: stockpickingupdateList[i]
+                                                                              [
+                                                                              'id']);
+                                                                    })).then(
+                                                                        (value) {
+                                                                      profileBloc
+                                                                          .getResUsersData();
 
-                                                                    setState(
-                                                                        () {
-                                                                      stockpickingupdateList
-                                                                          .clear();
+                                                                      setState(
+                                                                          () {
+                                                                        stockpickingupdateList
+                                                                            .clear();
+                                                                      });
                                                                     });
-                                                                  });
-                                                                },
-                                                                iconWidget:
-                                                                    Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
+                                                                  },
+                                                                  iconWidget:
+                                                                      Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      const Icon(
+                                                                        Icons
+                                                                            .read_more,
+                                                                        size:
+                                                                            25,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                      Text(
+                                                                        "View Details",
+                                                                        style: TextStyle(
+                                                                            fontSize: MediaQuery.of(context).size.width > 400.0
+                                                                                ? 18
+                                                                                : 12,
+                                                                            color:
+                                                                                Colors.white),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ],
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(8),
+                                                                color: Colors
+                                                                    .white,
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
                                                                   children: [
-                                                                    const Icon(
-                                                                      Icons
-                                                                          .read_more,
-                                                                      size: 25,
-                                                                      color: Colors
-                                                                          .white,
+                                                                    Row(
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              200,
+                                                                          child:
+                                                                              Text(
+                                                                            'Reference: ',
+                                                                            style: TextStyle(
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(
+                                                                            child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                              Text(
+                                                                                stockpickingupdateList[i]['name'],
+                                                                                style: const TextStyle(color: Colors.black, fontSize: 13),
+                                                                              )
+                                                                            ])),
+                                                                      ],
                                                                     ),
-                                                                    Text(
-                                                                      "View Details",
-                                                                      style: TextStyle(
-                                                                          fontSize: MediaQuery.of(context).size.width > 400.0
-                                                                              ? 18
-                                                                              : 12,
-                                                                          color:
-                                                                              Colors.white),
+                                                                    Row(
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              200,
+                                                                          child:
+                                                                              Text(
+                                                                            'From: ',
+                                                                            style: TextStyle(
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(
+                                                                            child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                              Text(
+                                                                                stockpickingupdateList[i]['location_id'][1],
+                                                                                style: const TextStyle(color: Colors.black, fontSize: 13),
+                                                                              )
+                                                                            ])),
+                                                                      ],
+                                                                    ),
+                                                                    Row(
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              200,
+                                                                          child:
+                                                                              Text(
+                                                                            'To: ',
+                                                                            style: TextStyle(
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(
+                                                                            child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                              Text(
+                                                                                stockpickingupdateList[i]['location_dest_id'][1],
+                                                                                style: const TextStyle(color: Colors.black, fontSize: 13),
+                                                                              )
+                                                                            ])),
+                                                                      ],
+                                                                    ),
+                                                                    Row(
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              200,
+                                                                          child:
+                                                                              Text(
+                                                                            'Schedule Date: ',
+                                                                            style: TextStyle(
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(
+                                                                            child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                              Text(
+                                                                                stockpickingupdateList[i]['scheduled_date'].toString(),
+                                                                                style: const TextStyle(color: Colors.black, fontSize: 13),
+                                                                              )
+                                                                            ])),
+                                                                      ],
+                                                                    ),
+                                                                    Row(
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              200,
+                                                                          child:
+                                                                              Text(
+                                                                            'Source Doucument: ',
+                                                                            style: TextStyle(
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(
+                                                                            child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                              Text(
+                                                                                stockpickingupdateList[i]['origin'] == false ? '' : stockpickingupdateList[i]['origin'],
+                                                                                style: const TextStyle(color: Colors.black, fontSize: 13),
+                                                                              )
+                                                                            ])),
+                                                                      ],
+                                                                    ),
+                                                                    Row(
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              200,
+                                                                          child:
+                                                                              Text(
+                                                                            'Status: ',
+                                                                            style: TextStyle(
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(
+                                                                            child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                              Text(
+                                                                                stockpickingupdateList[i]['state'] == 'assigned'
+                                                                                    ? 'Ready'
+                                                                                    : stockpickingupdateList[i]['state'] == 'done'
+                                                                                        ? 'Done'
+                                                                                        : 'Waiting For Related Manager',
+                                                                                style: const TextStyle(color: Colors.black, fontSize: 13),
+                                                                              )
+                                                                            ])),
+                                                                      ],
                                                                     ),
                                                                   ],
                                                                 ),
-                                                              )
-                                                            ],
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8),
-                                                              color:
-                                                                  Colors.white,
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            200,
-                                                                        child:
-                                                                            Text(
-                                                                          'Reference: ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Colors.black),
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                            Text(
-                                                                              stockpickingupdateList[i]['name'],
-                                                                              style: const TextStyle(color: Colors.black, fontSize: 13),
-                                                                            )
-                                                                          ])),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            200,
-                                                                        child:
-                                                                            Text(
-                                                                          'From: ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Colors.black),
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                            Text(
-                                                                              stockpickingupdateList[i]['location_id'][1],
-                                                                              style: const TextStyle(color: Colors.black, fontSize: 13),
-                                                                            )
-                                                                          ])),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            200,
-                                                                        child:
-                                                                            Text(
-                                                                          'To: ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Colors.black),
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                            Text(
-                                                                              stockpickingupdateList[i]['location_dest_id'][1],
-                                                                              style: const TextStyle(color: Colors.black, fontSize: 13),
-                                                                            )
-                                                                          ])),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            200,
-                                                                        child:
-                                                                            Text(
-                                                                          'Schedule Date: ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Colors.black),
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                            Text(
-                                                                              stockpickingupdateList[i]['scheduled_date'].toString(),
-                                                                              style: const TextStyle(color: Colors.black, fontSize: 13),
-                                                                            )
-                                                                          ])),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            200,
-                                                                        child:
-                                                                            Text(
-                                                                          'Source Doucument: ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Colors.black),
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                            Text(
-                                                                              stockpickingupdateList[i]['origin'] == false ? '' : stockpickingupdateList[i]['origin'],
-                                                                              style: const TextStyle(color: Colors.black, fontSize: 13),
-                                                                            )
-                                                                          ])),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            200,
-                                                                        child:
-                                                                            Text(
-                                                                          'Status: ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Colors.black),
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                            Text(
-                                                                              stockpickingupdateList[i]['state'] == 'assigned'
-                                                                                  ? 'Ready'
-                                                                                  : stockpickingupdateList[i]['state'] == 'done'
-                                                                                      ? 'Done'
-                                                                                      : 'Waiting For Related Manager',
-                                                                              style: const TextStyle(color: Colors.black, fontSize: 13),
-                                                                            )
-                                                                          ])),
-                                                                    ],
-                                                                  ),
-                                                                ],
                                                               ),
                                                             ),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                        ],
-                                                      );
-                                                    }),
-                                          );
-                                        }
-                                      });
-                                }
-                              });
-                        }
-                      });
-                }
-              });
-        }
-      },
-    ));
+                                                            const SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ],
+                                                        );
+                                                      }),
+                                            );
+                                          }
+                                        });
+                                  }
+                                });
+                          }
+                        });
+                  }
+                });
+          }
+        },
+      )),
+    );
   }
 }

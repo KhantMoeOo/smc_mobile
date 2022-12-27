@@ -281,8 +281,22 @@ class _MenuListMBState extends State<MenuListMB> {
               )),
             );
           } else {
-            return const Scaffold(
-              body: Center(child: Text('Unknown Error')),
+            return Scaffold(
+              body: Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Unknown Error'),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        profileBloc.getResUsersData();
+                      },
+                      child: const Text('Try Again'))
+                ],
+              )),
             );
           }
         } else {
@@ -370,8 +384,30 @@ class _MenuListMBState extends State<MenuListMB> {
                       )),
                     );
                   } else {
-                    return const Scaffold(
-                      body: Center(child: Text('Unknown Error')),
+                    return Scaffold(
+                      body: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Unknown Error'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                mrBloc.getMaterialRequisitionListData([
+                                  'request_person.user_id.id',
+                                  '=',
+                                  userList[0]['id']
+                                ], [
+                                  'id',
+                                  'ilike',
+                                  ''
+                                ]);
+                              },
+                              child: const Text('Try Again'))
+                        ],
+                      )),
                     );
                   }
                 } else {
@@ -445,8 +481,24 @@ class _MenuListMBState extends State<MenuListMB> {
                               )),
                             );
                           } else {
-                            return const Scaffold(
-                              body: Center(child: Text('Unknown Error')),
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('Unknown Error'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {
+                                        materialissuesBloc
+                                            .getPurchaseRequisitionListData(
+                                                mrIdList);
+                                      },
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
                             );
                           }
                         } else {
@@ -525,9 +577,26 @@ class _MenuListMBState extends State<MenuListMB> {
                                       )),
                                     );
                                   } else {
-                                    return const Scaffold(
-                                      body:
-                                          Center(child: Text('Unknown Error')),
+                                    return Scaffold(
+                                      body: Center(
+                                          child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Text('Unknown Error'),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          TextButton(
+                                              onPressed: () {
+                                                productBloc
+                                                    .getStockWarehouseData(
+                                                        zoneId: userList[0]
+                                                            ['zone_id'][0]);
+                                              },
+                                              child: const Text('Try Again'))
+                                        ],
+                                      )),
                                     );
                                   }
                                 } else {
@@ -628,9 +697,35 @@ class _MenuListMBState extends State<MenuListMB> {
                                               )),
                                             );
                                           } else {
-                                            return const Scaffold(
+                                            return Scaffold(
                                               body: Center(
-                                                  child: Text('Unknown Error')),
+                                                  child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  const Text('Unknown Error'),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        materialissuesBloc
+                                                            .getStockPickingData(
+                                                                [
+                                                              'material_id',
+                                                              'in',
+                                                              prIdList
+                                                            ],
+                                                                [
+                                                              'state',
+                                                              'in',
+                                                              ['assigned']
+                                                            ]);
+                                                      },
+                                                      child: const Text(
+                                                          'Try Again'))
+                                                ],
+                                              )),
                                             );
                                           }
                                         } else {
@@ -657,24 +752,23 @@ class _MenuListMBState extends State<MenuListMB> {
                                                     children: [
                                                       Expanded(
                                                         child: GridView(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                            left: 20,
-                                                            right: 20,
-                                                            top: 20,
-                                                            bottom: 20,
-                                                          ),
                                                           gridDelegate:
-                                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                                                  crossAxisSpacing:
-                                                                      10,
-                                                                  mainAxisSpacing:
-                                                                      30,
-                                                                  crossAxisCount:
-                                                                      2,
-                                                                  childAspectRatio:
-                                                                      1),
+                                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                                            crossAxisCount: 2,
+                                                            childAspectRatio: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width /
+                                                                (MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height /
+                                                                    2.5),
+                                                            mainAxisSpacing:
+                                                                50.0,
+                                                            // crossAxisSpacing:
+                                                            //     5.0,
+                                                          ),
                                                           children: [
                                                             InkWell(
                                                               onTap: () {
@@ -1134,8 +1228,7 @@ class _MenuListMBState extends State<MenuListMB> {
                                                           ],
                                                         ),
                                                       ),
-                                                      const Text(
-                                                          version)
+                                                      const Text(version)
                                                     ],
                                                   )));
                                         }

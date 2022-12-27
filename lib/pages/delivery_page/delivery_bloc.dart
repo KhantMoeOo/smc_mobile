@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 
@@ -32,10 +33,10 @@ class StockPickingBloc {
     stockpickingStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try Get Stock Picking');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'stock.picking',
@@ -68,14 +69,22 @@ class StockPickingBloc {
               ? stockpickingStreamController.sink.add(responseOb)
               : null;
         } else {
-          data = null;
-          print('GetStockPickingError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Stock Picking Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get Stock Picking Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           stockpickingStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('Stock Picking catch: $e');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -89,6 +98,7 @@ class StockPickingBloc {
         stockpickingStreamController.sink.add(responseOb);
       }
     }
+      });
   } // get Stock Picking List
 
   getStockPickingTypeData(name) async {
@@ -153,10 +163,10 @@ class StockPickingBloc {
     stockmoveStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try Get Stock Move Data');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'stock.move',
@@ -188,14 +198,22 @@ class StockPickingBloc {
               ? stockmoveStreamController.sink.add(responseOb)
               : null;
         } else {
-          data = null;
-          print('GetStockMoveError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Stock Move Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get Stock Move Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           stockmoveStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('Stock Move catch: $e');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -209,6 +227,7 @@ class StockPickingBloc {
         stockmoveStreamController.sink.add(responseOb);
       }
     }
+      });
   } // get Stock Move List
 
   dispose() {

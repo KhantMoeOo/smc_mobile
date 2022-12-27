@@ -1689,9 +1689,11 @@ class _MaterialRequisitionCreateMBState
                                                                   initialDate:
                                                                       DateTime
                                                                           .now(),
-                                                                  firstDate:
-                                                                      DateTime
-                                                                          .now(),
+                                                                  firstDate: DateTime
+                                                                          .now()
+                                                                      .subtract(const Duration(
+                                                                          days:
+                                                                              360)),
                                                                   lastDate:
                                                                       DateTime(
                                                                           2023));
@@ -1750,20 +1752,21 @@ class _MaterialRequisitionCreateMBState
                                                           icon: const Icon(Icons
                                                               .arrow_drop_down),
                                                           onPressed: () async {
-                                                            final DateTime?
-                                                                selected =
-                                                                await showDatePicker(
-                                                                    context:
-                                                                        context,
-                                                                    initialDate:
-                                                                        DateTime
-                                                                            .now(),
-                                                                    firstDate:
-                                                                        DateTime
-                                                                            .now(),
-                                                                    lastDate:
-                                                                        DateTime(
-                                                                            2023));
+                                                            final DateTime? selected = await showDatePicker(
+                                                                context:
+                                                                    context,
+                                                                initialDate:
+                                                                    DateTime
+                                                                        .now(),
+                                                                firstDate: DateTime
+                                                                        .now()
+                                                                    .subtract(
+                                                                        const Duration(
+                                                                            days:
+                                                                                360)),
+                                                                lastDate:
+                                                                    DateTime(
+                                                                        2023));
 
                                                             if (selected !=
                                                                 null) {
@@ -2087,8 +2090,20 @@ class _MaterialRequisitionCreateMBState
                               )),
                             );
                           } else {
-                            return const Scaffold(
-                              body: Center(child: Text('Unknown Error')),
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('Unknown Error'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
                             );
                           }
                         }
@@ -2158,8 +2173,20 @@ class _MaterialRequisitionCreateMBState
                               )),
                             );
                           } else {
-                            return const Scaffold(
-                              body: Center(child: Text('Unknown Error')),
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('Unknown Error'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
                             );
                           }
                         }
@@ -2229,8 +2256,20 @@ class _MaterialRequisitionCreateMBState
                               )),
                             );
                           } else {
-                            return const Scaffold(
-                              body: Center(child: Text('Unknown Error')),
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('Unknown Error'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
                             );
                           }
                         }
@@ -2300,8 +2339,20 @@ class _MaterialRequisitionCreateMBState
                               )),
                             );
                           } else {
-                            return const Scaffold(
-                              body: Center(child: Text('Unknown Error')),
+                            return Scaffold(
+                              body: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('Unknown Error'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextButton(
+                                      onPressed: () {},
+                                      child: const Text('Try Again'))
+                                ],
+                              )),
                             );
                           }
                         }

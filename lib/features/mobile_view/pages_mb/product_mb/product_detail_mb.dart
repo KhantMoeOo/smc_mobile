@@ -7,9 +7,11 @@ import '../../../../utils/app_const.dart';
 
 class ProductDetailMB extends StatefulWidget {
   int productId;
+  String stockonhand;
   ProductDetailMB({
     Key? key,
     required this.productId,
+    required this.stockonhand,
   }) : super(key: key);
 
   @override
@@ -114,12 +116,68 @@ class _ProductDetailMBState extends State<ProductDetailMB> {
                 ),
               );
             } else if (responseOb?.msgState == MsgState.error) {
-              return Container(
-                color: Colors.white,
-                child: const Center(
-                  child: Text("Error"),
-                ),
-              );
+              if (responseOb?.errState == ErrState.severErr) {
+                    return Scaffold(
+                      body: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('${responseOb?.data}'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                profileBloc.getResUsersData();
+                              },
+                              child: const Text('Try Again'))
+                        ],
+                      )),
+                    );
+                  } else if (responseOb?.errState == ErrState.noConnection) {
+                    return Scaffold(
+                      body: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/imgs/no_internet_connection_icon.png',
+                            width: 100,
+                            height: 100,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Text('No Internet Connection'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                profileBloc.getResUsersData();
+                              },
+                              child: const Text('Try Again'))
+                        ],
+                      )),
+                    );
+                  } else {
+                    return Scaffold(
+                              body: Center(child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Unknown Error'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  profileBloc.getResUsersData();
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                            );
+                  }
             } else {
               return Scaffold(
                 backgroundColor: Colors.grey[200],
@@ -259,7 +317,7 @@ class _ProductDetailMBState extends State<ProductDetailMB> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
                                               children: [
-                                            Text(stockonhand,
+                                            Text(widget.stockonhand,
                                                 style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 18))

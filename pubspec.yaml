@@ -35,7 +35,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   odoo_api: ^1.0.4
-  shared_preferences: ^2.0.12
   aligned_dialog: ^0.0.6
   overlay_container: ^0.0.5+1
   dropdown_search2: ^1.0.2
@@ -61,6 +60,9 @@ dependencies:
   internet_connection_checker: ^0.0.1+3
   flutter_rating_bar: ^4.0.1
   provider: ^6.0.3
+  image_picker: ^0.6.2+3
+  geolocator: ^9.0.1
+  shared_preferences: ^2.0.15
   
 
 dev_dependencies:

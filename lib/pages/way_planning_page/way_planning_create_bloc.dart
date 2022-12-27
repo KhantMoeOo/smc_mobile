@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 import 'package:odoo_api/odoo_user_response.dart';
@@ -30,6 +31,11 @@ class TripPlanCreateBloc {
   Stream<ResponseOb> createTripPlanDeliveryStream() =>
       createTripPlanDeliveryStreamController
           .stream; // TripPlanDelivery Create Controller
+
+  StreamController<ResponseOb> createCallVisitStreamController =
+      StreamController<ResponseOb>.broadcast();
+  Stream<ResponseOb> createCallVisitStream() =>
+      createCallVisitStreamController.stream; // Call Visit Create Controller
 
   late Odoo odoo;
 
@@ -219,10 +225,85 @@ class TripPlanCreateBloc {
     }
   } // Create TripPlanDelivery
 
+  createCallVisit(
+      {arrivalImage,
+        townshipId,
+      wayplanId,
+      customerId,
+      date,
+      arlTime,
+      deptTime,
+      lt,
+      lg,
+      zoneId,
+      fleetId,
+      driverId,
+      remark}) async {
+    print('Create Call Visit');
+    ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
+    createCallVisitStreamController.sink.add(responseOb);
+    Sharef.getOdooClientInstance().then((value) async {
+      try {
+        print('Try Create Call Visit');
+        odoo = Odoo(BASEURL);
+        odoo.setSessionId(value['session_id']);
+        OdooResponse res = await odoo.create('call.visit', {
+          'action_image': arrivalImage,
+          'way_id': wayplanId,
+          'township_id': townshipId,
+          'customer_id': customerId,
+          'date': date,
+          'arl_time': arlTime,
+          'dept_time': deptTime,
+          'lt': lt,
+          'lg': lg,
+          'zone_id': zoneId,
+          'fleet_id': fleetId,
+          'driver_id': driverId,
+          'remark': remark
+        });
+        if (!res.hasError()) {
+          print('Create Call Visit Result: ${res.getResult()}');
+          responseOb.msgState = MsgState.data;
+          responseOb.data = res.getResult();
+          createCallVisitStreamController.sink.add(responseOb);
+        } else {
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Create Call Visit Error: ${map['message']}');
+              }
+            },
+          );
+          print('Create Call Visit Error:' + res.getError().keys.toString());
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          createCallVisitStreamController.sink.add(responseOb);
+        }
+      } catch (e) {
+        print('catch');
+        if (e.toString().contains("SocketException")) {
+          responseOb.data = "Internet Connection Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.noConnection;
+          createCallVisitStreamController.sink.add(responseOb);
+        } else {
+          responseOb.data = "Unknown Error";
+          responseOb.msgState = MsgState.error;
+          responseOb.errState = ErrState.unKnownErr;
+          createCallVisitStreamController.sink.add(responseOb);
+        }
+      }
+    });
+  } // Create Call Visit
+
   dispose() {
     createTripPlanStreamController.close();
     createHrEmployeeLineStreamController.close();
     createTripPlanScheduleStreamController.close();
     createTripPlanDeliveryStreamController.close();
+    createCallVisitStreamController.close();
   }
 }

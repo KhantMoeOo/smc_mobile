@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import '../../../../../dbs/database_helper.dart';
 import '../../../../../obs/response_ob.dart';
@@ -137,6 +138,11 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
     print("SOLIDS: ${widget.solId}");
     print("NewOrEdit: ${widget.newOrEditSOL}");
     print('CurrencyId: ${widget.currencyId}');
+    print('uomId: ${widget.uomId}');
+    print('productcodeId: ${widget.productCodeId}');
+    print('zoneId: ${widget.zoneId}');
+    print('segmentId: ${widget.segmentId}');
+    print('partnerId: ${widget.partnerId}');
     quantityFocus.addListener(() {
       if (!quantityFocus.hasFocus) {
         print('Quantity UnFocus');
@@ -174,19 +180,22 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
     saleorderlineBloc
         .getAccountTaxeslistListStream()
         .listen(getAccountTaxesListListen);
-    if (widget.newOrEditSOL == 1) {
-      quantityController.text = widget.quantity!;
-      unitPriceController.text = widget.unitPrice!;
-      subTotalController.text = widget.subtotal!;
-      hasQuantity = true;
-      hasUnitPrice = true;
-      // isCheck = widget.isFOC == 0 ? false : true;
-    } else {
-      quantityController.text = '1';
-      hasQuantity = true;
-      unitPriceController.text = '0.00';
-      hasUnitPrice = true;
-    }
+
+    saleorderlineBloc.getUnitPriceListStream().listen(getUnitPriceListen);
+    // if (widget.newOrEditSOL == 1) {
+
+    //   // isCheck = widget.isFOC == 0 ? false : true;
+    // } else {
+    //   quantityController.text = '1';
+    //   hasQuantity = true;
+    //   unitPriceController.text = '0.00';
+    //   hasUnitPrice = true;
+    // }
+    quantityController.text = widget.quantity!;
+    // unitPriceController.text = widget.unitPrice!;
+    // subTotalController.text = widget.subtotal!;
+    hasQuantity = true;
+    hasUnitPrice = true;
   }
 
   @override
@@ -198,6 +207,16 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
     quantityController.dispose();
     unitPriceController.dispose();
     unitpriceFocus.dispose();
+  }
+
+  void getUnitPriceListen(ResponseOb responseOb) {
+    if (responseOb.msgState == MsgState.data) {
+      unitPriceController.text = responseOb.data.toString();
+      subTotalController.text = (double.parse(quantityController.text) *
+              double.parse(unitPriceController.text))
+          .toString();
+      print('UnitPirce: ${unitPriceController.text}');
+    }
   }
 
   void getSalePricelistProductLineListen(ResponseOb responseOb) {
@@ -222,7 +241,7 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
       productproductList = responseOb.data;
       hasProductProductData = true;
       getProductProduct();
-      setProductCodeNameMethod();
+      // setProductCodeNameMethod();
     } else if (responseOb.msgState == MsgState.error) {
       print("NoProductProductList");
     }
@@ -272,9 +291,9 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
                 print("uomFactor: $uomFactor");
               }
             }
-            Future.delayed(Duration(seconds: 2), () {
-              calculateUnitPrice();
-            });
+            // Future.delayed(Duration(seconds: 2), () {
+            //   calculateUnitPrice();
+            // });
           }
         }
         for (var getuomList in uomList) {
@@ -493,6 +512,7 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
     if (responseOb.msgState == MsgState.data) {
       uomList = responseOb.data;
       hasUOMData = true;
+      setProductCodeNameMethod();
       setUOMNameMethod();
     } else if (responseOb.msgState == MsgState.error) {
       print("NoUOMList");
@@ -508,6 +528,15 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
           if (element['id'] == uomId) {
             uomName = element['name'];
             uomId = element['id'];
+            saleorderlineBloc.getUnitPrice(
+                id: 766,
+                productId: widget.productCodeId,
+                currencyId: 119,
+                productuom: uomId,
+                zoneId: widget.zoneId,
+                regionId: false,
+                segmentId: widget.segmentId,
+                partnerId: widget.partnerId);
             productUOMCategoryId = element['category_id'][0];
             productUOMCategoryName = element['category_id'][1];
             // productUOMFactor = element['factor'];
@@ -583,6 +612,15 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
             uomName = element['name'];
             print('uomId: $uomId');
             print('uomName: $uomName');
+            saleorderlineBloc.getUnitPrice(
+                id: 766,
+                productId: widget.productCodeId,
+                currencyId: 119,
+                productuom: uomId,
+                zoneId: widget.zoneId,
+                regionId: false,
+                segmentId: widget.segmentId,
+                partnerId: widget.partnerId);
           }
         }
       }
@@ -600,6 +638,8 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
   } // listen to get Account Taxes List
 
   void getAccountTaxesListId(List? v) {
+    accounttaxesIdList.clear();
+    accounttaxesNameList.clear();
     if (v != null) {
       setState(() {
         //accounttaxesId = int.parse(v.toString().split(',')[0]);
@@ -782,34 +822,39 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
                           child: Text("Something went Wrong!"),
                         );
                       } else {
-                        return DropdownSearch<String>(
-                          autoValidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please select Product Name';
-                            }
-                            return null;
-                          },
-                          popupItemBuilder: (context, item, isSelected) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.toString().split(',')[1]),
-                                  const Divider(),
-                                ],
-                              ),
-                            );
-                          },
-                          showSearchBox: true,
-                          showSelectedItems: true,
-                          showClearButton: !hasNotProductProduct,
-                          items: productproductListUpdate.map((e) {
-                            return '${e['id']},${e['product_code']}';
-                          }).toList(),
-                          onChanged: getProductProductId,
-                          selectedItem: productproductName,
+                        return Container(
+                          color: Colors.white,
+                          child: DropdownSearch<String>(
+                            enabled: false,
+                            autoValidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select Product Name';
+                              }
+                              return null;
+                            },
+                            popupItemBuilder: (context, item, isSelected) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(item.toString().split(',')[1]),
+                                    const Divider(),
+                                  ],
+                                ),
+                              );
+                            },
+                            showSearchBox: true,
+                            showSelectedItems: true,
+                            // showClearButton: !hasNotProductProduct,
+                            items: productproductListUpdate.map((e) {
+                              return '${e['id']},${e['product_code']}';
+                            }).toList(),
+                            onChanged: getProductProductId,
+                            selectedItem: productproductName,
+                          ),
                         );
                       }
                     }),
@@ -823,16 +868,19 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
               ),
               SizedBox(
                 height: 40,
-                child: TextField(
-                  controller: descriptionController,
-                  readOnly: true,
-                  onChanged: (des) {
-                    setState(() {
-                      description = des;
-                    });
-                  },
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
+                child: Container(
+                  color: Colors.white,
+                  child: TextField(
+                    controller: descriptionController,
+                    readOnly: true,
+                    onChanged: (des) {
+                      setState(() {
+                        description = des;
+                      });
+                    },
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
+                  ),
                 ),
               ), // description field from Order Line
               const SizedBox(
@@ -847,40 +895,43 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
               ),
               SizedBox(
                 height: 40,
-                child: TextFormField(
-                  readOnly: hasNotProductProduct == true ? true : false,
-                  focusNode: quantityFocus,
-                  onChanged: (value) {
-                    if (value == '') {
-                      setState(() {
-                        hasQuantity = false;
-                      });
-                    } else {
-                      setState(() {
-                        hasQuantity = true;
-                      });
-                    }
-                  },
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter Quantity';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  onFieldSubmitted: (value) {
-                    subTotalController.text = (double.parse(value) *
-                            double.parse(unitPriceController.text))
-                        .toString();
-                    print('subtotal: ${subTotalController.text}');
-                  },
-                  controller: quantityController,
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
+                child: Container(
+                  color: Colors.white,
+                  child: TextFormField(
+                    readOnly: hasNotProductProduct == true ? true : false,
+                    focusNode: quantityFocus,
+                    onChanged: (value) {
+                      if (value == '') {
+                        setState(() {
+                          hasQuantity = false;
+                        });
+                      } else {
+                        setState(() {
+                          hasQuantity = true;
+                        });
+                      }
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter Quantity';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onFieldSubmitted: (value) {
+                      subTotalController.text = (double.parse(value) *
+                              double.parse(unitPriceController.text))
+                          .toString();
+                      print('subtotal: ${subTotalController.text}');
+                    },
+                    controller: quantityController,
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
+                  ),
                 ),
               ), // Quantity from Order Line
               const SizedBox(
@@ -921,6 +972,15 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
                             }
                             return null;
                           },
+                          dropdownBuilder: (c, i) {
+                            // print(
+                            //     'i : ${i.toString().split(',')[1]}');
+                            return Text(i == null
+                                ? ''
+                                : i.contains(',')
+                                    ? i.toString().split(',')[1]
+                                    : i);
+                          },
                           popupItemBuilder: (context, item, isSelected) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -935,7 +995,7 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
                           },
                           showSearchBox: true,
                           showSelectedItems: true,
-                          showClearButton: !hasNotUOM,
+                          // showClearButton: !hasNotUOM,
                           items: uomListUpdate
                               .map((e) => '${e['id']},${e['name']}')
                               .toList(),
@@ -957,45 +1017,82 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
               ),
               SizedBox(
                 height: 40,
-                child: TextFormField(
-                  readOnly: hasNotProductProduct == true ? true : false,
-                  focusNode: unitpriceFocus,
-                  onChanged: (value) {
-                    if (value == '') {
-                      setState(() {
-                        hasUnitPrice = false;
-                      });
-                    } else {
-                      setState(() {
-                        hasUnitPrice = true;
-                      });
-                    }
-                  },
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter Unit Price';
-                    }
-                    return null;
-                  },
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^(\d+)?\.?\d{0,2}'))
-                  ],
-                  onFieldSubmitted: (value) {
-                    subTotalController.text =
-                        (double.parse(quantityController.text) *
-                                double.parse(value))
-                            .toString();
-                    print('subtotal: ${subTotalController.text}');
-                  },
-                  controller: unitPriceController,
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
-                ),
-              ), // Unit Price from Order Line
+                child: StreamBuilder<ResponseOb>(
+                    initialData: hasUOMData == true
+                        ? null
+                        : ResponseOb(msgState: MsgState.loading),
+                    stream: saleorderlineBloc.getUnitPriceListStream(),
+                    builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
+                      ResponseOb? responseOb = snapshot.data;
+                      if (responseOb?.msgState == MsgState.loading) {
+                        return Center(
+                          child: Image.asset(
+                            'assets/gifs/loading.gif',
+                            width: 100,
+                            height: 100,
+                          ),
+                        );
+                      } else if (responseOb?.msgState == MsgState.error) {
+                        return const Center(
+                          child: Text("Something went Wrong!"),
+                        );
+                      } else {
+                        return Container(
+                          color: Colors.white,
+                          child: TextField(
+                              readOnly: true,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              controller: unitPriceController),
+                        );
+                      }
+                    }),
+              ),
+              // SizedBox(
+              //   height: 40,
+              //   child: Container(
+              //     color: Colors.white,
+              //     child: TextFormField(
+              //       readOnly: true,
+              //       focusNode: unitpriceFocus,
+              //       onChanged: (value) {
+              //         if (value == '') {
+              //           setState(() {
+              //             hasUnitPrice = false;
+              //           });
+              //         } else {
+              //           setState(() {
+              //             hasUnitPrice = true;
+              //           });
+              //         }
+              //       },
+              //       autovalidateMode: AutovalidateMode.onUserInteraction,
+              //       validator: (value) {
+              //         if (value == null || value.isEmpty) {
+              //           return 'Please enter Unit Price';
+              //         }
+              //         return null;
+              //       },
+              //       keyboardType:
+              //           const TextInputType.numberWithOptions(decimal: true),
+              //       inputFormatters: <TextInputFormatter>[
+              //         FilteringTextInputFormatter.allow(
+              //             RegExp(r'^(\d+)?\.?\d{0,2}'))
+              //       ],
+              //       onFieldSubmitted: (value) {
+              //         subTotalController.text =
+              //             (double.parse(quantityController.text) *
+              //                     double.parse(value))
+              //                 .toString();
+              //         print('subtotal: ${subTotalController.text}');
+              //       },
+              //       controller: unitPriceController,
+              //       decoration:
+              //           const InputDecoration(border: OutlineInputBorder()),
+              //     ),
+              //   ),
+              // ), // Unit Price from Order Line
               // const SizedBox(
               //   height: 10,
               // ),
@@ -1089,27 +1186,47 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
                           child: Text("Something went Wrong!"),
                         );
                       } else {
-                        return DropdownSearch<String>.multiSelection(
-                          popupItemBuilder: (context, item, isSelected) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.toString().split(',')[1]),
-                                  const Divider(),
-                                ],
-                              ),
-                            );
-                          },
-                          showSearchBox: true,
-                          showSelectedItems: true,
-                          showClearButton: !hasNotAccountTaxes,
-                          items: accounttaxsList
-                              .map((e) => '${e['id']},${e['name']}')
-                              .toList(),
-                          onChanged: getAccountTaxesListId,
-                          //selectedItem: accounttaxesName,
+                        return Container(
+                          color: Colors.white,
+                          child: DropdownSearch<String>.multiSelection(
+                            popupItemBuilder: (context, item, isSelected) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(item.toString().split(',')[1]),
+                                    const Divider(),
+                                  ],
+                                ),
+                              );
+                            },
+                            dropdownBuilder: (c, i) {
+                              // print(
+                              //     'i : ${i.toString().split(',')[1]}');
+                              return ListView(
+                                scrollDirection: Axis.horizontal,
+                                children: i
+                                    .map((e) => Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                color: Colors.black)),
+                                        child: Text(e.split(',')[1])))
+                                    .toList(),
+                              );
+                            },
+                            showSearchBox: true,
+                            showSelectedItems: true,
+                            // showClearButton: !hasNotAccountTaxes,
+                            items: accounttaxsList
+                                .map((e) => '${e['id']},${e['name']}')
+                                .toList(),
+                            onChanged: getAccountTaxesListId,
+                            //selectedItem: accounttaxesName,
+                          ),
                         );
                       }
                     }),
@@ -1143,11 +1260,14 @@ class _SaleOrderLineEditMBState extends State<SaleOrderLineEditMB> {
               ),
               SizedBox(
                 height: 40,
-                child: TextField(
-                  readOnly: true,
-                  controller: subTotalController,
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
+                child: Container(
+                  color: Colors.white,
+                  child: TextField(
+                    readOnly: true,
+                    controller: subTotalController,
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
+                  ),
                 ),
               ), // Subtotal from Order Line
             ],

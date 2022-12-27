@@ -291,34 +291,34 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                                 .bluetoothScan.isGranted &&
                                             await Permission
                                                 .location.isGranted) {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                            return Print(
-                                              customerSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .customersignature,
-                                              authorSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .authorizedsignature,
-                                              orderId:
-                                                  widget.quotationId.toString(),
-                                              customerName: invoiceList[0]
-                                                  ['partner_id'][1],
-                                              address: widget.address,
-                                              vrno: invoiceList[0]['name'],
-                                              terms: invoiceList[0][
-                                                          'invoice_payment_term_id'] ==
-                                                      false
-                                                  ? ''
-                                                  : invoiceList[0][
-                                                      'invoice_payment_term_id'][1],
-                                              saleperson: invoiceList[0]
-                                                  ['invoice_user_id'][1],
-                                              invoicedate: invoiceList[0]
-                                                  ['invoice_date'],
-                                            );
-                                          }));
+                                          // Navigator.of(context).push(
+                                          //     MaterialPageRoute(
+                                          //         builder: (context) {
+                                          //   return Print(
+                                          //     customerSign:
+                                          //         InvoiceLineDetailWidgetState
+                                          //             .customersignature,
+                                          //     authorSign:
+                                          //         InvoiceLineDetailWidgetState
+                                          //             .authorizedsignature,
+                                          //     orderId:
+                                          //         widget.quotationId.toString(),
+                                          //     customerName: invoiceList[0]
+                                          //         ['partner_id'][1],
+                                          //     address: widget.address,
+                                          //     vrno: invoiceList[0]['name'],
+                                          //     terms: invoiceList[0][
+                                          //                 'invoice_payment_term_id'] ==
+                                          //             false
+                                          //         ? ''
+                                          //         : invoiceList[0][
+                                          //             'invoice_payment_term_id'][1],
+                                          //     saleperson: invoiceList[0]
+                                          //         ['invoice_user_id'][1],
+                                          //     invoicedate: invoiceList[0]
+                                          //         ['invoice_date'],
+                                          //   );
+                                          // }));
                                         }
                                       } else {
                                         if (!bluetooth.isGranted ||
@@ -332,34 +332,34 @@ class _InvoiceDetailPageState extends State<InvoiceDetailPage>
                                                 .bluetooth.isGranted &&
                                             await Permission
                                                 .location.isGranted) {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                            return Print(
-                                              authorSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .authorizedsignature,
-                                              customerSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .customersignature,
-                                              orderId:
-                                                  widget.quotationId.toString(),
-                                              customerName: invoiceList[0]
-                                                  ['partner_id'][1],
-                                              address: widget.address,
-                                              vrno: invoiceList[0]['name'],
-                                              terms: invoiceList[0][
-                                                          'invoice_payment_term_id'] ==
-                                                      false
-                                                  ? ''
-                                                  : invoiceList[0]
-                                                      ['invoice_user_id'][1],
-                                              saleperson: invoiceList[0][
-                                                  'invoice_payment_term_id'][1],
-                                              invoicedate: invoiceList[0]
-                                                  ['invoice_date'],
-                                            );
-                                          }));
+                                          // Navigator.of(context).push(
+                                          //     MaterialPageRoute(
+                                          //         builder: (context) {
+                                          //   return Print(
+                                          //     authorSign:
+                                          //         InvoiceLineDetailWidgetState
+                                          //             .authorizedsignature,
+                                          //     customerSign:
+                                          //         InvoiceLineDetailWidgetState
+                                          //             .customersignature,
+                                          //     orderId:
+                                          //         widget.quotationId.toString(),
+                                          //     customerName: invoiceList[0]
+                                          //         ['partner_id'][1],
+                                          //     address: widget.address,
+                                          //     vrno: invoiceList[0]['name'],
+                                          //     terms: invoiceList[0][
+                                          //                 'invoice_payment_term_id'] ==
+                                          //             false
+                                          //         ? ''
+                                          //         : invoiceList[0]
+                                          //             ['invoice_user_id'][1],
+                                          //     saleperson: invoiceList[0][
+                                          //         'invoice_payment_term_id'][1],
+                                          //     invoicedate: invoiceList[0]
+                                          //         ['invoice_date'],
+                                          //   );
+                                          // }));
                                         }
                                       }
                                     }

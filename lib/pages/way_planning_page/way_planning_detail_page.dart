@@ -75,7 +75,7 @@ class _WayPlanningDetailPageState extends State<WayPlanningDetailPage>
     saleteamBloc.getSaleTeamListStream().listen(getHrEmployeeLineListListen);
     deliveryBloc.getDeliveryListData();
     deliveryBloc.getDeliveryListStream().listen(getTipPlanDeliveryListListen);
-    scheduleBloc.getScheduleListData();
+    scheduleBloc.getScheduleListData(filter: ['id','ilike','']);
     scheduleBloc.getScheduleListStream().listen(getTipPlanScheduleListListen);
     wayplanDeleteBloc.deleteWayPlanStream().listen(deleteRecordListen);
     wayplanDeleteBloc

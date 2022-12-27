@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 import '../../dbs/sharef.dart';
@@ -25,10 +26,10 @@ class InvoiceBloc {
     invoiceStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try Invoice');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'account.move',
@@ -81,14 +82,22 @@ class InvoiceBloc {
               ? invoiceStreamController.sink.add(responseOb)
               : null;
         } else {
-          data = null;
-          print('GetInvoiceError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Invoice List Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get Invoice List Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           invoiceStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('Invoice catch: $e');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -102,6 +111,7 @@ class InvoiceBloc {
         invoiceStreamController.sink.add(responseOb);
       }
     }
+      });
   } // get Invoice List
 
   getAccountJournalData(name) async {

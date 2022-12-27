@@ -56,7 +56,7 @@ class _ScheduleCreatePageState extends State<ScheduleCreatePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    scheduleBloc.getTownshipListData('');
+    // scheduleBloc.getTownshipListData('');
     scheduleBloc.getTownshipListStream().listen(getTownshipListListen);
     if (widget.newOrEdit == 1) {
       fromDateController.text = widget.fromDate;

@@ -186,6 +186,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
                                       itemCount: customerList.length,
                                       itemBuilder: (context, i) {
                                         return CustomerCardWidget(
+                                          customerId: customerList[i]['id'],
                                           customerName: customerList[i]['name'],
                                           code: customerList[i]['code'] == false
                                               ? ''
@@ -198,6 +199,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
                                                   ['contact_address_complete'],
                                           companyType: customerList[i]
                                               ['company_type'],
+                                          zoneId: 0,
                                         );
                                       }),
                                   Visibility(

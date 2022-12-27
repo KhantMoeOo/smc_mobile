@@ -135,7 +135,7 @@ class QuotationBloc {
           );
           print('Get Quotation List Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           quotationStreamController.sink.add(responseOb);
         }
       } catch (e) {
@@ -227,7 +227,7 @@ class QuotationBloc {
           print(
               'Get Quotation With Id Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           quotationWithIdStreamController.sink.add(responseOb);
         }
       } catch (e) {
@@ -294,7 +294,7 @@ class QuotationBloc {
           data = null;
           print('GetquoError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           customerStreamController.sink.add(responseOb);
         }
       });
@@ -338,7 +338,7 @@ class QuotationBloc {
           data = null;
           print('GetCurrencyError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           currencyStreamController.sink.add(responseOb);
         }
       });
@@ -382,7 +382,7 @@ class QuotationBloc {
           data = null;
           print('GetPricelistError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           pricelistStreamController.sink.add(responseOb);
         }
       });
@@ -426,7 +426,7 @@ class QuotationBloc {
           data = null;
           print('GetPaymentTermslistError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           paymentTermsStreamController.sink.add(responseOb);
         }
       });
@@ -470,7 +470,7 @@ class QuotationBloc {
           data = null;
           print('GetZonelistError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           zoneListStreamController.sink.add(responseOb);
         }
       });
@@ -519,7 +519,7 @@ class QuotationBloc {
           print(
               'GetZoneListWithUserIdError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           zoneListWithUserIdStreamController.sink.add(responseOb);
         }
       });
@@ -563,7 +563,7 @@ class QuotationBloc {
           data = null;
           print('GetSegmentlistError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           segmentListStreamController.sink.add(responseOb);
         }
       });
@@ -607,7 +607,7 @@ class QuotationBloc {
           data = null;
           print('GetRegionlistError:' + res.getErrorMessage().toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           regionListStreamController.sink.add(responseOb);
         }
       });

@@ -475,8 +475,7 @@ class _QuotationListPageState extends State<QuotationListPage> {
                                     return QuotationCardWidget(
                                       quotationId: quotationList[i]['id'],
                                       name: quotationList[i]['name'],
-                                      userid: quotationList[i]['user_id']
-                                          .toString(),
+                                      userid: quotationList[i]['user_id'],
                                       customerId: quotationList[i]
                                           ['partner_id'],
                                       amountTotal: quotationList[i]

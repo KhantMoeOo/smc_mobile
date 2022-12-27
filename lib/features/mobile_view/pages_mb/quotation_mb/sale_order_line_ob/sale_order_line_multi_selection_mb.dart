@@ -148,7 +148,9 @@ class _SaleOrderLineMultiSelectionMBState
     print("SOLIDS: ${widget.solId}");
     print("NewOrEdit: ${widget.newOrEditSOL}");
     print('CurrencyId: ${widget.currencyId}');
-    print('SegmentId: ${widget.segmentId}');
+    print('zoneId: ${widget.zoneId}');
+    print('segmentId: ${widget.segmentId}');
+    print('partnerId: ${widget.partnerId}');
     quantityFocus.addListener(() {
       if (!quantityFocus.hasFocus) {
         print('Quantity UnFocus');
@@ -306,7 +308,8 @@ class _SaleOrderLineMultiSelectionMBState
         for (var element in productproductList) {
           if (element['id'] == productId) {
             hasNotUOM = false;
-            productproductName = element['product_code'];
+            productproductName =
+                element['product_code'] == false ? '' : element['product_code'];
             descriptionController.text = element['name'];
             productproductId = element['id'];
             productproductuomId = element['uom_id'][0];
@@ -578,54 +581,6 @@ class _SaleOrderLineMultiSelectionMBState
             print(
                 'productUOM Category: [$productUOMCategoryId, $productUOMCategoryName]');
             print("uomFactor: $uomFactor");
-            // if (prioritySort.isNotEmpty) {
-            //   print('Priority Sort List: ${prioritySort}');
-            //   prioritySort.sort(
-            //       (a, b) => (b['priority_new']).compareTo(a['priority_new']));
-            //   print('Sorted Priority: ${prioritySort.toList()}');
-            //   for (var uom in uomList) {
-            //     if (uom['id'] == prioritySort[0]['uom_id'][0]) {
-            //       prioritySortUOMCategoryId = uom['category_id'][0];
-            //       prioritySortUOMCategoryName = uom['category_id'][1];
-            //       print(
-            //           'prioritySortUOMCategoryId: $prioritySortUOMCategoryId');
-            //       print(
-            //           'prioritySortUOMCategoryName: $prioritySortUOMCategoryName');
-            //     }
-            //   }
-            //   if (prioritySortUOMCategoryId == productUOMCategoryId) {
-            //     if (prioritySort[0]['uom_id'] != null &&
-            //         prioritySort[0]['uom_id'][0] != uomId) {
-            //       print('Does not same uomIds');
-            //       totalFactor = (1.0 * uomFactor);
-            //       totalFactor = (totalFactor / productUOMFactor);
-            //       unitPriceController.text =
-            //           (prioritySort[0]['price'] * totalFactor).toString();
-            //       subTotalController.text =
-            //           (double.parse(quantityController.text) *
-            //                   double.parse(unitPriceController.text))
-            //               .toString();
-            //       print('subtotal: ${subTotalController.text}');
-            //       print('unit Price: ${unitPriceController.text}');
-            //     } else {
-            //       unitPriceController.text =
-            //           prioritySort[0]['price'].toString();
-            //       print('Unit Price: ${prioritySort[0]['price']}');
-            //       subTotalController.text =
-            //           (double.parse(quantityController.text) *
-            //                   double.parse(unitPriceController.text))
-            //               .toString();
-            //       print('unit Price: ${unitPriceController.text}');
-            //       print('subtotal: ${subTotalController.text}');
-            //     }
-            //   }
-            // } else {
-            //   unitPriceController.text = '1.0';
-            //   subTotalController.text = (double.parse(quantityController.text) *
-            //           double.parse(unitPriceController.text))
-            //       .toString();
-            //   print('subtotal: ${subTotalController.text}');
-            // }
           }
         }
       });
@@ -750,10 +705,67 @@ class _SaleOrderLineMultiSelectionMBState
                 ),
               );
             } else if (responseOb?.msgState == MsgState.error) {
-              return Container(
-                color: Colors.white,
-                child: const Center(child: Text('Error')),
-              );
+              if (responseOb?.errState == ErrState.severErr) {
+                return Scaffold(
+                  body: Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('${responseOb?.data}'),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            saleorderlineBloc.getProductProductData();
+                          },
+                          child: const Text('Try Again'))
+                    ],
+                  )),
+                );
+              } else if (responseOb?.errState == ErrState.noConnection) {
+                return Scaffold(
+                  body: Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/imgs/no_internet_connection_icon.png',
+                        width: 100,
+                        height: 100,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text('No Internet Connection!'),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            saleorderlineBloc.getProductProductData();
+                          },
+                          child: const Text('Try Again'))
+                    ],
+                  )),
+                );
+              } else {
+                return Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Unknown Error'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          saleorderlineBloc.getProductProductData();
+                        },
+                        child: const Text('Try Again'))
+                  ],
+                ));
+              }
             } else {
               return Column(
                 children: [
@@ -1314,6 +1326,8 @@ class _SaleOrderLineMultiSelectionMBState
                                                                     );
                                                                   } else {
                                                                     return TextField(
+                                                                        readOnly:
+                                                                            true,
                                                                         decoration:
                                                                             const InputDecoration(
                                                                           border:

@@ -250,7 +250,11 @@ class _WayPlanningCardWidgetState extends State<WayPlanningCardWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    widget.state,
+                                    widget.state == 'draft'
+                                        ? 'Draft'
+                                        : widget.state == 'confirm'
+                                            ? 'Confirmed'
+                                            : 'Approved',
                                     style: const TextStyle(color: Colors.black),
                                   )
                                 ]))

@@ -80,7 +80,7 @@ class MaterialRequisitionBloc {
           print('Get Material Requisition Error:' +
               res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           materialrequisitionListStreamController.sink.add(responseOb);
         }
       } catch (e) {

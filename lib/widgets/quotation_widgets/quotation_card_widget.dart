@@ -8,7 +8,7 @@ import '../../utils/app_const.dart';
 
 class QuotationCardWidget extends StatefulWidget {
   String name;
-  String userid;
+  List<dynamic> userid;
   List<dynamic> customerId;
   String amountTotal;
   String state;
@@ -157,7 +157,8 @@ class _QuotationCardWidgetState extends State<QuotationCardWidget> {
                           size: 15,
                         ),
                       ],
-                    )
+                    ),
+                    Text('Created By ${widget.userid[1]}')
                   ],
                 ),
               ),

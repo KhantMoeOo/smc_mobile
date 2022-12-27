@@ -58,7 +58,7 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
               onTap: () {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
-                  return ProductDetailMB(productId: widget.productid);
+                  return ProductDetailMB(productId: widget.productid, stockonhand: widget.qtyAvailable,);
                 }));
               },
               iconWidget: Column(

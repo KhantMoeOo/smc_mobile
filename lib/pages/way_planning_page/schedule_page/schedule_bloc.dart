@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:odoo_api/odoo_api_connector.dart';
 
@@ -20,7 +21,7 @@ class ScheduleBloc {
 
   late Odoo odoo;
 
-  getScheduleListData() {
+  getScheduleListData({required filter}) {
     print('Enterget Schedule ListData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     scheduleListStreamController.sink.add(responseOb);
@@ -33,7 +34,7 @@ class ScheduleBloc {
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
           'trip.plan.schedule',
-          [],
+          [filter,],
           ['id', 'trip_id', 'from_date', 'to_date', 'location_id', 'remark'],
           // order: 'emp_name asc'
         );
@@ -69,21 +70,21 @@ class ScheduleBloc {
     }
   } // Get Trip Plan Schedule List Data
 
-  getTownshipListData(cityId) {
+  getTownshipListData({filter}) {
     print('Enterget Township ListData');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     townshipListStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Get Township List');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
           'res.township',
           [
-            ['city_id.id', '=', cityId]
+            filter,
           ],
           ['id', 'name', 'city_id'],
           // order: 'emp_name asc'
@@ -95,14 +96,22 @@ class ScheduleBloc {
           responseOb.data = data;
           townshipListStreamController.sink.add(responseOb);
         } else {
-          data = null;
-          print('Get township Error:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Township List Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get  Township List Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
           responseOb.errState = ErrState.unKnownErr;
           townshipListStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('Township catch');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -116,6 +125,7 @@ class ScheduleBloc {
         townshipListStreamController.sink.add(responseOb);
       }
     }
+      });
   } // Get Township List Data
 
   dispose() {

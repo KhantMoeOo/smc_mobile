@@ -1,10 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:device_info/device_info.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:smc_mobile/features/mobile_view/pages_mb/invoice_mb/invoice_preview.dart';
 import '../../../../dbs/database_helper.dart';
 import '../../../../obs/invoice_line_ob.dart';
 import '../../../../obs/response_ob.dart';
@@ -102,6 +107,21 @@ class _InvoiceDetailMBState extends State<InvoiceDetailMB>
       print('No Invoice Line List');
     }
   } // get Invoice line List Listen
+
+  // Future<Uint8List> captureAddress() async{
+  //   try{
+  //     print('Capture Address');
+
+  //     print(pngBytes);
+  //     print(bs64);
+  //     setState(() {
+
+  //     });
+  //     return pngBytes;
+  //   }catch (e){
+  //     print(e);
+  //   }
+  // }
 
   Future<void> getInvoiceLineListDB() async {
     for (var element in invoiceLineList) {
@@ -205,7 +225,83 @@ class _InvoiceDetailMBState extends State<InvoiceDetailMB>
                       ),
                     ));
               } else if (responseOb?.msgState == MsgState.error) {
-                return const Center(child: Text('Error'));
+                if (responseOb?.errState == ErrState.severErr) {
+            return Scaffold(
+              body: Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('${responseOb?.data}'),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        if (widget.neworeditInvoice == 1) {
+      invoiceBloc.getInvoiceData(
+          ['line_ids.sale_line_ids.order_id', '=', widget.quotationId]);
+    } else {
+      invoiceBloc.getInvoiceData(['id', '=', widget.invoiceId]);
+    }
+                      },
+                      child: const Text('Try Again'))
+                ],
+              )),
+            );
+          } else if (responseOb?.errState == ErrState.noConnection) {
+            return Scaffold(
+              body: Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/imgs/no_internet_connection_icon.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text('No Internet Connection!'),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        if (widget.neworeditInvoice == 1) {
+      invoiceBloc.getInvoiceData(
+          ['line_ids.sale_line_ids.order_id', '=', widget.quotationId]);
+    } else {
+      invoiceBloc.getInvoiceData(['id', '=', widget.invoiceId]);
+    }
+                      },
+                      child: const Text('Try Again'))
+                ],
+              )),
+            );
+          } else {
+            return Scaffold(
+                              body: Center(child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Unknown Error'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  if (widget.neworeditInvoice == 1) {
+      invoiceBloc.getInvoiceData(
+          ['line_ids.sale_line_ids.order_id', '=', widget.quotationId]);
+    } else {
+      invoiceBloc.getInvoiceData(['id', '=', widget.invoiceId]);
+    }
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                            );
+          }
               } else {
                 return Stack(
                   children: [
@@ -259,109 +355,13 @@ class _InvoiceDetailMBState extends State<InvoiceDetailMB>
                                     //         );
                                     //       }));
                                     //     }
-                                    var bluetoothConnect = await Permission
-                                        .bluetoothConnect.status;
-                                    var bluetoothScan =
-                                        await Permission.bluetoothScan.status;
-                                    var location =
-                                        await Permission.location.status;
-                                    var bluetooth =
-                                        await Permission.bluetooth.status;
-                                    Map<Permission, PermissionStatus> statuses;
-                                    DeviceInfoPlugin deviceInfoPlugin =
-                                        DeviceInfoPlugin();
-                                    if (Platform.isAndroid) {
-                                      AndroidDeviceInfo androidDeviceInfo =
-                                          await deviceInfoPlugin.androidInfo;
-                                      if (androidDeviceInfo.version.sdkInt >=
-                                          31) {
-                                        if (!bluetoothConnect.isGranted ||
-                                            !bluetoothScan.isGranted ||
-                                            !location.isGranted) {
-                                          statuses = await [
-                                            Permission.bluetoothConnect,
-                                            Permission.bluetoothScan,
-                                            Permission.location
-                                          ].request();
-                                        }
-                                        if (await Permission
-                                                .bluetoothConnect.isGranted &&
-                                            await Permission
-                                                .bluetoothScan.isGranted &&
-                                            await Permission
-                                                .location.isGranted) {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                            return Print(
-                                              customerSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .customersignature,
-                                              authorSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .authorizedsignature,
-                                              orderId:
-                                                  widget.quotationId.toString(),
-                                              customerName: invoiceList[0]
-                                                  ['partner_id'][1],
-                                              address: widget.address,
-                                              vrno: invoiceList[0]['name'],
-                                              terms: invoiceList[0][
-                                                          'invoice_payment_term_id'] ==
-                                                      false
-                                                  ? ''
-                                                  : invoiceList[0][
-                                                      'invoice_payment_term_id'][1],
-                                              saleperson: invoiceList[0]
-                                                  ['invoice_user_id'][1],
-                                              invoicedate: invoiceList[0]
-                                                  ['invoice_date'],
-                                            );
-                                          }));
-                                        }
-                                      } else {
-                                        if (!bluetooth.isGranted ||
-                                            !location.isGranted) {
-                                          statuses = await [
-                                            Permission.bluetooth,
-                                            Permission.location
-                                          ].request();
-                                        }
-                                        if (await Permission
-                                                .bluetooth.isGranted &&
-                                            await Permission
-                                                .location.isGranted) {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                            return Print(
-                                              authorSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .authorizedsignature,
-                                              customerSign:
-                                                  InvoiceLineDetailWidgetState
-                                                      .customersignature,
-                                              orderId:
-                                                  widget.quotationId.toString(),
-                                              customerName: invoiceList[0]
-                                                  ['partner_id'][1],
-                                              address: widget.address,
-                                              vrno: invoiceList[0]['name'],
-                                              terms: invoiceList[0][
-                                                          'invoice_payment_term_id'] ==
-                                                      false
-                                                  ? ''
-                                                  : invoiceList[0]
-                                                      ['invoice_user_id'][1],
-                                              saleperson: invoiceList[0][
-                                                  'invoice_payment_term_id'][1],
-                                              invoicedate: invoiceList[0]
-                                                  ['invoice_date'],
-                                            );
-                                          }));
-                                        }
-                                      }
-                                    }
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                      return InvoicePreview(
+                                        invoiceList: invoiceList,
+                                        address: widget.address,
+                                      );
+                                    }));
                                     // Navigator.of(context).push(MaterialPageRoute(builder: (context){
                                     //   return InvoiceCreatePage(
                                     //     createInvoiceWithId: 1,
@@ -471,6 +471,30 @@ class _InvoiceDetailMBState extends State<InvoiceDetailMB>
                                                           color: Colors.black,
                                                           fontSize: 18))
                                                 ])),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(
+                                              width: 200,
+                                            ),
+                                            Expanded(
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(widget.address,
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 18,
+                                                        )),
+                                                  ]),
+                                            ),
                                           ],
                                         ),
                                         const SizedBox(height: 10),
@@ -711,253 +735,63 @@ class _InvoiceDetailMBState extends State<InvoiceDetailMB>
                                     borderRadius: BorderRadius.circular(10),
                                     // color: AppColors.appBarColor,
                                   ),
-                                  child: 
-                                  // MediaQuery.of(context).size.width >
-                                  //         400.0
-                                  //     ? SpeedDial(
-                                  //         buttonSize: 80,
-                                  //         childrenButtonSize: 100,
-                                  //         backgroundColor: Colors.transparent,
-                                  //         elevation: 0.0,
-                                  //         activeChild: const Icon(
-                                  //           Icons.close,
-                                  //           color: AppColors.appBarColor,
-                                  //         ),
-                                  //         child: invoiceList[0]['state'] ==
-                                  //                 'draft'
-                                  //             ? Container(
-                                  //                 width: 80,
-                                  //                 height: 40,
-                                  //                 decoration: BoxDecoration(
-                                  //                   color:
-                                  //                       AppColors.appBarColor,
-                                  //                   borderRadius:
-                                  //                       BorderRadius.circular(
-                                  //                           10),
-                                  //                 ),
-                                  //                 child: const Center(
-                                  //                   child: Text('Draft',
-                                  //                       textAlign:
-                                  //                           TextAlign.center,
-                                  //                       style: TextStyle(
-                                  //                           fontSize: 10)),
-                                  //                 ),
-                                  //               )
-                                  //             : invoiceList[0]['state'] ==
-                                  //                     'posted'
-                                  //                 ? Container(
-                                  //                     width: 80,
-                                  //                     height: 40,
-                                  //                     decoration: BoxDecoration(
-                                  //                       color: AppColors
-                                  //                           .appBarColor,
-                                  //                       borderRadius:
-                                  //                           BorderRadius
-                                  //                               .circular(10),
-                                  //                     ),
-                                  //                     child: const Center(
-                                  //                       child: Text('Posted',
-                                  //                           textAlign: TextAlign
-                                  //                               .center,
-                                  //                           style: TextStyle(
-                                  //                               fontSize: 10)),
-                                  //                     ),
-                                  //                   )
-                                  //                 : Container(
-                                  //                     width: 80,
-                                  //                     height: 40,
-                                  //                     decoration: BoxDecoration(
-                                  //                       color: AppColors
-                                  //                           .appBarColor,
-                                  //                       borderRadius:
-                                  //                           BorderRadius
-                                  //                               .circular(10),
-                                  //                     ),
-                                  //                     child: const Center(
-                                  //                       child: Text('Cancelled',
-                                  //                           textAlign: TextAlign
-                                  //                               .center,
-                                  //                           style: TextStyle(
-                                  //                               fontSize: 10)),
-                                  //                     ),
-                                  //                   ),
-                                  //         spaceBetweenChildren: 5,
-                                  //         direction: SpeedDialDirection.left,
-                                  //         renderOverlay: false,
-                                  //         children: [
-                                  //             SpeedDialChild(
-                                  //               backgroundColor:
-                                  //                   Colors.transparent,
-                                  //               elevation: 0.0,
-                                  //               child: Container(
-                                  //                 height: 40,
-                                  //                 width: 80,
-                                  //                 decoration: BoxDecoration(
-                                  //                     border:
-                                  //                         Border.all(width: 1),
-                                  //                     borderRadius:
-                                  //                         BorderRadius.circular(
-                                  //                             10),
-                                  //                     color: invoiceList[0]
-                                  //                                 ['state'] ==
-                                  //                             'cancel'
-                                  //                         ? AppColors
-                                  //                             .appBarColor
-                                  //                         : Colors.white),
-                                  //                 child: Center(
-                                  //                   child: Text(
-                                  //                     "Cancelled",
-                                  //                     style: TextStyle(
-                                  //                         color: invoiceList[0][
-                                  //                                     'state'] ==
-                                  //                                 'cancel'
-                                  //                             ? Colors.white
-                                  //                             : Colors.grey,
-                                  //                         fontSize: 15),
-                                  //                   ),
-                                  //                 ),
-                                  //               ),
-                                  //             ),
-                                  //             SpeedDialChild(
-                                  //               backgroundColor:
-                                  //                   Colors.transparent,
-                                  //               elevation: 0.0,
-                                  //               child: Container(
-                                  //                 height: 40,
-                                  //                 width: 80,
-                                  //                 decoration: BoxDecoration(
-                                  //                     border:
-                                  //                         Border.all(width: 1),
-                                  //                     borderRadius:
-                                  //                         BorderRadius.circular(
-                                  //                             10),
-                                  //                     color: invoiceList[0]
-                                  //                                 ['state'] ==
-                                  //                             'posted'
-                                  //                         ? AppColors
-                                  //                             .appBarColor
-                                  //                         : Colors.white),
-                                  //                 child: Center(
-                                  //                   child: Text(
-                                  //                     "Posted",
-                                  //                     textAlign:
-                                  //                         TextAlign.center,
-                                  //                     style: TextStyle(
-                                  //                         color: invoiceList[0][
-                                  //                                     'state'] ==
-                                  //                                 'posted'
-                                  //                             ? Colors.white
-                                  //                             : Colors.grey,
-                                  //                         fontSize: 15),
-                                  //                   ),
-                                  //                 ),
-                                  //               ),
-                                  //             ),
-                                  //             SpeedDialChild(
-                                  //               backgroundColor:
-                                  //                   Colors.transparent,
-                                  //               elevation: 0.0,
-                                  //               child: Container(
-                                  //                 height: 40,
-                                  //                 width: 80,
-                                  //                 decoration: BoxDecoration(
-                                  //                     border:
-                                  //                         Border.all(width: 1),
-                                  //                     borderRadius:
-                                  //                         BorderRadius.circular(
-                                  //                             10),
-                                  //                     color: invoiceList[0]
-                                  //                                 ['state'] ==
-                                  //                             'draft'
-                                  //                         ? AppColors
-                                  //                             .appBarColor
-                                  //                         : Colors.white),
-                                  //                 child: Center(
-                                  //                   child: Text(
-                                  //                     "Draft",
-                                  //                     textAlign:
-                                  //                         TextAlign.center,
-                                  //                     style: TextStyle(
-                                  //                         color: invoiceList[0][
-                                  //                                     'state'] ==
-                                  //                                 'draft'
-                                  //                             ? Colors.white
-                                  //                             : Colors.grey,
-                                  //                         fontSize: 15),
-                                  //                   ),
-                                  //                 ),
-                                  //               ),
-                                  //             ),
-                                  //           ])
-                                      // : 
-                                      Container(
-                                          child: invoiceList[0]['state'] ==
-                                                  'draft'
-                                              ? Container(
-                                                  width: 80,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        AppColors.appBarColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: const Center(
-                                                    child: Text('Draft',
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: Colors.white,
-                                                        )),
-                                                  ),
-                                                )
-                                              : invoiceList[0]['state'] ==
-                                                      'posted'
-                                                  ? Container(
-                                                      width: 80,
-                                                      height: 40,
-                                                      decoration: BoxDecoration(
-                                                        color: AppColors
-                                                            .appBarColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      child: const Center(
-                                                        child: Text('Posted',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                              fontSize: 15,
-                                                              color:
-                                                                  Colors.white,
-                                                            )),
-                                                      ),
-                                                    )
-                                                  : Container(
-                                                      width: 80,
-                                                      height: 40,
-                                                      decoration: BoxDecoration(
-                                                        color: AppColors
-                                                            .appBarColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      child: const Center(
-                                                        child: Text('Cancelled',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                              fontSize: 15,
-                                                              color:
-                                                                  Colors.white,
-                                                            )),
-                                                      ),
-                                                    ),
-                                        ),
+                                  child: Container(
+                                    child: invoiceList[0]['state'] == 'draft'
+                                        ? Container(
+                                            width: 80,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.appBarColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: const Center(
+                                              child: Text('Draft',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.white,
+                                                  )),
+                                            ),
+                                          )
+                                        : invoiceList[0]['state'] == 'posted'
+                                            ? Container(
+                                                width: 80,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.appBarColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: const Center(
+                                                  child: Text('Posted',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        color: Colors.white,
+                                                      )),
+                                                ),
+                                              )
+                                            : Container(
+                                                width: 80,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.appBarColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: const Center(
+                                                  child: Text('Cancelled',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        color: Colors.white,
+                                                      )),
+                                                ),
+                                              ),
+                                  ),
                                 ),
                               ),
                             ),

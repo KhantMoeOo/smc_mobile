@@ -78,7 +78,7 @@ class MaterialIssuesBloc {
           print('Get Purchase Requisition Error:' +
               res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           purchaserequisitionListStreamController.sink.add(responseOb);
         }
       } catch (e) {
@@ -152,7 +152,7 @@ class MaterialIssuesBloc {
           );
           print('Get Stock Picking Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           stockpickingStreamController.sink.add(responseOb);
         }
       } catch (e) {

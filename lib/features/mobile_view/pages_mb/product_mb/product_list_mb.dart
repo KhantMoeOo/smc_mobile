@@ -140,9 +140,69 @@ class _ProductListMBState extends State<ProductListMB> {
             builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
               ResponseOb? responseOb = snapshot.data;
               if (responseOb?.msgState == MsgState.error) {
-                return const Center(
-                  child: Text('Error in UserProfile'),
-                );
+                if (responseOb?.errState == ErrState.severErr) {
+                  return Scaffold(
+                    body: Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('${responseOb?.data}'),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              profileBloc.getResUsersData();
+                            },
+                            child: const Text('Try Again'))
+                      ],
+                    )),
+                  );
+                } else if (responseOb?.errState == ErrState.noConnection) {
+                  return Scaffold(
+                    body: Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/imgs/no_internet_connection_icon.png',
+                          width: 100,
+                          height: 100,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text('No Internet Connection'),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              profileBloc.getResUsersData();
+                            },
+                            child: const Text('Try Again'))
+                      ],
+                    )),
+                  );
+                } else {
+                  return Scaffold(
+                    body: Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Unknown Error'),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              profileBloc.getResUsersData();
+                            },
+                            child: const Text('Try Again'))
+                      ],
+                    )),
+                  );
+                }
               } else if (responseOb?.msgState == MsgState.loading) {
                 return Container(
                   color: Colors.white,
@@ -163,9 +223,70 @@ class _ProductListMBState extends State<ProductListMB> {
                     builder: (context, AsyncSnapshot<ResponseOb> snapshot) {
                       ResponseOb? responseOb = snapshot.data;
                       if (responseOb?.msgState == MsgState.error) {
-                        return const Center(
-                          child: Text('Error in UserProfile'),
-                        );
+                        if (responseOb?.errState == ErrState.severErr) {
+                          return Scaffold(
+                            body: Center(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('${responseOb?.data}'),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                TextButton(
+                                    onPressed: () {
+                                      profileBloc.getResUsersData();
+                                    },
+                                    child: const Text('Try Again'))
+                              ],
+                            )),
+                          );
+                        } else if (responseOb?.errState ==
+                            ErrState.noConnection) {
+                          return Scaffold(
+                            body: Center(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/imgs/no_internet_connection_icon.png',
+                                  width: 100,
+                                  height: 100,
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Text('No Internet Connection'),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                TextButton(
+                                    onPressed: () {
+                                      profileBloc.getResUsersData();
+                                    },
+                                    child: const Text('Try Again'))
+                              ],
+                            )),
+                          );
+                        } else {
+                          return Scaffold(
+                            body: Center(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('Unknown Error'),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                TextButton(
+                                    onPressed: () {
+                                      profileBloc.getResUsersData();
+                                    },
+                                    child: const Text('Try Again'))
+                              ],
+                            )),
+                          );
+                        }
                       } else if (responseOb?.msgState == MsgState.loading) {
                         return Container(
                           color: Colors.white,
@@ -211,8 +332,8 @@ class _ProductListMBState extends State<ProductListMB> {
                                         Text(
                                             'There is more than one Warehouse in ${userList[0]['name']} (${userList[0]['zone_id'][1]})'),
                                         const SizedBox(
-                                        height: 20,
-                                      ),
+                                          height: 20,
+                                        ),
                                         TextButton(
                                             onPressed: () {
                                               productListBloc
@@ -236,9 +357,81 @@ class _ProductListMBState extends State<ProductListMB> {
                                       ResponseOb? responseOb = snapshot.data;
                                       if (responseOb?.msgState ==
                                           MsgState.error) {
-                                        return const Center(
-                                          child: Text('Error'),
-                                        );
+                                        if (responseOb?.errState ==
+                                            ErrState.severErr) {
+                                          return Scaffold(
+                                            body: Center(
+                                                child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text('${responseOb?.data}'),
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                TextButton(
+                                                    onPressed: () {
+                                                      profileBloc
+                                                          .getResUsersData();
+                                                    },
+                                                    child:
+                                                        const Text('Try Again'))
+                                              ],
+                                            )),
+                                          );
+                                        } else if (responseOb?.errState ==
+                                            ErrState.noConnection) {
+                                          return Scaffold(
+                                            body: Center(
+                                                child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                  'assets/imgs/no_internet_connection_icon.png',
+                                                  width: 100,
+                                                  height: 100,
+                                                ),
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                const Text(
+                                                    'No Internet Connection'),
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                TextButton(
+                                                    onPressed: () {
+                                                      profileBloc
+                                                          .getResUsersData();
+                                                    },
+                                                    child:
+                                                        const Text('Try Again'))
+                                              ],
+                                            )),
+                                          );
+                                        } else {
+                                          return Scaffold(
+                                            body: Center(
+                                                child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                const Text('Unknown Error'),
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                TextButton(
+                                                    onPressed: () {
+                                                      profileBloc
+                                                          .getResUsersData();
+                                                    },
+                                                    child:
+                                                        const Text('Try Again'))
+                                              ],
+                                            )),
+                                          );
+                                        }
                                       } else if (responseOb?.msgState ==
                                           MsgState.data) {
                                         productList = responseOb!.data;
@@ -257,7 +450,8 @@ class _ProductListMBState extends State<ProductListMB> {
                                               ),
                                               backgroundColor:
                                                   AppColors.appBarColor,
-                                              title: const Text("Products"),
+                                              title: Text(
+                                                  "Products (${userList[0]['zone_id'][1]})"),
                                             ),
                                             body: Column(
                                               children: [

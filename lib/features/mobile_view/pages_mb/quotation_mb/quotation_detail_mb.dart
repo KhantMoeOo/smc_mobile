@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:expandable/expandable.dart';
@@ -34,7 +35,7 @@ import 'quotation_list_mb.dart';
 
 class QuotationDetailMB extends StatefulWidget {
   String name;
-  String userid;
+  List<dynamic> userid;
   List<dynamic> customerId;
   String amountTotal;
   String state;
@@ -96,7 +97,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
   final isDialOpen = ValueNotifier(false);
   //Map<String, dynamic> saleorderidList = {};
   final databaseHelper = DatabaseHelper();
-  List<SaleOrderLineOb>? materialproductlineDBList = [];
+  List<SaleOrderLineOb>? saleorderlineDBList = [];
   List<dynamic> productlineList = [];
   List<dynamic> salediscountlist = [];
   List<dynamic> salepromotionlist = [];
@@ -198,18 +199,14 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                 : element['price_unit'].toString(),
             quotationId:
                 element['order_id'] == false ? '' : element['order_id'][0],
-            discountId: element['discount_ids'].isEmpty
-                ? 0
-                : element['discount_ids'][0],
-            discountName: discountName.toString(),
-            promotionId: element['promotion_ids'].isEmpty
-                ? 0
-                : element['promotion_ids'][0],
-            promotionName: promotionName.toString(),
+            discountId: 0,
+            discountName: element['discount_ids'].toString(),
+            promotionId: 0,
+            promotionName: element['promotion_ids'].toString(),
             saleDiscount: element['sale_discount'].toString(),
             promotionDiscount: element['promotion_discount'].toString(),
             taxId: element['tax_id'].toString(),
-            taxName: taxName,
+            taxName: '',
             isFOC: element['is_foc'] == false ? 0 : 1,
             subTotal: element['price_subtotal'].toString());
         await databaseHelper.insertOrderLineUpdate(saleOrderLineOb);
@@ -523,9 +520,9 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
 
   void quotationDeleteListen(ResponseOb responseOb) async {
     if (responseOb.msgState == MsgState.data) {
-      // if (materialproductlineDBList!.isNotEmpty) {
-      //   for (var element in materialproductlineDBList!) {
-      //     print('SOLDBList from delete?_______________: ${materialproductlineDBList?.length}');
+      // if (saleorderlineDBList!.isNotEmpty) {
+      //   for (var element in saleorderlineDBList!) {
+      //     print('SOLDBList from delete?_______________: ${saleorderlineDBList?.length}');
       //     if(element.quotationId != 0){
       //       print('SOLIDS..................: ${element.id}');
       //       await quotationdeleteBloc.deleteSaleOrderLineData(element.id);
@@ -633,10 +630,11 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
   void getStockPickingListen(ResponseOb responseOb) {
     if (responseOb.msgState == MsgState.data) {
       setState(() {
+        stockpickingId = responseOb.data;
         isCallStockPicking = false;
         isCallStockMove = true;
       });
-      stockpickingBloc.getStockMoveData(responseOb.data[0]['id']);
+      stockpickingBloc.getStockMoveData(stockpickingId);
     }
   }
 
@@ -700,9 +698,72 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
               ),
             );
           } else if (responseOb.msgState == MsgState.error) {
-            return const Center(
-              child: Text('Error'),
-            );
+            if (responseOb.errState == ErrState.severErr) {
+              return Scaffold(
+                body: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('${responseOb.data}'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          quotationBloc
+                              .getQuotationWithIdData(widget.quotationId);
+                        },
+                        child: const Text('Try Again'))
+                  ],
+                )),
+              );
+            } else if (responseOb.errState == ErrState.noConnection) {
+              return Scaffold(
+                body: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/imgs/no_internet_connection_icon.png',
+                      width: 100,
+                      height: 100,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text('No Internet Connection'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          quotationBloc
+                              .getQuotationWithIdData(widget.quotationId);
+                        },
+                        child: const Text('Try Again'))
+                  ],
+                )),
+              );
+            } else {
+              return Scaffold(
+                body: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Unknown Error'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          quotationBloc
+                              .getQuotationWithIdData(widget.quotationId);
+                        },
+                        child: const Text('Try Again'))
+                  ],
+                )),
+              );
+            }
           } else {
             return StreamBuilder<ResponseOb>(
                 initialData: ResponseOb(msgState: MsgState.loading),
@@ -721,9 +782,72 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                       ),
                     );
                   } else if (responseOb?.msgState == MsgState.error) {
-                    return const Center(
-                      child: Text("Something went wrong!"),
-                    );
+                    if (responseOb?.errState == ErrState.severErr) {
+                      return Scaffold(
+                        body: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('${responseOb?.data}'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  quotationBloc.getQuotationWithIdData(
+                                      widget.quotationId);
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                      );
+                    } else if (responseOb?.errState == ErrState.noConnection) {
+                      return Scaffold(
+                        body: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/imgs/no_internet_connection_icon.png',
+                              width: 100,
+                              height: 100,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text('No Internet Connection'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  quotationBloc.getQuotationWithIdData(
+                                      widget.quotationId);
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                      );
+                    } else {
+                      return Scaffold(
+                        body: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Unknown Error'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  quotationBloc.getQuotationWithIdData(
+                                      widget.quotationId);
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                      );
+                    }
                   } else {
                     return Stack(
                       children: [
@@ -736,38 +860,6 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                               title: Text(
                                   '${widget.name} (${widget.customerId[1]})'),
                               actions: [
-                                // TextButton(
-                                //     onPressed: () async {
-                                //       final invoice = Invoice(
-                                //           info: InvoiceInfo(
-                                //             number: widget.name,
-                                //             date: widget.dateOrder
-                                //                 .toString()
-                                //                 .split(' ')[0],
-                                //           ),
-                                //           supplier: const Supplier(
-                                //               name: 'SMc',
-                                //               address: 'address',
-                                //               paymentInfo: 'paymentInfo'),
-                                //           customer: Customer(
-                                //               name: widget.customerId[1],
-                                //               address: 'Myanmar'),
-                                //           items: materialproductlineDBList!.map((e) {
-                                //             return InvoiceItem(
-                                //                 description: e.description,
-                                //                 uomName: e.uomName,
-                                //                 quantity:
-                                //                     double.parse(e.quantity),
-                                //                 unitPrice:
-                                //                     double.parse(e.unitPrice),
-                                //                 subtotal: e.subTotal,
-                                //                 isFOC: e.isFOC);
-                                //           }).toList());
-                                //       final pdfFile =
-                                //           await PdfInvoiceApi.generate(invoice);
-                                //       PdfApi.openFile(pdfFile);
-                                //     },
-                                //     child: const Text("Save as PDF")),
                                 Visibility(
                                   visible: quotationList[0]['invoice_status'] ==
                                           'to invoice'
@@ -775,132 +867,6 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                       : false,
                                   child: TextButton(
                                       onPressed: () async {
-                                        // var bluetoothScanstatus =
-                                        //     await Permission.bluetoothScan.status;
-                                        // var bluetoothAdvertise = await Permission
-                                        //     .bluetoothAdvertise.status;
-                                        // var bluetoothConnect = await Permission
-                                        //     .bluetoothConnect.status;
-                                        // if (!bluetoothScanstatus.isGranted) {
-                                        //   await Permission.bluetoothScan.request();
-                                        // }
-                                        // if (!bluetoothAdvertise.isGranted) {
-                                        //   await Permission.bluetoothAdvertise
-                                        //       .request();
-                                        // }
-                                        // if (!bluetoothConnect.isGranted) {
-                                        //   await Permission.bluetoothConnect
-                                        //       .request();
-                                        // }
-                                        // if (await Permission
-                                        //         .bluetoothScan.isGranted &&
-                                        //     await Permission
-                                        //         .bluetoothAdvertise.isGranted &&
-                                        //     await Permission
-                                        //         .bluetoothConnect.isGranted) {
-                                        //   Navigator.of(context).push(
-                                        //       MaterialPageRoute(builder: (context) {
-                                        //     return Print(
-                                        //       productlineList:
-                                        //           materialproductlineDBList!,
-                                        //       orderId: widget.name,
-                                        //       customerName: widget.customerId[1],
-                                        //       dateorder: quotationList[0]
-                                        //           ['date_order'],
-                                        //       amountUntaxed: quotationList[0]
-                                        //               ['amount_untaxed']
-                                        //           .toString(),
-                                        //     );
-                                        //   }));
-                                        //}
-                                        // var bluetoothConnect = await Permission
-                                        //     .bluetoothConnect.status;
-                                        // var bluetoothScan =
-                                        //     await Permission.bluetoothScan.status;
-                                        // var location =
-                                        //     await Permission.location.status;
-                                        // var bluetooth =
-                                        //     await Permission.bluetooth.status;
-                                        // Map<Permission, PermissionStatus> statuses;
-                                        // DeviceInfoPlugin deviceInfoPlugin =
-                                        //     DeviceInfoPlugin();
-                                        // if (Platform.isAndroid) {
-                                        //   AndroidDeviceInfo androidDeviceInfo =
-                                        //       await deviceInfoPlugin.androidInfo;
-                                        //   if (androidDeviceInfo.version.sdkInt >=
-                                        //       31) {
-                                        //     if (!bluetoothConnect.isGranted ||
-                                        //         !bluetoothScan.isGranted ||
-                                        //         !location.isGranted) {
-                                        //       statuses = await [
-                                        //         Permission.bluetoothConnect,
-                                        //         Permission.bluetoothScan,
-                                        //         Permission.location
-                                        //       ].request();
-                                        //     }
-                                        //     if (await Permission
-                                        //             .bluetoothConnect.isGranted &&
-                                        //         await Permission
-                                        //             .bluetoothScan.isGranted &&
-                                        //         await Permission
-                                        //             .location.isGranted) {
-                                        //       Navigator.of(context).push(
-                                        //           MaterialPageRoute(
-                                        //               builder: (context) {
-                                        //         return Print(
-                                        //           productlineList:
-                                        //               materialproductlineDBList!,
-                                        //           orderId: widget.name,
-                                        //           customerName:
-                                        //               widget.customerId[1],
-                                        //           dateorder: quotationList[0]
-                                        //               ['date_order'],
-                                        //           amountUntaxed: quotationList[0]
-                                        //                   ['amount_untaxed']
-                                        //               .toString(),
-                                        //         );
-                                        //       }));
-                                        //     }
-                                        //   } else {
-                                        //     if (!bluetooth.isGranted ||
-                                        //         !location.isGranted) {
-                                        //       statuses = await [
-                                        //         Permission.bluetooth,
-                                        //         Permission.location
-                                        //       ].request();
-                                        //     }
-                                        //     if (await Permission
-                                        //             .bluetooth.isGranted &&
-                                        //         await Permission
-                                        //             .location.isGranted) {
-                                        //       Navigator.of(context).push(
-                                        //           MaterialPageRoute(
-                                        //               builder: (context) {
-                                        //         return Print(
-                                        //           productlineList:
-                                        //               materialproductlineDBList!,
-                                        //           orderId: widget.name,
-                                        //           customerName:
-                                        //               widget.customerId[1],
-                                        //           dateorder: quotationList[0]
-                                        //               ['date_order'],
-                                        //           amountUntaxed: quotationList[0]
-                                        //                   ['amount_untaxed']
-                                        //               .toString(),
-                                        //         );
-                                        //       }));
-                                        //     }
-                                        //   }
-                                        // }
-                                        // Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                                        //   return InvoiceCreatePage(
-                                        //     createInvoiceWithId: 1,
-                                        //     quotationId: quotationList[0]['id'],
-                                        //     customerId: quotationList[0]['partner_id'][0],
-                                        //     paymentTermsId: quotationList[0]['payment_term_id'] == false ? 0: quotationList[0]['payment_term_id'][0],
-                                        //     currencyId: quotationList[0]['currency_id'] == false ? 0: quotationList[0]['currency_id'][0],
-                                        //   );
-                                        // }));
                                         showDialog(
                                             context: context,
                                             builder: (context) {
@@ -925,6 +891,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                     color: Colors
                                                                         .black)),
                                                         onPressed: () {
+                                                          accountIdList.clear();
                                                           for (var sol
                                                               in productlineList) {
                                                             for (var product
@@ -941,6 +908,8 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                           'id'] ==
                                                                       product['categ_id']
                                                                           [0]) {
+                                                                    print(
+                                                                        'Categ Id: ${product['categ_id'][0]}, ${categ['id']}');
                                                                     print(
                                                                         'Product Category: ${categ['name']},${categ['property_account_income_categ_id']}');
                                                                     accountIdList
@@ -1167,7 +1136,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                 future:
                                     databaseHelper.getSaleOrderLineUpdateList(),
                                 builder: (context, snapshot) {
-                                  materialproductlineDBList = snapshot.data;
+                                  saleorderlineDBList = snapshot.data;
                                   Widget saleOrderLineWidget =
                                       SliverToBoxAdapter(
                                     child: Container(),
@@ -1177,11 +1146,11 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                         delegate: SliverChildBuilderDelegate(
                                       (context, i) {
                                         print(
-                                            'SOLLength------------: ${materialproductlineDBList?.length}');
-                                        return materialproductlineDBList![i]
+                                            'SOLLength------------: ${saleorderlineDBList?.length}');
+                                        return saleorderlineDBList![i]
                                                         .quotationId !=
                                                     widget.quotationId &&
-                                                materialproductlineDBList![i]
+                                                saleorderlineDBList![i]
                                                         .isSelect !=
                                                     1
                                             ? Container()
@@ -1225,7 +1194,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .productCodeName,
                                                             //           style: TextStyle(
@@ -1255,12 +1224,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             .start,
                                                                     children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .productCodeName,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -1285,7 +1254,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .description,
                                                             //           style: TextStyle(
@@ -1315,13 +1284,13 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             .start,
                                                                     children: [
                                                                   Text(
-                                                                    materialproductlineDBList![
+                                                                    saleorderlineDBList![
                                                                             i]
                                                                         .description,
                                                                     style: TextStyle(
-                                                                        color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                        color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                             ? Colors.cyan
-                                                                            : materialproductlineDBList![i].isFOC == 1
+                                                                            : saleorderlineDBList![i].isFOC == 1
                                                                                 ? Colors.amber
                                                                                 : Colors.black,
                                                                         fontSize: 18),
@@ -1350,7 +1319,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .description,
                                                             //           style: TextStyle(
@@ -1381,12 +1350,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .description,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -1410,7 +1379,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .quantity,
                                                             //           style: TextStyle(
@@ -1441,12 +1410,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .quantity,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -1483,12 +1452,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                               CrossAxisAlignment.start,
                                                                           children: [
                                                                         Text(
-                                                                          materialproductlineDBList![i]
+                                                                          saleorderlineDBList![i]
                                                                               .qtyDelivered!,
                                                                           style: TextStyle(
-                                                                              color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                              color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                   ? Colors.cyan
-                                                                                  : materialproductlineDBList![i].isFOC == 1
+                                                                                  : saleorderlineDBList![i].isFOC == 1
                                                                                       ? Colors.amber
                                                                                       : Colors.black,
                                                                               fontSize: 18),
@@ -1526,12 +1495,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                               CrossAxisAlignment.start,
                                                                           children: [
                                                                         Text(
-                                                                          materialproductlineDBList![i]
+                                                                          saleorderlineDBList![i]
                                                                               .qtyInvoiced!,
                                                                           style: TextStyle(
-                                                                              color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                              color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                   ? Colors.cyan
-                                                                                  : materialproductlineDBList![i].isFOC == 1
+                                                                                  : saleorderlineDBList![i].isFOC == 1
                                                                                       ? Colors.amber
                                                                                       : Colors.black,
                                                                               fontSize: 18),
@@ -1555,7 +1524,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .uomName,
                                                             //           style: TextStyle(
@@ -1586,12 +1555,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .uomName,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -1615,7 +1584,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .unitPrice,
                                                             //           style: TextStyle(
@@ -1646,12 +1615,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .unitPrice,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -1675,7 +1644,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .discountName,
                                                             //           style: TextStyle(
@@ -1704,41 +1673,70 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                   ),
                                                                 ),
                                                                 Visibility(
-                                                                  visible: materialproductlineDBList![i]
+                                                                  visible: saleorderlineDBList![i]
                                                                               .discountName ==
                                                                           '[]'
                                                                       ? false
                                                                       : true,
                                                                   child:
                                                                       Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                        Container(
-                                                                          padding:
-                                                                              const EdgeInsets.all(3),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color:
-                                                                                Colors.black,
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(5),
-                                                                          ),
                                                                           child:
-                                                                              Text(
-                                                                            materialproductlineDBList![i].discountName == '[]'
-                                                                                ? ''
-                                                                                : materialproductlineDBList![i].discountName!.substring(1, materialproductlineDBList![i].discountName!.length - 1),
+                                                                              Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: salediscountlist
+                                                                        .where((element) => json
+                                                                            .decode(saleorderlineDBList![i]
+                                                                                .discountName!)
+                                                                            .contains(element[
+                                                                                'id']))
+                                                                        .map(
+                                                                            (e) {
+                                                                      return Container(
+                                                                          padding: const EdgeInsets.all(
+                                                                              3),
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(10),
+                                                                              border: Border.all(color: Colors.black)),
+                                                                          child: Text(
+                                                                            e['name'],
                                                                             style: TextStyle(
-                                                                                color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                                color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                     ? Colors.cyan
-                                                                                    : materialproductlineDBList![i].isFOC == 1
+                                                                                    : saleorderlineDBList![i].isFOC == 1
                                                                                         ? Colors.amber
-                                                                                        : Colors.white,
+                                                                                        : Colors.black,
                                                                                 fontSize: 18),
-                                                                          ),
-                                                                        )
-                                                                      ])),
+                                                                          ));
+                                                                    }).toList(),
+                                                                    //         [
+                                                                    //   Container(
+                                                                    //     padding:
+                                                                    //         const EdgeInsets.all(3),
+                                                                    //     decoration:
+                                                                    //         BoxDecoration(
+                                                                    //       color:
+                                                                    //           Colors.black,
+                                                                    //       borderRadius:
+                                                                    //           BorderRadius.circular(5),
+                                                                    //     ),
+                                                                    //     child:
+                                                                    //         Text(
+                                                                    //       saleorderlineDBList![i].discountName == '[]'
+                                                                    //           ? ''
+                                                                    //           : saleorderlineDBList![i].discountName!.substring(1, saleorderlineDBList![i].discountName!.length - 1),
+                                                                    //       style: TextStyle(
+                                                                    //           color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                    //               ? Colors.cyan
+                                                                    //               : saleorderlineDBList![i].isFOC == 1
+                                                                    //                   ? Colors.amber
+                                                                    //                   : Colors.white,
+                                                                    //           fontSize: 18),
+                                                                    //     ),
+                                                                    //   )
+                                                                    // ]
+                                                                  )),
                                                                 ),
                                                               ],
                                                             ),
@@ -1762,41 +1760,70 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                   ),
                                                                 ),
                                                                 Visibility(
-                                                                  visible: materialproductlineDBList![i]
+                                                                  visible: saleorderlineDBList![i]
                                                                               .promotionName ==
                                                                           '[]'
                                                                       ? false
                                                                       : true,
                                                                   child:
                                                                       Expanded(
-                                                                          child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                        Container(
-                                                                          padding:
-                                                                              const EdgeInsets.all(3),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color:
-                                                                                Colors.black,
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(5),
-                                                                          ),
                                                                           child:
-                                                                              Text(
-                                                                            materialproductlineDBList![i].promotionName == '[]'
-                                                                                ? ''
-                                                                                : materialproductlineDBList![i].promotionName!.substring(1, materialproductlineDBList![i].promotionName!.length - 1),
+                                                                              Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: salepromotionlist
+                                                                        .where((element) => json
+                                                                            .decode(saleorderlineDBList![i]
+                                                                                .promotionName!)
+                                                                            .contains(element[
+                                                                                'id']))
+                                                                        .map(
+                                                                            (e) {
+                                                                      return Container(
+                                                                          padding: const EdgeInsets.all(
+                                                                              3),
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(10),
+                                                                              border: Border.all(color: Colors.black)),
+                                                                          child: Text(
+                                                                            e['name'],
                                                                             style: TextStyle(
-                                                                                color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                                color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                     ? Colors.cyan
-                                                                                    : materialproductlineDBList![i].isFOC == 1
+                                                                                    : saleorderlineDBList![i].isFOC == 1
                                                                                         ? Colors.amber
-                                                                                        : Colors.white,
+                                                                                        : Colors.black,
                                                                                 fontSize: 18),
-                                                                          ),
-                                                                        )
-                                                                      ])),
+                                                                          ));
+                                                                    }).toList(),
+                                                                    //         [
+                                                                    //   Container(
+                                                                    //     padding:
+                                                                    //         const EdgeInsets.all(3),
+                                                                    //     decoration:
+                                                                    //         BoxDecoration(
+                                                                    //       color:
+                                                                    //           Colors.black,
+                                                                    //       borderRadius:
+                                                                    //           BorderRadius.circular(5),
+                                                                    //     ),
+                                                                    //     child:
+                                                                    //         Text(
+                                                                    //       saleorderlineDBList![i].promotionName == '[]'
+                                                                    //           ? ''
+                                                                    //           : saleorderlineDBList![i].promotionName!.substring(1, saleorderlineDBList![i].promotionName!.length - 1),
+                                                                    //       style: TextStyle(
+                                                                    //           color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                    //               ? Colors.cyan
+                                                                    //               : saleorderlineDBList![i].isFOC == 1
+                                                                    //                   ? Colors.amber
+                                                                    //                   : Colors.white,
+                                                                    //           fontSize: 18),
+                                                                    //     ),
+                                                                    //   )
+                                                                    // ]
+                                                                  )),
                                                                 ),
                                                               ],
                                                             ),
@@ -1825,12 +1852,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .saleDiscount!,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -1863,12 +1890,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .promotionDiscount!,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -1892,7 +1919,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .taxName,
                                                             //           style: TextStyle(
@@ -1918,22 +1945,51 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                   ),
                                                                 ),
                                                                 Expanded(
-                                                                    child: Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                      Text(
-                                                                        materialproductlineDBList![i]
-                                                                            .taxName,
-                                                                        style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
-                                                                                ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
-                                                                                    ? Colors.amber
-                                                                                    : Colors.black,
-                                                                            fontSize: 18),
-                                                                      )
-                                                                    ])),
+                                                                    child:
+                                                                        Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: accounttaxsList
+                                                                      .where((element) => json
+                                                                          .decode(saleorderlineDBList![i]
+                                                                              .taxId)
+                                                                          .contains(
+                                                                              element['id']))
+                                                                      .map((e) {
+                                                                    return Container(
+                                                                        padding:
+                                                                            const EdgeInsets.all(
+                                                                                3),
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(10),
+                                                                            border: Border.all(color: Colors.black)),
+                                                                        child: Text(
+                                                                          e['name'],
+                                                                          style: TextStyle(
+                                                                              color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                                  ? Colors.cyan
+                                                                                  : saleorderlineDBList![i].isFOC == 1
+                                                                                      ? Colors.amber
+                                                                                      : Colors.black,
+                                                                              fontSize: 18),
+                                                                        ));
+                                                                  }).toList(),
+                                                                  //     [
+                                                                  //   Text(
+                                                                  //     saleorderlineDBList![i]
+                                                                  //         .taxName,
+                                                                  //     style: TextStyle(
+                                                                  //         color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                  //             ? Colors.cyan
+                                                                  //             : saleorderlineDBList![i].isFOC == 1
+                                                                  //                 ? Colors.amber
+                                                                  //                 : Colors.black,
+                                                                  //         fontSize: 18),
+                                                                  //   )
+                                                                  // ]
+                                                                )),
                                                               ],
                                                             ),
                                                             Row(
@@ -1952,7 +2008,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             .black),
                                                                   ),
                                                                 ),
-                                                                Icon(materialproductlineDBList![i]
+                                                                Icon(saleorderlineDBList![i]
                                                                             .isFOC ==
                                                                         0
                                                                     ? Icons
@@ -1977,7 +2033,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             //                 .black),
                                                             //       ),
                                                             //       TextSpan(
-                                                            //           text: materialproductlineDBList![
+                                                            //           text: saleorderlineDBList![
                                                             //                   i]
                                                             //               .subTotal,
                                                             //           style: TextStyle(
@@ -2008,12 +2064,12 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                       Text(
-                                                                        materialproductlineDBList![i]
+                                                                        saleorderlineDBList![i]
                                                                             .subTotal,
                                                                         style: TextStyle(
-                                                                            color: quotationList[0]['state'] == 'sale' && materialproductlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
+                                                                            color: quotationList[0]['state'] == 'sale' && saleorderlineDBList![i].isFOC == 0 && quotationList[0]['invoice_count'] == 0
                                                                                 ? Colors.cyan
-                                                                                : materialproductlineDBList![i].isFOC == 1
+                                                                                : saleorderlineDBList![i].isFOC == 1
                                                                                     ? Colors.amber
                                                                                     : Colors.black,
                                                                             fontSize: 18),
@@ -2030,8 +2086,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                 ],
                                               );
                                       },
-                                      childCount:
-                                          materialproductlineDBList!.length,
+                                      childCount: saleorderlineDBList!.length,
                                     ));
                                   } else {
                                     saleOrderLineWidget = SliverToBoxAdapter(
@@ -2154,7 +2209,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                                             children: [
                                                                               TextSpan(text: '${quotationList[i]['customer_filter'] == false ? '' : quotationList[i]['customer_filter']} - ', style: const TextStyle(color: Colors.black, fontSize: 18)),
                                                                               quotationList[i]['customer_filter'] == 'zone'
-                                                                                  ? TextSpan(text: '${quotationList[i]['zone_filter_id'][1]}', style: const TextStyle(color: Colors.black, fontSize: 18))
+                                                                                  ? TextSpan(text: '${quotationList[i]['zone_filter_id'] == false ? '' : quotationList[i]['zone_filter_id'][1]}', style: const TextStyle(color: Colors.black, fontSize: 18))
                                                                                   : quotationList[i]['customer_filter'] == 'segment'
                                                                                       ? TextSpan(text: '${quotationList[i]['seg_filter_id'][1]}', style: const TextStyle(color: Colors.black, fontSize: 18))
                                                                                       : const TextSpan(),
@@ -2822,6 +2877,38 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                             const SizedBox(
                                                               height: 10,
                                                             ),
+                                                            Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                const SizedBox(
+                                                                  width: 200,
+                                                                  child: Text(
+                                                                    'Saleperson: ',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            20,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color: Colors
+                                                                            .black),
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                    child: Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        children: [
+                                                                      Text(
+                                                                          '${quotationList[i]['user_id'] == false ? '-' : quotationList[i]['user_id'][1]}',
+                                                                          style: const TextStyle(
+                                                                              color: Colors.black,
+                                                                              fontSize: 18))
+                                                                    ])),
+                                                              ],
+                                                            ),
                                                           ],
                                                         ),
                                                       );
@@ -3096,298 +3183,7 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                   BorderRadius.circular(10),
                                               // color: AppColors.appBarColor,
                                             ),
-                                            child:
-                                                // MediaQuery.of(context)
-                                                //             .size
-                                                //             .width >
-                                                //         400.0
-                                                //     ? SpeedDial(
-                                                //         buttonSize: 80,
-                                                //         childrenButtonSize: 100,
-                                                //         backgroundColor:
-                                                //             Colors.transparent,
-                                                //         elevation: 0.0,
-                                                //         activeChild: const Icon(
-                                                //           Icons.close,
-                                                //           color:
-                                                //               AppColors.appBarColor,
-                                                //         ),
-                                                //         child: quotationList[0]
-                                                //                     ['state'] ==
-                                                //                 'draft'
-                                                //             ? Container(
-                                                //                 width: 80,
-                                                //                 height: 40,
-                                                //                 decoration:
-                                                //                     BoxDecoration(
-                                                //                   color: AppColors
-                                                //                       .appBarColor,
-                                                //                   borderRadius:
-                                                //                       BorderRadius
-                                                //                           .circular(
-                                                //                               10),
-                                                //                 ),
-                                                //                 child: const Center(
-                                                //                   child: Text(
-                                                //                       'Quotation',
-                                                //                       textAlign:
-                                                //                           TextAlign
-                                                //                               .center,
-                                                //                       style: TextStyle(
-                                                //                           fontSize:
-                                                //                               10)),
-                                                //                 ),
-                                                //               )
-                                                //             : quotationList[0]
-                                                //                         ['state'] ==
-                                                //                     'sent'
-                                                //                 ? Container(
-                                                //                     width: 80,
-                                                //                     height: 40,
-                                                //                     decoration:
-                                                //                         BoxDecoration(
-                                                //                       color: AppColors
-                                                //                           .appBarColor,
-                                                //                       borderRadius:
-                                                //                           BorderRadius
-                                                //                               .circular(
-                                                //                                   10),
-                                                //                     ),
-                                                //                     child:
-                                                //                         const Center(
-                                                //                       child: Text(
-                                                //                           'Quotation Sent',
-                                                //                           textAlign:
-                                                //                               TextAlign
-                                                //                                   .center,
-                                                //                           style: TextStyle(
-                                                //                               fontSize:
-                                                //                                   10)),
-                                                //                     ),
-                                                //                   )
-                                                //                 : quotationList[0][
-                                                //                             'state'] ==
-                                                //                         'sale'
-                                                //                     ? Container(
-                                                //                         width: 80,
-                                                //                         height: 40,
-                                                //                         decoration:
-                                                //                             BoxDecoration(
-                                                //                           color: AppColors
-                                                //                               .appBarColor,
-                                                //                           borderRadius:
-                                                //                               BorderRadius.circular(
-                                                //                                   10),
-                                                //                         ),
-                                                //                         child:
-                                                //                             const Center(
-                                                //                           child: Text(
-                                                //                               'Sale Order',
-                                                //                               textAlign: TextAlign
-                                                //                                   .center,
-                                                //                               style:
-                                                //                                   TextStyle(fontSize: 10)),
-                                                //                         ),
-                                                //                       )
-                                                //                     : Container(
-                                                //                         width: 80,
-                                                //                         height: 40,
-                                                //                         decoration:
-                                                //                             BoxDecoration(
-                                                //                           color: AppColors
-                                                //                               .appBarColor,
-                                                //                           borderRadius:
-                                                //                               BorderRadius.circular(
-                                                //                                   10),
-                                                //                         ),
-                                                //                         child:
-                                                //                             const Center(
-                                                //                           child: Text(
-                                                //                               'Cancelled',
-                                                //                               textAlign: TextAlign
-                                                //                                   .center,
-                                                //                               style:
-                                                //                                   TextStyle(fontSize: 10)),
-                                                //                         ),
-                                                //                       ),
-                                                //         spaceBetweenChildren: 5,
-                                                //         direction:
-                                                //             SpeedDialDirection.left,
-                                                //         renderOverlay: false,
-                                                //         children: [
-                                                //             SpeedDialChild(
-                                                //               backgroundColor:
-                                                //                   Colors
-                                                //                       .transparent,
-                                                //               elevation: 0.0,
-                                                //               child: Container(
-                                                //                 height: 40,
-                                                //                 width: 80,
-                                                //                 decoration: BoxDecoration(
-                                                //                     border:
-                                                //                         Border.all(
-                                                //                             width:
-                                                //                                 1),
-                                                //                     borderRadius:
-                                                //                         BorderRadius
-                                                //                             .circular(
-                                                //                                 10),
-                                                //                     color: quotationList[0]
-                                                //                                 [
-                                                //                                 'state'] ==
-                                                //                             'cancel'
-                                                //                         ? AppColors
-                                                //                             .appBarColor
-                                                //                         : Colors
-                                                //                             .white),
-                                                //                 child: Center(
-                                                //                   child: Text(
-                                                //                     "Cancelled",
-                                                //                     style: TextStyle(
-                                                //                         color: quotationList[0]['state'] ==
-                                                //                                 'cancel'
-                                                //                             ? Colors
-                                                //                                 .white
-                                                //                             : Colors
-                                                //                                 .grey,
-                                                //                         fontSize:
-                                                //                             15),
-                                                //                   ),
-                                                //                 ),
-                                                //               ),
-                                                //             ),
-                                                //             SpeedDialChild(
-                                                //               backgroundColor:
-                                                //                   Colors
-                                                //                       .transparent,
-                                                //               elevation: 0.0,
-                                                //               child: Container(
-                                                //                 height: 40,
-                                                //                 width: 80,
-                                                //                 decoration: BoxDecoration(
-                                                //                     border:
-                                                //                         Border.all(
-                                                //                             width:
-                                                //                                 1),
-                                                //                     borderRadius:
-                                                //                         BorderRadius
-                                                //                             .circular(
-                                                //                                 10),
-                                                //                     color: quotationList[0]
-                                                //                                 [
-                                                //                                 'state'] ==
-                                                //                             'sale'
-                                                //                         ? AppColors
-                                                //                             .appBarColor
-                                                //                         : Colors
-                                                //                             .white),
-                                                //                 child: Center(
-                                                //                   child: Text(
-                                                //                     "Sale Order",
-                                                //                     textAlign:
-                                                //                         TextAlign
-                                                //                             .center,
-                                                //                     style: TextStyle(
-                                                //                         color: quotationList[0]['state'] ==
-                                                //                                 'sale'
-                                                //                             ? Colors
-                                                //                                 .white
-                                                //                             : Colors
-                                                //                                 .grey,
-                                                //                         fontSize:
-                                                //                             15),
-                                                //                   ),
-                                                //                 ),
-                                                //               ),
-                                                //             ),
-                                                //             SpeedDialChild(
-                                                //               backgroundColor:
-                                                //                   Colors
-                                                //                       .transparent,
-                                                //               elevation: 0.0,
-                                                //               child: Container(
-                                                //                 height: 40,
-                                                //                 width: 80,
-                                                //                 decoration: BoxDecoration(
-                                                //                     border:
-                                                //                         Border.all(
-                                                //                             width:
-                                                //                                 1),
-                                                //                     borderRadius:
-                                                //                         BorderRadius
-                                                //                             .circular(
-                                                //                                 10),
-                                                //                     color: quotationList[0]
-                                                //                                 [
-                                                //                                 'state'] ==
-                                                //                             'sent'
-                                                //                         ? AppColors
-                                                //                             .appBarColor
-                                                //                         : Colors
-                                                //                             .white),
-                                                //                 child: Center(
-                                                //                   child: Text(
-                                                //                     "Quotation Sent",
-                                                //                     textAlign:
-                                                //                         TextAlign
-                                                //                             .center,
-                                                //                     style: TextStyle(
-                                                //                         color: quotationList[0]['state'] ==
-                                                //                                 'sent'
-                                                //                             ? Colors
-                                                //                                 .white
-                                                //                             : Colors
-                                                //                                 .grey,
-                                                //                         fontSize:
-                                                //                             15),
-                                                //                   ),
-                                                //                 ),
-                                                //               ),
-                                                //             ),
-                                                //             SpeedDialChild(
-                                                //               backgroundColor:
-                                                //                   Colors
-                                                //                       .transparent,
-                                                //               elevation: 0.0,
-                                                //               child: Container(
-                                                //                 height: 40,
-                                                //                 width: 80,
-                                                //                 decoration: BoxDecoration(
-                                                //                     border:
-                                                //                         Border.all(
-                                                //                             width:
-                                                //                                 1),
-                                                //                     borderRadius:
-                                                //                         BorderRadius
-                                                //                             .circular(
-                                                //                                 10),
-                                                //                     color: quotationList[0]
-                                                //                                 [
-                                                //                                 'state'] ==
-                                                //                             'draft'
-                                                //                         ? AppColors
-                                                //                             .appBarColor
-                                                //                         : Colors
-                                                //                             .white),
-                                                //                 child: Center(
-                                                //                   child: Text(
-                                                //                     "Quotation",
-                                                //                     style: TextStyle(
-                                                //                         color: quotationList[0]['state'] ==
-                                                //                                 'draft'
-                                                //                             ? Colors
-                                                //                                 .white
-                                                //                             : Colors
-                                                //                                 .grey,
-                                                //                         fontSize:
-                                                //                             15),
-                                                //                   ),
-                                                //                 ),
-                                                //               ),
-                                                //             ),
-                                                //           ])
-                                                //     :
-                                                Container(
+                                            child: Container(
                                               child: quotationList[0]
                                                           ['state'] ==
                                                       'draft'
@@ -3527,32 +3323,31 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                       Navigator.of(context).push(
                                           MaterialPageRoute(builder: (context) {
                                         return QuotationCreateMB(
-                                          quotationId: widget.quotationId,
-                                          name: widget.name,
-                                          userid: widget.userid,
-                                          customerId: widget.customerId,
-                                          dateOrder: widget.dateOrder,
-                                          validityDate: widget.validityDate,
-                                          currencyId: widget.currencyId,
-                                          exchangeRate: widget.exchangeRate,
-                                          pricelistId: widget.pricelistId,
-                                          paymentTermId: widget.paymentTermId,
-                                          zoneId: widget.zoneId,
-                                          segmentId: widget.segmentId,
-                                          regionId: widget.regionId,
-                                          newOrEdit: 1,
-                                          productlineList: productlineList,
-                                          filter: widget.filterBy,
-                                          zoneFilterId:
-                                              widget.zoneFilterId.isNotEmpty
-                                                  ? widget.zoneFilterId[0]
-                                                  : 0,
-                                          segmentFilterId:
-                                              widget.segmentFilterId.isNotEmpty
-                                                  ? widget.segmentFilterId[0]
-                                                  : 0,
-                                                  userzoneId: userList[0]['zone_id']
-                                        );
+                                            quotationId: widget.quotationId,
+                                            name: widget.name,
+                                            userid: widget.userid,
+                                            customerId: widget.customerId,
+                                            dateOrder: widget.dateOrder,
+                                            validityDate: widget.validityDate,
+                                            currencyId: widget.currencyId,
+                                            exchangeRate: widget.exchangeRate,
+                                            pricelistId: widget.pricelistId,
+                                            paymentTermId: widget.paymentTermId,
+                                            zoneId: widget.zoneId,
+                                            segmentId: widget.segmentId,
+                                            regionId: widget.regionId,
+                                            newOrEdit: 1,
+                                            productlineList: productlineList,
+                                            filter: widget.filterBy,
+                                            zoneFilterId:
+                                                widget.zoneFilterId.isNotEmpty
+                                                    ? widget.zoneFilterId[0]
+                                                    : 0,
+                                            segmentFilterId: widget
+                                                    .segmentFilterId.isNotEmpty
+                                                ? widget.segmentFilterId[0]
+                                                : 0,
+                                            userzoneId: userList[0]['zone_id']);
                                       })).then((value) {
                                         setState(() {});
                                       });
@@ -3565,26 +3360,25 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                       Navigator.of(context).push(
                                           MaterialPageRoute(builder: (context) {
                                         return QuotationCreateMB(
-                                          quotationId: widget.quotationId,
-                                          name: widget.name,
-                                          userid: widget.userid,
-                                          customerId: widget.customerId,
-                                          dateOrder: widget.dateOrder,
-                                          validityDate: widget.validityDate,
-                                          currencyId: widget.currencyId,
-                                          exchangeRate: widget.exchangeRate,
-                                          pricelistId: widget.pricelistId,
-                                          paymentTermId: widget.paymentTermId,
-                                          zoneId: widget.zoneId,
-                                          segmentId: widget.segmentId,
-                                          regionId: widget.regionId,
-                                          newOrEdit: 0,
-                                          productlineList: productlineList,
-                                          filter: '',
-                                          zoneFilterId: 0,
-                                          segmentFilterId: 0,
-                                          userzoneId: userList[0]['zone_id']
-                                        );
+                                            quotationId: widget.quotationId,
+                                            name: widget.name,
+                                            userid: widget.userid,
+                                            customerId: widget.customerId,
+                                            dateOrder: widget.dateOrder,
+                                            validityDate: widget.validityDate,
+                                            currencyId: widget.currencyId,
+                                            exchangeRate: widget.exchangeRate,
+                                            pricelistId: widget.pricelistId,
+                                            paymentTermId: widget.paymentTermId,
+                                            zoneId: widget.zoneId,
+                                            segmentId: widget.segmentId,
+                                            regionId: widget.regionId,
+                                            newOrEdit: 0,
+                                            productlineList: productlineList,
+                                            filter: '',
+                                            zoneFilterId: 0,
+                                            segmentFilterId: 0,
+                                            userzoneId: userList[0]['zone_id']);
                                       })).then((value) {
                                         setState(() {});
                                       });
@@ -3655,6 +3449,10 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                     },
                                                     child: const Text('No')),
                                                 TextButton(
+                                                    style: TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            AppColors
+                                                                .appBarColor),
                                                     onPressed: () {
                                                       Navigator.of(context)
                                                           .pop();
@@ -3672,7 +3470,10 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                                       //             .quotationId,
                                                       //         'sale');
                                                     },
-                                                    child: const Text('Yes'))
+                                                    child: const Text('Yes',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white)))
                                               ],
                                             );
                                           });
@@ -3738,6 +3539,85 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                   } else if (responseOb?.msgState ==
                                       MsgState.data) {
                                     updateStatus = false;
+                                  } else {
+                                    if (responseOb?.errState ==
+                                        ErrState.severErr) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text('${responseOb?.data}'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingcreateBloc
+                                                      .callActionConfirm(
+                                                          id: widget
+                                                              .quotationId);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else if (responseOb?.errState ==
+                                        ErrState.noConnection) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/imgs/no_internet_connection_icon.png',
+                                              width: 100,
+                                              height: 100,
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'No Internet Connection'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingcreateBloc
+                                                      .callActionConfirm(
+                                                          id: widget
+                                                              .quotationId);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Text('Unknown Error'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingcreateBloc
+                                                      .callActionConfirm(
+                                                          id: widget
+                                                              .quotationId);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    }
                                   }
                                   return Container(
                                     color: Colors.white,
@@ -3906,7 +3786,92 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
-                                      MsgState.data) {}
+                                      MsgState.error) {
+                                    if (responseOb?.errState ==
+                                        ErrState.severErr) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text('${responseOb?.data}'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingBloc
+                                                      .getStockPickingData([
+                                                    'sale_id',
+                                                    '=',
+                                                    widget.quotationId
+                                                  ]);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else if (responseOb?.errState ==
+                                        ErrState.noConnection) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/imgs/no_internet_connection_icon.png',
+                                              width: 100,
+                                              height: 100,
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'No Internet Connection'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingBloc
+                                                      .getStockPickingData([
+                                                    'sale_id',
+                                                    '=',
+                                                    widget.quotationId
+                                                  ]);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Text('Unknown Error'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingBloc
+                                                      .getStockPickingData([
+                                                    'sale_id',
+                                                    '=',
+                                                    widget.quotationId
+                                                  ]);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    }
+                                  }
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
@@ -3940,7 +3905,83 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
-                                      MsgState.data) {}
+                                      MsgState.error) {
+                                    if (responseOb?.errState ==
+                                        ErrState.severErr) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text('${responseOb?.data}'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingBloc
+                                                      .getStockMoveData(
+                                                          stockpickingId);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else if (responseOb?.errState ==
+                                        ErrState.noConnection) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/imgs/no_internet_connection_icon.png',
+                                              width: 100,
+                                              height: 100,
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'No Internet Connection'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingBloc
+                                                      .getStockMoveData(
+                                                          stockpickingId);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Text('Unknown Error'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  stockpickingBloc
+                                                      .getStockMoveData(
+                                                          stockpickingId);
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    }
+                                  }
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(
@@ -3975,7 +4016,98 @@ class _QuotationDetailMBState extends State<QuotationDetailMB> {
                                       ),
                                     );
                                   } else if (responseOb?.msgState ==
-                                      MsgState.data) {}
+                                      MsgState.error) {
+                                    if (responseOb?.errState ==
+                                        ErrState.severErr) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text('${responseOb?.data}'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  for (var stockmove
+                                                      in stockmoveList) {
+                                                    stockpickingcreateBloc
+                                                        .updateQtyDoneData(
+                                                            stockmove['id'],
+                                                            stockmove[
+                                                                'product_uom_qty']);
+                                                  }
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else if (responseOb?.errState ==
+                                        ErrState.noConnection) {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/imgs/no_internet_connection_icon.png',
+                                              width: 100,
+                                              height: 100,
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'No Internet Connection'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  for (var stockmove
+                                                      in stockmoveList) {
+                                                    stockpickingcreateBloc
+                                                        .updateQtyDoneData(
+                                                            stockmove['id'],
+                                                            stockmove[
+                                                                'product_uom_qty']);
+                                                  }
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    } else {
+                                      return Scaffold(
+                                        body: Center(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Text('Unknown Error'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  for (var stockmove
+                                                      in stockmoveList) {
+                                                    stockpickingcreateBloc
+                                                        .updateQtyDoneData(
+                                                            stockmove['id'],
+                                                            stockmove[
+                                                                'product_uom_qty']);
+                                                  }
+                                                },
+                                                child: const Text('Try Again'))
+                                          ],
+                                        )),
+                                      );
+                                    }
+                                  }
                                   return Container(
                                     color: Colors.black.withOpacity(0.5),
                                     child: Center(

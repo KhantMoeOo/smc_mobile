@@ -262,7 +262,7 @@ class _CustomerCreatePageState extends State<CustomerCreatePage> {
           if (element['id'] == rescitiesId) {
             rescitiesName = element['name'];
             rescitiesId = element['id'];
-            scheduleBloc.getTownshipListData(rescitiesId);
+            scheduleBloc.getTownshipListData(filter: ['city_id.id', '=', rescitiesId]);
             print('rescitiesName: $rescitiesName');
             print('rescitiesId: $rescitiesId');
           }

@@ -36,10 +36,10 @@ class MaterialProductLineBloc {
     getMaterialProductLineListStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Get Material Product Line List');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'material.product.line',
@@ -64,16 +64,22 @@ class MaterialProductLineBloc {
           responseOb.data = data;
           getMaterialProductLineListStreamController.sink.add(responseOb);
         } else {
-          print('error');
-          data = null;
-          print('GetMaterialProductLineListError:' +
-              res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Material Product Line List Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get Material Product Line List Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           getMaterialProductLineListStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('catch');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -87,6 +93,7 @@ class MaterialProductLineBloc {
         getMaterialProductLineListStreamController.sink.add(responseOb);
       }
     }
+      });
   }
 
   createMaterialProductLine({

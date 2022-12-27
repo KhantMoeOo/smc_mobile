@@ -329,9 +329,32 @@ class _LoginMBState extends State<LoginMB> {
                                                         ],
                                                       ));
                                                 } else {
-                                                  return const Center(
-                                                      child: Text(
-                                                          'Unknown Error'));
+                                                  return SizedBox(
+                                                      height: 50,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          const Center(
+                                                              child: Text(
+                                                                  'Unknown Error!',
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .red))),
+                                                          IconButton(
+                                                              onPressed: () {
+                                                                loginBloc
+                                                                    .getDatabasesList();
+                                                              },
+                                                              icon: const Icon(
+                                                                  Icons
+                                                                      .refresh))
+                                                        ],
+                                                      ));
                                                 }
                                               } else {
                                                 return DropdownSearch<String>(

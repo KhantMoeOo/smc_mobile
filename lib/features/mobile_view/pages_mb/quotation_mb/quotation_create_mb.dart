@@ -27,7 +27,7 @@ import 'sale_order_line_ob/sale_order_line_multi_selection_mb.dart';
 
 class QuotationCreateMB extends StatefulWidget {
   String name;
-  String userid;
+  List<dynamic> userid;
   List<dynamic> customerId;
   String dateOrder;
   String validityDate;
@@ -288,7 +288,7 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
       if (userList.isNotEmpty) {
         productBloc.getStockWarehouseData(zoneId: userList[0]['zone_id'][0]);
         quotationBloc.getCustomerList(
-          ['name', 'ilike', ''],
+          ['id', 'ilike', ''],
           ['zone_id.id', '=', userList[0]['zone_id'][0]],
         );
       }
@@ -1212,8 +1212,8 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
               appBar: AppBar(
                 backgroundColor: AppColors.appBarColor,
                 title: Text(widget.newOrEdit == 1
-                    ? '${widget.name} (${widget.userzoneId == false ? '':widget.userzoneId[1]})'
-                    : 'New (${widget.userzoneId == false ? '':widget.userzoneId[1]})'),
+                    ? '${widget.name} (${widget.userzoneId == false ? '' : widget.userzoneId[1]})'
+                    : 'New (${widget.userzoneId == false ? '' : widget.userzoneId[1]})'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -2209,8 +2209,12 @@ class _QuotationCreateMBState extends State<QuotationCreateMB> {
                                                           context: context,
                                                           initialDate:
                                                               DateTime.now(),
-                                                          firstDate:
-                                                              DateTime.now(),
+                                                          firstDate: DateTime
+                                                                  .now()
+                                                              .subtract(
+                                                                  const Duration(
+                                                                      days:
+                                                                          360)),
                                                           lastDate:
                                                               DateTime(2023));
 

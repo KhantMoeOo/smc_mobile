@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:odoo_api/odoo_api_connector.dart';
@@ -237,10 +238,10 @@ class QuotationEditBloc {
     print('checkQtyAvailable');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     checkqtyavailableStreamController.sink.add(responseOb);
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try Check Qty Available');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.callKW('sale.order', 'check_available_stock', [id]);
@@ -250,13 +251,22 @@ class QuotationEditBloc {
           responseOb.data = res.getResult();
           checkqtyavailableStreamController.sink.add(responseOb);
         } else {
-          print('checkQtyAvailable Error:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Check Qty Available Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get Check Qty Available Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           checkqtyavailableStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('catch');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -270,6 +280,7 @@ class QuotationEditBloc {
         checkqtyavailableStreamController.sink.add(responseOb);
       }
     }
+      });
   }
 
   dispose() {

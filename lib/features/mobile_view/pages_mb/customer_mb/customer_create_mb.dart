@@ -130,7 +130,7 @@ class _CustomerCreateMBState extends State<CustomerCreateMB> {
       for (var element in rescountrystateList) {
         element['country_code'] = rescountryCode;
       }
-      print('Final ResCountryState: ${rescountrystateList}');
+      print('Final ResCountryState: $rescountrystateList');
       // setLocationNameMethod();
       // getTripConfigListId();
     } else if (responseOb.msgState == MsgState.error) {
@@ -262,7 +262,7 @@ class _CustomerCreateMBState extends State<CustomerCreateMB> {
           if (element['id'] == rescitiesId) {
             rescitiesName = element['name'];
             rescitiesId = element['id'];
-            scheduleBloc.getTownshipListData(rescitiesId);
+            scheduleBloc.getTownshipListData(filter: ['city_id.id', '=', rescitiesId]);
             print('rescitiesName: $rescitiesName');
             print('rescitiesId: $rescitiesId');
           }

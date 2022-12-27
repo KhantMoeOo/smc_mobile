@@ -239,9 +239,22 @@ class _QuotationListMBState extends State<QuotationListMB> {
                       )),
                     );
                   } else {
-                    return const Scaffold(
-                      body: Center(child: Text('Unknown Error')),
-                    );
+                    return Scaffold(
+                              body: Center(child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Unknown Error'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  profileBloc.getResUsersData();
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                            );
                   }
                 } else if (responseOb.msgState == MsgState.loading) {
                   return Container(
@@ -298,7 +311,7 @@ class _QuotationListMBState extends State<QuotationListMB> {
                                             return QuotationCreateMB(
                                               quotationId: 0,
                                               name: '',
-                                              userid: '',
+                                              userid: [],
                                               customerId: [],
                                               dateOrder: '',
                                               validityDate: '',
@@ -497,7 +510,7 @@ class _QuotationListMBState extends State<QuotationListMB> {
                                                               return QuotationCreateMB(
                                                                 quotationId: 0,
                                                                 name: '',
-                                                                userid: '',
+                                                                userid: [],
                                                                 customerId: [],
                                                                 dateOrder: '',
                                                                 validityDate:
@@ -731,8 +744,7 @@ class _QuotationListMBState extends State<QuotationListMB> {
                                                           name: quotationList[i]
                                                               ['name'],
                                                           userid: quotationList[
-                                                                  i]['user_id']
-                                                              .toString(),
+                                                                  i]['user_id'],
                                                           customerId:
                                                               quotationList[i][
                                                                   'partner_id'],
@@ -1305,54 +1317,9 @@ class _QuotationListMBState extends State<QuotationListMB> {
                                             ),
                                     ],
                                   ),
-                                  // Visibility(
-                                  //   visible: isConnection == true ? false : true,
-                                  //   child: Positioned(
-                                  //       bottom: 0.0,
-                                  //       left: 0.0,
-                                  //       right: 0.0,
-                                  //       child: Container(
-                                  //         height: 50,
-                                  //         color: Colors.red,
-                                  //         child: const Center(
-                                  //           child: Text(
-                                  //             'No Internet Connection!',
-                                  //             style: TextStyle(
-                                  //                 color: Colors.black, fontSize: 20),
-                                  //           ),
-                                  //         ),
-                                  //       )),
-                                  // )
                                 ],
                               ),
                             ),
-                            // Visibility(
-                            //   visible: isConnection == true ? false : true,
-                            //   child: Positioned(
-                            //       child: Expanded(
-                            //     child: Column(
-                            //       children: [
-                            //         Expanded(
-                            //           child: Container(
-                            //             color: Colors.grey.withOpacity(.2),
-                            //           ),
-                            //         ),
-                            //         Container(
-                            //           height: 50,
-                            //           color: Colors.red,
-                            //           child: const Center(
-                            //             child: Text(
-                            //               'No Internet Connection!',
-                            //               style: TextStyle(
-                            //                   color: Colors.black,
-                            //                   fontSize: 20),
-                            //             ),
-                            //           ),
-                            //         )
-                            //       ],
-                            //     ),
-                            //   )),
-                            // ),
                           ],
                         );
                       } else if (responseOb.msgState == MsgState.error) {
@@ -1412,9 +1379,25 @@ class _QuotationListMBState extends State<QuotationListMB> {
                             )),
                           );
                         } else {
-                          return const Scaffold(
-                            body: Center(child: Text('Unknown Error')),
-                          );
+                          return Scaffold(
+                              body: Center(child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Unknown Error'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  quotationBloc.getQuotationData(
+                                            name: ['name', 'ilike', ''],
+                                            state: ['id', 'ilike', ''],
+                                            zoneId: userList[0]['zone_id'][0]);
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        )),
+                            );
                         }
                       } else {
                         return Container(

@@ -723,10 +723,67 @@ class _MaterialProductLineMultiSelectionMBState
                 ),
               );
             } else if (responseOb?.msgState == MsgState.error) {
-              return Container(
-                color: Colors.white,
-                child: const Center(child: Text('Error')),
-              );
+              if (responseOb?.errState == ErrState.severErr) {
+                          return Scaffold(
+                            body: Center(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('${responseOb?.data}'),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                TextButton(
+                                    onPressed: () {
+                                      saleorderlineBloc.getProductProductData();
+                                    },
+                                    child: const Text('Try Again'))
+                              ],
+                            )),
+                          );
+                        } else if (responseOb?.errState ==
+                            ErrState.noConnection) {
+                          return Scaffold(
+                            body: Center(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/imgs/no_internet_connection_icon.png',
+                                  width: 100,
+                                  height: 100,
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Text('No Internet Connection!'),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                TextButton(
+                                    onPressed: () {
+                                      saleorderlineBloc.getProductProductData();
+                                    },
+                                    child: const Text('Try Again'))
+                              ],
+                            )),
+                          );
+                        } else {
+                          return Center(child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Unknown Error'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  saleorderlineBloc.getProductProductData();
+                                },
+                                child: const Text('Try Again'))
+                          ],
+                        ));
+                        }
             } else {
               return Column(
                 children: [

@@ -201,10 +201,10 @@ class StockPickingCreateBloc {
     print('Call Action Confirm');
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     callActionConfirmStreamController.sink.add(responseOb);
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try Call Action Confirm');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.callKW('sale.order', 'action_confirm', [id]);
@@ -226,11 +226,10 @@ class StockPickingCreateBloc {
           print(
               'GetCall Action Confirm Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           callActionConfirmStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('catch');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -244,6 +243,7 @@ class StockPickingCreateBloc {
         callActionConfirmStreamController.sink.add(responseOb);
       }
     }
+      });
   } // Call Action Confirm
 
   updateQtyDoneData(ids, qtyDone) {
@@ -251,10 +251,10 @@ class StockPickingCreateBloc {
     ResponseOb responseOb = ResponseOb(msgState: MsgState.loading);
     updateQtyDoneStreamController.sink.add(responseOb);
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try Update Qty Done');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res =
             await odoo.write('stock.move', [ids], {'quantity_done': qtyDone});
@@ -264,13 +264,22 @@ class StockPickingCreateBloc {
           responseOb.data = res.getResult();
           updateQtyDoneStreamController.sink.add(responseOb);
         } else {
-          print('updateQtyDoneDataError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Update Qty Done Error: ${map['message']}');
+              }
+            },
+          );
+          print(
+              'Get Update Qty Done Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           updateQtyDoneStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('catch');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -284,6 +293,7 @@ class StockPickingCreateBloc {
         updateQtyDoneStreamController.sink.add(responseOb);
       }
     }
+      });
   }
 
   dispose() {

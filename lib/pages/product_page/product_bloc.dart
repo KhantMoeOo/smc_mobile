@@ -31,10 +31,10 @@ class ProductBloc {
     productListStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try get Product List');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'product.template',
@@ -63,15 +63,21 @@ class ProductBloc {
           responseOb.data = data;
           productListStreamController.sink.add(responseOb);
         } else {
-          print('error');
-          data = null;
-          print('GetProductError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Product List Error: ${map['message']}');
+              }
+            },
+          );
+          print('Get Product List Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           productListStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('catch');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -83,8 +89,8 @@ class ProductBloc {
         responseOb.msgState = MsgState.error;
         responseOb.errState = ErrState.unKnownErr;
         productListStreamController.sink.add(responseOb);
-      }
-    }
+      }}
+      });
   }
 
   getStockQuantData({locationId, productId}) {
@@ -93,10 +99,10 @@ class ProductBloc {
     stockquantStreamController.sink.add(responseOb);
     List<dynamic>? data;
 
-    try {
-      print('Try');
-      Sharef.getOdooClientInstance().then((value) async {
-        odoo = Odoo(BASEURL);
+    Sharef.getOdooClientInstance().then((value) async {
+        try{
+          print('Try get Stock QuantData');
+          odoo = Odoo(BASEURL);
         odoo.setSessionId(value['session_id']);
         OdooResponse res = await odoo.searchRead(
             'stock.quant',
@@ -117,13 +123,21 @@ class ProductBloc {
           responseOb.data = data;
           stockquantStreamController.sink.add(responseOb);
         } else {
-          print('GetStockQuantError:' + res.getErrorMessage().toString());
+          res.getError().forEach(
+            (key, value) {
+              if (key == 'data') {
+                Map map = value;
+                responseOb.data = map['message'];
+                log('Get Stock Quant Error: ${map['message']}');
+              }
+            },
+          );
+          print('Get Stock Quant Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           stockquantStreamController.sink.add(responseOb);
         }
-      });
-    } catch (e) {
+        }catch (e) {
       print('catch');
       if (e.toString().contains("SocketException")) {
         responseOb.data = "Internet Connection Error";
@@ -137,6 +151,7 @@ class ProductBloc {
         stockquantStreamController.sink.add(responseOb);
       }
     }
+      });
   }
 
   getStockWarehouseData({zoneId}) {
@@ -180,7 +195,7 @@ class ProductBloc {
           );
           print('Get Stock Warehouse Error:' + res.getError().keys.toString());
           responseOb.msgState = MsgState.error;
-          responseOb.errState = ErrState.unKnownErr;
+          responseOb.errState = ErrState.severErr;
           stockwarehouseStreamController.sink.add(responseOb);
         }
       } catch (e) {
